@@ -591,7 +591,6 @@ html, body {
   }
 
   blockquote {
-    border-top: 1px solid #AAA;
     padding: 0 !important;
   }
 
@@ -613,7 +612,6 @@ html, body {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // RESPONSIVE DESIGN
 ////////////////////////////////////////////////////////////////////////////////
 // These are the styles for phones and tablets
@@ -1016,9 +1014,14 @@ h3 .heading-title {
     color: #555;
 }
 
-p a {
+
+.content table a,
+.content li a,
+.content p a {
   color: #00757F;
 }
-p a:visited {
+.content table a:visited,
+.content li a:visited,
+.content p a:visited {
   color: #8AAAB7
 }

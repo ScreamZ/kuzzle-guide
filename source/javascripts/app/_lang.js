@@ -171,7 +171,7 @@ under the License.
     })
 
     $.each(validEls, function(k, el) {
-       $(el).before($(langSelector).clone().css('float', 'right').css('position', 'relative'));
+       $(el).before($(langSelector).clone().css('position', 'relative'));
     });
 
     $(langSelector).remove()

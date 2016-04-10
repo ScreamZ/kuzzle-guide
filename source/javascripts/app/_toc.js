@@ -19,7 +19,7 @@
       hideEffectSpeed: 180,
       ignoreSelector: '.toc-ignore',
       highlightOffset: 300,
-      scrollTo: 50,
+      scrollTo: 100,
       scrollHistory: true,
       hashGenerator: function (text, element) {
         return element.prop('id');
@@ -61,7 +61,7 @@
       });
 
       var issueTitle = 'Issue related to "' + previousSection + '/' + $(node).text() + '" section';
-      var issueLink = "https://github.com/kuzzleio/kuzzle-api-documentation/issues/new?labels=bug&title=" + encodeURIComponent(issueTitle);
+      var issueLink = "https://github.com/kuzzleio/kuzzle-guide/issues/new?labels=bug&title=" + encodeURIComponent(issueTitle);
 
       $(node).replaceWith(
         '<div class="heading">' +
@@ -77,7 +77,6 @@
             '</div>' +
           '</h2>' +
         '</div>' +
-        '<div class="right">&nbsp;</div>' +
         '<div class="clear"></div>' +
         '</div>'
       )
@@ -85,10 +84,10 @@
 
     $('h1').each(function(key, node) {
       var issueTitle = 'Issue related to "' + $(node).text() + '" section';
-      var issueLink = "https://github.com/kuzzleio/kuzzle-api-documentation/issues/new?labels=bug&title=" + encodeURIComponent(issueTitle);
+      var issueLink = "https://github.com/kuzzleio/kuzzle-guide/issues/new?labels=bug&title=" + encodeURIComponent(issueTitle);
 
       $(node).replaceWith(
-        '<div class="heading">' +
+        '<div class="heading' + ((key === 0) ? ' heading-first' : '') + '">' +
         '<div class="left">' +
           '<h1 id="' + node.id + '">' +
             '<span class="heading-title">' +
@@ -101,7 +100,6 @@
             '</div>' +
           '</h1>' +
         '</div>' +
-        '<div class="right">&nbsp;</div>' +
         '<div class="clear"></div>' +
         '</div>'
       )
@@ -111,9 +109,12 @@
       $(node).replaceWith(
         '<div class="heading">' +
         '<div class="left">' +
-        node.outerHTML +
+          '<' + node.tagName + ' id="' + node.id + '">' +
+            '<span class="heading-title">' +
+              node.innerHTML +
+            '</span>' +
+          '</' + node.tagName + '>' +
         '</div>' +
-        '<div class="right">&nbsp;</div>' +
         '<div class="clear"></div>' +
         '</div>'
       )

@@ -96,9 +96,9 @@ under the License.
       </div>
       <div class="developer-nav open">
         <ul>
-            <li><a href="/guide"><span>Guide</span></a></li>
+            <li class="active"><a href="/guide"><span>Guide</span></a></li>
             <li><a href="/sdk-documentation"><span>SDK Documentation</span></a></li>
-            <li class="active"><a href="/api-reference"><span>API Reference</span></a></li>
+            <li><a href="/api-reference"><span>API Reference</span></a></li>
         </ul>
         </div>
     </header>
@@ -118,17 +118,9 @@ under the License.
             <% end %>
           </div>
         <% end %>
-        <div class="version-selector">
-          <label>
-            select version:
-            <select>
-              <option>v1.0.x (current)</option>
-            </select>
-          </label>
-        </div>
         <% if current_page.data.search %>
           <div class="search">
-            <input type="text" class="search" id="input-search" placeholder="Search in api reference">
+            <input type="text" class="search" id="input-search" placeholder="Search in the guide">
           </div>
           <ul class="search-results"></ul>
         <% end %>

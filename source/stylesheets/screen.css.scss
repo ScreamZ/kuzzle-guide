@@ -273,7 +273,6 @@ html, body {
   // I know, it's hackish, but it's the simplist way to make the left
   // half of the content always this background color.
   .dark-box {
-    width: $examples-width;
     background-color: $examples-bg;
     position: absolute;
     right: 0;
@@ -290,8 +289,8 @@ html, body {
 
 .lang-selector {
   background-color: $lang-select-bg;
-  width: 50%;
   font-weight: bold;
+  margin: 0 40% 0 $main-padding;
   a {
     display: block;
     float:left;
@@ -336,13 +335,11 @@ html, body {
   }
 
   &>h1, &>h2, &>h3, &>h4, &>h5, &>h6, &>p, &>table, &>ul, &>ol, &>aside, &>dl {
-    margin-right: $examples-width;
     padding: 0 $main-padding;
     box-sizing: border-box;
     display: block;
     @include text-shadow($main-embossed-text-shadow);
 
-    @extend %left-col;
   }
 
   &>ul, &>ol {
@@ -372,7 +369,7 @@ html, body {
     font-size: 20px;
     margin-top: 4em;
     margin-bottom: 0;
-    border-top: 1px solid #aaa;
+    border-top: 60px solid #EEE;
     padding-top: 1.2em;
     padding-bottom: 1.2em;
     background-image: linear-gradient(to bottom, rgba(#fff, 0.6), rgba(#fff, 0));
@@ -410,35 +407,15 @@ html, body {
   .heading {
     clear: both;
 
-    .left {
-      width: 50%;
-      float: left;
-      clear: left;
+    .left {;
       &>h1 {
-        border-top: 1px solid #aaa;
+        border-top: solid 100px #EEE;
       }
-      &>h2 {
+      &>h2, &>h3 {
         padding: 1.2em 0 1.2em 25px;
       }
     }
 
-    .right {
-      float: right;
-      clear: right;
-      width: 50%;
-      text-align: right;
-      color: #AAA;
-      &>h1 {
-        border-top: 1px solid #CCC;
-        background: #EEE;
-        color: #EEE;
-      }
-      &>h2 {
-        padding: 1.2em 25px 1.2em 0;
-        border-top: 1px solid #000;
-        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-      }
-    }
   }
 
   .clear {
@@ -515,11 +492,9 @@ html, body {
   }
 
   aside {
-    padding-top: 1em;
-    padding-bottom: 1em;
+    padding: 1.5em;
     @include text-shadow(0 1px 0 lighten($aside-notice-bg, 15%));
-    margin-top: 1.4em;
-    margin-bottom: 1.5em;
+    margin: 1.4em 40% 1.5em $main-padding;
     background: $aside-notice-bg;
     line-height: 1.6;
     clear: left;
@@ -572,6 +547,9 @@ html, body {
 // This is all the stuff that appears in the right half of the page
 
 .content {
+  border-right: solid 30px #EEE;
+  border-bottom: solid 60px #EEE;
+
   pre, blockquote {
     background-color: $code-bg;
     color: #fff;
@@ -579,11 +557,8 @@ html, body {
     position: relative;
 
     padding: 2em $main-padding;
-    margin: 0;
-    width: $examples-width;
+    margin: 0 40% 0 $main-padding;
 
-    float:right;
-    clear:right;
 
     box-sizing: border-box;
     @include text-shadow(0px 1px 2px rgba(0,0,0,0.4));
@@ -618,7 +593,6 @@ html, body {
   blockquote {
     border-top: 1px solid #AAA;
     padding: 0 !important;
-    margin: 0;
   }
 
   blockquote {
@@ -630,6 +604,12 @@ html, body {
       border-top: 1px solid #000;
       border-bottom: 1px solid #404040;
     }
+  }
+
+
+
+  p {
+    margin-top: 20px;
   }
 }
 
@@ -924,15 +904,12 @@ header nav ul li a.github .icon:after {
   left: 0;
   right: 0;
 }
-.container .content .heading .right > h2 {
-  border-top: 1px solid #CCC;
-  color: #EEE;
-}
 .container .page-wrapper {
     background-color: rgba(250, 250, 250, 1);
 }
 .container .page-wrapper .lang-selector {
   border-bottom: 4px solid #00757F;
+  margin-top: 20px;
 }
 .container .page-wrapper .dark-box {
   background-color: #EEE;
@@ -944,7 +921,7 @@ header nav ul li a.github .icon:after {
 .container .tocify-wrapper {
   top: 125px;
   background: rgba(250, 250, 250, 1);
-  border-right: solid 1px #CCC;
+  border-right: solid 30px #EEE;
 }
 .container .tocify-wrapper .search-results {
   background: #EEE;
@@ -992,11 +969,14 @@ header nav ul li a.github .icon:after {
 h1 .heading-title {
     border-left: solid 21px #00757F;
 }
+h3 .heading-title {
+  border-left: dotted 3px #45B29D;
+}
 .heading-links {
-    display: inline-block;
-    float: right;
-    padding: 0 20px 0 0;
-    opacity: 0.5;
+  display: inline-block;
+  padding: 0 20px 0px 10px;
+  opacity: 0.5;
+  vertical-align: 5px;
 }
 .heading-links:hover {
     opacity: 1;
@@ -1026,4 +1006,19 @@ h1 .heading-title {
 }
 .version-selector label {
     font-size: 12px;
+}
+.content .heading-first h1 {
+    margin-top: 0;
+    border-top: 30px solid #EEE !important;
+}
+.content p, .content li, .content dt, .content dd {
+    font-size: 15px;
+    color: #555;
+}
+
+p a {
+  color: #00757F;
+}
+p a:visited {
+  color: #8AAAB7
 }

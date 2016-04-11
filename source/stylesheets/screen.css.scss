@@ -96,7 +96,7 @@ html, body {
       padding: 6px 0 6px 20px;
       box-sizing: border-box;
       margin: $nav-v-padding $nav-padding;
-      width: $nav-width - 30;
+      width: $nav-width - 65;
       outline: none;
       color: $nav-text;
       border-radius: 0; /* ios has a default border radius */
@@ -339,7 +339,10 @@ html, body {
     box-sizing: border-box;
     display: block;
     @include text-shadow($main-embossed-text-shadow);
+  }
 
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Raleway";
   }
 
   &>ul, &>ol {
@@ -369,10 +372,14 @@ html, body {
     font-size: 20px;
     margin-top: 4em;
     margin-bottom: 0;
-    border-top: 60px solid #EEE;
+    border-top: 40px solid #EEE;
     padding-top: 1.2em;
     padding-bottom: 1.2em;
     background-image: linear-gradient(to bottom, rgba(#fff, 0.6), rgba(#fff, 0));
+  }
+
+  h3 {
+    border-top: 10px solid #EEE;
   }
 
   // h2s right after h1s should bump right up
@@ -413,6 +420,9 @@ html, body {
       }
       &>h2, &>h3 {
         padding: 1.2em 0 1.2em 25px;
+      }
+      &>h4, &>h5, &>h6 {
+        padding: 0 0 0 25px;
       }
     }
 
@@ -557,7 +567,7 @@ html, body {
     position: relative;
 
     padding: 2em $main-padding;
-    margin: 0 40% 0 $main-padding;
+    margin: 10px 40% 0 $main-padding;
 
 
     box-sizing: border-box;
@@ -807,18 +817,191 @@ header nav li.active span {
 }
 
 /** header github **/
+
 .icon {
-    font-family: 'kuzzle-icon', 'icomoon';
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    font-size: 36px;
-    color: #FFFFFF;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: 'kuzzle-icon', 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  font-size: 36px;
+  color: #FFFFFF;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon.icon-x-small {
+  font-size: 12px;
+}
+.icon.icon-small {
+  font-size: 18px;
+}
+.icon.icon-medium {
+  font-size: 26px;
+}
+.icon.icon-large {
+  font-size: 45px;
+}
+.icon.icon-yellow {
+  color: #EFC94C;
+}
+.icon.icon-light {
+  color: #45B29D;
+}
+.icon.icon-dark {
+  color: #004B52;
+}
+.icon.icon-grey {
+  color: #33393F;
+}
+.icon.icon-middle {
+  vertical-align: middle;
+}
+.icon.icon-sub {
+  vertical-align: sub;
+}
+.icon.icon-tooltip {
+  padding: 0 10px 0 10px;
+  display: inline-block;
+}
+.icon.icon-play_arrow:before {
+  content: "\e01b";
+}
+.icon.icon-download-alt:before {
+  content: "\e0ff";
+}
+.icon.icon-arrow-down:before {
+  content: "\e10f";
+}
+.icon.icon-arrow-up:before {
+  content: "\e112";
+}
+.icon.icon-menu:before {
+  content: "\e20e";
+}
+.icon.icon-code:before {
+  content: "\e284";
+}
+.icon.icon-settings_ethernet:before {
+  content: "\e2d1";
+}
+.icon.icon-reading:before {
+  content: "\e620";
+}
+.icon.icon-collaboration:before {
+  content: "\e616";
+}
+.icon.icon-diploma1:before {
+  content: "\e617";
+}
+.icon.icon-download2:before {
+  content: "\e618";
+}
+.icon.icon-external:before {
+  content: "\e619";
+}
+.icon.icon-info:before {
+  content: "\e61a";
+}
+.icon.icon-left-round:before {
+  content: "\e61b";
+}
+.icon.icon-left-arrow:before {
+  content: "\e61c";
+}
+.icon.icon-right-round:before {
+  content: "\e61b";
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  display: inline-block;
+}
+.icon.icon-right-arrow:before {
+  content: "\e61c";
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  display: inline-block;
+}
+.icon.icon-puzzle:before {
+  content: "\e61d";
+}
+.icon.icon-checkmark:before {
+  content: "\e61e";
+}
+.icon.icon-contacts:before {
+  content: "\e61f";
+}
+.icon.icon-linkedin:before {
+  content: "\e615";
+}
+.icon.icon-cancel:before {
+  content: "\e614";
+}
+.icon.icon-quote-alt:before {
+  content: "\e613";
+}
+.icon.icon-alert:before {
+  content: "\e60f";
+}
+.icon.icon-bookmark:before {
+  content: "\e610";
+}
+.icon.icon-check:before {
+  content: "\e611";
+}
+.icon.icon-star:before {
+  content: "\e612";
+}
+.icon.icon-idea:before {
+  content: "\e60e";
+}
+.icon.icon-download:before {
+  content: "\e60d";
+}
+.icon.icon-ask:before {
+  content: "\e600";
+}
+.icon.icon-buisiness:before {
+  content: "\e601";
+}
+.icon.icon-doc:before {
+  content: "\e602";
+}
+.icon.icon-email:before {
+  content: "\e603";
+}
+.icon.icon-games:before {
+  content: "\e604";
+}
+.icon.icon-get-started:before {
+  content: "\e605";
+}
+.icon.icon-github:before {
+  content: "\e606";
+}
+.icon.icon-iot:before {
+  content: "\e607";
+}
+.icon.icon-mobile:before {
+  content: "\e608";
+}
+.icon.icon-quote:before {
+  content: "\e609";
+}
+.icon.icon-social-media:before {
+  content: "\e60a";
+}
+.icon.icon-twitter:before {
+  content: "\e60b";
+}
+.icon.icon-websites:before {
+  content: "\e60c";
+}
+.icon.icon-eye-plus:before {
+  content: "\e900";
 }
 
 .icon.icon-small {
@@ -960,21 +1143,45 @@ header nav ul li a.github .icon:after {
 
 
 .heading-title {
-    border-left: solid 7px #45B29D;
-    padding-left: 10px;
-    display: inline-block;
+  border-left: solid 7px #45B29D;
+  padding-left: 10px;
+  display: inline-block;
 }
 h1 .heading-title {
-    border-left: solid 21px #00757F;
+  border-left: solid 21px #00757F;
+  font-weight: 800;
+}
+h2 .heading-title {
+  font-weight: 700;
 }
 h3 .heading-title {
   border-left: dotted 3px #45B29D;
+  font-size: 16px;
+  font-weight: 700;
+}
+h4 .heading-title {
+  border-left: solid 3px #CCC;
+  padding-left: 10px !important;
+  border-bottom: none !important;
+  font-weight: 600;
+}
+h5 .heading-title {
+  border-left: dotted 3px #DDD;
+  padding-left: 10px !important;
+  border-bottom: none !important;
+  font-weight: 500;
 }
 .heading-links {
   display: inline-block;
-  padding: 0 20px 0px 10px;
+  padding: 0 20px 0 10px;
   opacity: 0.5;
   vertical-align: 5px;
+}
+h2 .heading-links {
+  vertical-align: 2px;
+}
+h3 .heading-links {
+  vertical-align: 2px;
 }
 .heading-links:hover {
     opacity: 1;
@@ -1024,4 +1231,54 @@ h3 .heading-title {
 .content li a:visited,
 .content p a:visited {
   color: #8AAAB7
+}
+
+.content .panels {
+  padding: 35px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+.content .panel {
+  display: inline-block;
+  width: 30%;
+}
+.content .panel a {
+  text-decoration: none;
+  margin: 10px 20px 30px 20px;
+  display: block;
+  padding: 15px 25px;
+  border: solid 1px #DDD;
+  background-color: #FFF;
+  animation: 1s all;
+  box-shadow: 0;
+}
+.content .panel a:hover {
+  box-shadow: 2px 2px 12px 0 rgba(0, 0, 0, 0.2);
+}
+.content .panel-title {
+  color: #111;
+  text-decoration: none !important;
+  font-family: Raleway;
+  font-weight: 700;
+  font-size: 20px;
+}
+.content .panel-title .icon {
+  color: #00757F;
+  vertical-align: -8px;
+  margin-right: 7px;
+}
+.panel-content {
+  color: #555;
+  padding: 25px 0 10px 0;
+}
+.panel-content button {
+  display: block;
+  margin-top: 24px;
+  background-color: #45B29D;
+  color: #FFF;
+  width: 100%;
+  border: none;
+  padding: 7px 30px;
 }

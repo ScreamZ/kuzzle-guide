@@ -11,7 +11,7 @@
 
   var makeToc = function() {
     global.toc = $("#toc").tocify({
-      selectors: 'h1, h2',
+      selectors: 'h1, h2, h3',
       extendPage: false,
       theme: 'none',
       smoothScroll: false,
@@ -51,6 +51,43 @@
       global.toc.calculateHeights();
     });
 
+    $('h3').each(function(key, node) {
+      var previousSection = '';
+      var previousSubSection = '';
+      var subheadings = $(node).prevAll('h2');
+      var headings = $(node).prevAll('h1');
+
+      $.each(subheadings, function(k, el) {
+        previousSubSection = el.innerHTML;
+        return false;
+      });
+
+      $.each(headings, function(k, el) {
+        previousSection = el.innerHTML;
+        return false;
+      });
+
+      var issueTitle = 'Issue related to "' + previousSection + '/' +  previousSubSection + '/' + $(node).text() + '" section';
+      var issueLink = "https://github.com/kuzzleio/kuzzle-guide/issues/new?labels=bug&title=" + encodeURIComponent(issueTitle);
+
+      $(node).replaceWith(
+        '<div class="heading">' +
+        '<div class="left">' +
+          '<h3 id="' + node.id + '">' +
+            '<span class="heading-title">' +
+              node.innerHTML +
+            '</span>' +
+            '<div class="heading-links">' +
+              '<a target="_blank" rel="external" href="' + issueLink + '" title=\'' + issueTitle + '\'>' +
+                '<i class="icon icon-github icon-small"></i>report an issue' +
+              '</a>' +
+            '</div>' +
+          '</h3>' +
+        '</div>' +
+        '</div>'
+      )
+    });
+
     $('h2').each(function(key, node) {
       var previousSection = '';
       var headings = $(node).prevAll('h1');
@@ -77,10 +114,9 @@
             '</div>' +
           '</h2>' +
         '</div>' +
-        '<div class="clear"></div>' +
         '</div>'
       )
-    })
+    });
 
     $('h1').each(function(key, node) {
       var issueTitle = 'Issue related to "' + $(node).text() + '" section';
@@ -100,12 +136,11 @@
             '</div>' +
           '</h1>' +
         '</div>' +
-        '<div class="clear"></div>' +
         '</div>'
       )
-    })
+    });
 
-    $('h3, h5, h6').each(function(key, node) {
+    $('h4, h5, h6').each(function(key, node) {
       $(node).replaceWith(
         '<div class="heading">' +
         '<div class="left">' +
@@ -115,7 +150,6 @@
             '</span>' +
           '</' + node.tagName + '>' +
         '</div>' +
-        '<div class="clear"></div>' +
         '</div>'
       )
     })

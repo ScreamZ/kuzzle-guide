@@ -22,7 +22,8 @@ under the License.
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title><%= current_page.data.title || "API Documentation" %></title>
 
-    <link href='http://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600' rel='stylesheet' type='text/css'>
     <%= stylesheet_link_tag :screen, media: :screen %>
     <%= stylesheet_link_tag :print, media: :print %>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -101,7 +102,10 @@ under the License.
             <li><a href="/sdk-documentation"><span>SDK Documentation</span></a></li>
             <li><a href="/api-reference"><span>API Reference</span></a></li>
         </ul>
+        <div class="search">
+          <input type="text" class="search" id="input-search" tabindex="1" placeholder="Search in the guide">
         </div>
+      </div>
     </header>
 
     <div class="container">
@@ -120,9 +124,6 @@ under the License.
           </div>
         <% end %>
         <% if current_page.data.search %>
-          <div class="search">
-            <input type="text" class="search" id="input-search" placeholder="Search in the guide">
-          </div>
           <ul class="search-results"></ul>
         <% end %>
         <div id="toc">

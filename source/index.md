@@ -31,7 +31,7 @@ Welcome to the Kuzzle developer guide
 <div class="panels">
 
 <div class="panel">
-    <a href="#">
+    <a href="#quickstart">
         <div class="panel-title"><i class="icon icon-play_arrow"></i> Quickstart</div>
         <div class="panel-content">
             <span>First steps into Kuzzle</span>
@@ -41,7 +41,7 @@ Welcome to the Kuzzle developer guide
 </div>
 
 <div class="panel">
-    <a href="#">
+    <a href="#tutorial">
         <div class="panel-title"><i class="icon icon-code"></i> Tutorial: Klack</div>
         <div class="panel-content">
             <span>Build an application step by step</span>
@@ -51,7 +51,7 @@ Welcome to the Kuzzle developer guide
 </div>
 
 <div class="panel">
-    <a href="#">
+    <a href="#basics">
         <div class="panel-title"><i class="icon icon-get-started"></i> Basics</div>
         <div class="panel-content">
             <span>Learn more about Kuzzle</span>
@@ -61,7 +61,7 @@ Welcome to the Kuzzle developer guide
 </div>
 
 <div class="panel">
-    <a href="#">
+    <a href="#cookbook">
         <div class="panel-title"><i class="icon icon-reading"></i> Cookbook</div>
         <div class="panel-content">
             <span>Usefull concepts with Kuzzle</span>

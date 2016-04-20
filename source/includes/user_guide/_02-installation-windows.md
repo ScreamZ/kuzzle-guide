@@ -1,4 +1,4 @@
-## Install on Windows™
+## Install on Windows
 
 ### Using Docker
 
@@ -13,7 +13,7 @@
 
 Clone the Kuzzle Git repo:
 
-```shell
+```bash
 git clone https://github.com/kuzzleio/kuzzle.git
 ```
 
@@ -21,17 +21,17 @@ git clone https://github.com/kuzzleio/kuzzle.git
 
 Go into the kuzzle directory and launch it:
 
-```shell
+```bash
 cd kuzzle && docker-compose up
 ```
 
 A bunch of logs should appear, and the last line should ends with 
 
-```shell
+```bash
 log:info: == DB preparation done.
 ```
 
-Then you can type ```http://<docker-machine IP>:7511/api/1.0``` and you should read 
+Then you can access ```http://<docker-machine IP>:7511/api/1.0``` in your browser and you should read 
 
 ```javascript
 {

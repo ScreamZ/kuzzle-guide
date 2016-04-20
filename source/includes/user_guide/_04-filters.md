@@ -1,7 +1,6 @@
 ## Filtering Syntax
 
-For real-time subscription we use a sub language of Elasticsearch DSL, only for [Filters](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-filters.html). Queries are not implemented and will not be.
-For a list of available filters in real-time see [Real-time implemented filters](#real-time-filters)
+For real-time subscription we use a sub language of Elasticsearch DSL, only for [Filters](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-filters.html).
 
 For no-real-time, like search, get, etc, we directly pass information to Elasticsearch. You can use the whole [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
 
@@ -13,7 +12,7 @@ The and filter allow to filter documents on two or more terms.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -30,7 +29,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the first document: 
 
-```
+```javascript
 {
   and: [
     {
@@ -47,7 +46,7 @@ The following filter can be made, and will be validated on the first document:
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
 ```js
 var filter = {
@@ -79,7 +78,7 @@ A filter that matches documents matching boolean combinations of other queries.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -105,7 +104,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the second document: 
 
-```
+```javascript
 bool: {
   must : [
     {
@@ -144,9 +143,9 @@ bool: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
     bool: {
       must : [
@@ -200,7 +199,7 @@ Returns documents that have at least one non-null value in the original field.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -218,7 +217,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the first document: 
 
-```
+```javascript
 {
   exists: {
     field: 'alive'
@@ -226,7 +225,7 @@ The following filter can be made, and will be validated on the first document:
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
 ```js
 var filter = {
@@ -249,7 +248,7 @@ Returns documents that have only null values or no value in the original field
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -267,7 +266,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the second document:
  
-```
+```javascript
 {
   missing: {
     field: 'alive'
@@ -275,7 +274,7 @@ The following filter can be made, and will be validated on the second document:
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
 ```js
 var filter = {
@@ -298,7 +297,7 @@ A filter that filters out matched documents.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -325,9 +324,9 @@ The following filter can be made, and will be validated on the first document:
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   not: {
     term: {
@@ -350,7 +349,7 @@ A filter that matches documents using the OR boolean operator on other filters.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -373,7 +372,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the first and second documents: 
 
-```
+```javascript
 {
   or: {
     term: {
@@ -388,9 +387,9 @@ The following filter can be made, and will be validated on the first and second 
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   or: {
     term: {
@@ -418,7 +417,7 @@ Filters documents that have fields that contain a term.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper'
@@ -431,15 +430,15 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the first document: 
 
-```
+```javascript
 term: {
   firstName: 'Grace'
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   term: {
     firstName: 'Grace'
@@ -460,7 +459,7 @@ Filters documents that have fields that match any of the provided terms.
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper'
@@ -477,15 +476,15 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the two first documents: 
 
-```
+```javascript
 terms: {
   firstName: ['Grace', 'Ada']
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   term: {
     firstName: ['Grace', 'Ada']
@@ -506,7 +505,7 @@ Filters documents that only have the provided ids.
 
 Given the following documents:
 
-```
+```javascript
 {
   _id: 'a',
   firstName: 'Grace',
@@ -526,15 +525,15 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the first document: 
 
-```
+```javascript
 ids: {
   values: ['a']
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   term: {
     firstName: ['Grace', 'Ada']
@@ -565,7 +564,7 @@ The range filter accepts the following parameters:
 
 Given the following documents:
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -591,7 +590,7 @@ Given the following documents:
 
 The following filter can be made, and will be validated on the two last documents, not the first: 
 
-```
+```javascript
 range: {
   age: {
     gte: 36,
@@ -600,9 +599,9 @@ range: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```js
+```javascript
 var filter = {
   range: {
     age: {
@@ -638,11 +637,11 @@ There are some inherent objects and concepts wich are good to understand before 
 A point is... well you know, a point, defined by a longitude and a latitude.
 The following notations are valid: 
 
-```
+```javascript
 { lat: -74.1, lon: 40.73 }
 ```
 
-```
+```javascript
 { latLon: { lat: 40.73, lon: -74.1 } }
 ```
 
@@ -650,7 +649,7 @@ The following notations are valid:
 When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
 </aside>
 
-```
+```javascript
 { latLon: [ -74.1, 40.73 ] }
 ```
 
@@ -658,13 +657,13 @@ When cooddinates are in array format, the format is [lon, lat] to comply with [E
 As a string, the coordinates format is "lat, lon"
 </aside>
 
-```
+```javascript
 { latLon: "40.73, -74.1" }
 ```
 
 Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
-```
+```javascript
 { latLon: "dr5r9ydj2" }
 ```
 
@@ -677,7 +676,7 @@ A bounding box (also known as BBox) is a 2D box that can be defined via:
 
 All of these representations are defining the same BBox: 
 
-```
+```javascript
 {
   top: -74.1,
   left: 40.73,
@@ -686,7 +685,7 @@ All of these representations are defining the same BBox:
 }
 ```
 
-```
+```javascript
 {
   topLeft: { lat: 40.73, lon: -74.1 },
   bottomRight: { lat: 40.01, lon: -71.12 }
@@ -697,7 +696,7 @@ All of these representations are defining the same BBox:
 When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
 </aside>
 
-```
+```javascript
 {
   topLeft: [ -74.1, 40.73 ], 
   bottomRight: [ -71.12, 40.01 ]
@@ -708,7 +707,7 @@ When cooddinates are in array format, the format is [lon, lat] to comply with [E
 As a string, the coordinates format is "lat, lon"
 </aside>
 
-```
+```javascript
 {
   topLeft: "40.73, -74.1", 
   bottomRight: "40.01, -71.12"
@@ -717,7 +716,7 @@ As a string, the coordinates format is "lat, lon"
 
 Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
-```
+```javascript
 {
   topLeft: "dr5r9ydj2", 
   bottomRight: "drj7teegp"
@@ -732,7 +731,7 @@ For each polygon points, all the possible point notations are valid.
 
 Example of a valid polygon representation: 
 
-```
+```javascript
 {
   points: [
     [0,0],
@@ -780,7 +779,7 @@ Filter documents wich have a location field and are located into a [bounding box
 
 Given the following documents: 
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -797,7 +796,7 @@ Given the following documents:
 
 The following filter will match the second document only:
 
-```
+```javascript
 geoBoundingBox: {
   location: {
     top: -2.939744,
@@ -808,9 +807,9 @@ geoBoundingBox: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```
+```javascript
 var filter = {
   geoBoundingBox: {
     location: {
@@ -838,7 +837,7 @@ Filter documents wich have a location field and are located into a given [distan
 
 Given the following documents: 
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -855,7 +854,7 @@ Given the following documents:
 
 The following filter will match the second document only:
 
-```
+```javascript
 geoDistance: {
   location: {
     lat: 51.5029017,
@@ -865,9 +864,9 @@ geoDistance: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```
+```javascript
 var filter = {
   geoDistance: {
     location: { // Buckingham Palace
@@ -895,7 +894,7 @@ Filter documents wich have a location field and are located into a given [distan
 
 Given the following documents: 
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -912,7 +911,7 @@ Given the following documents:
 
 The following filter will match the second document only:
 
-```
+```javascript
 geoDistanceRange: {
   location: {
     lat: 51.5029017,
@@ -923,9 +922,9 @@ geoDistanceRange: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```
+```javascript
 var filter = {
   geoDistanceRange: {
     location: { // Buckingham Palace
@@ -953,7 +952,7 @@ Filter documents wich have a location field and are located into a given [polygo
 
 Given the following documents: 
 
-```
+```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
@@ -970,7 +969,7 @@ Given the following documents:
 
 The following filter will match the second document only:
 
-```
+```javascript
 geoPolygon: {
   location: {
     points: [
@@ -984,9 +983,9 @@ geoPolygon: {
 }
 ```
 
-With the [JavaScript SDK](http://kuzzleio.github.io/sdk-documentation/#subscribe):
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
-```
+```javascript
 var filter = {
   geoPolygon: {
     location: {

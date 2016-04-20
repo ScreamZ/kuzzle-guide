@@ -10,25 +10,45 @@ If you are running Docker and just want to get your own Kuzzle running, you can 
 * [Docker](https://docs.docker.com/installation/#installation)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-From Kuzzle's root directory:
+<aside class="notice">
+You don't have to clone kuzzle to use it.
+</aside>
 
-```shell
-$ docker-compose up
+- Create a `docker-compose.yml` with:
+
+```yml
+kuzzle:
+  image: kuzzleio/kuzzle:latest
+  ports:
+    - "7512:7512"
+    - "7511:7511"
+  links:
+    - elasticsearch
+    - redis
+
+redis:
+  image: redis:3.0
+
+elasticsearch:
+  image: elasticsearch:2.2
 ```
 
-#### Reset Kuzzle with Docker
+<aside class="notice">
+You can also retrieve this file directly with curl/wget : <br />
+<code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
+</aside>
 
-If you need to get a fresh start with all persistent data erased, from Kuzzle's root directory:
+- run: 
 
-```shell
-$ LIKE_A_VIRGIN=1 docker-compose up
+```bash
+$ docker-compose up
 ```
 
 #### Reset Kuzzle and insert some fixtures with Docker
 
-If you need to get a fresh start with all persistent data erased and populate it with default fixtures, from Kuzzle's root directory:
+If you need to get a fresh start with all persistent data erased and populate it with default fixtures, set the <code>FIXTURES</code> environment variable like:
 
-```shell
+```bash
 $ FIXTURES=path/to/the/fixtures/file.json docker-compose up
 ```
     
@@ -64,10 +84,10 @@ Remember that the fixtures must be in the Docker container scope !
 
 #### Initialize Kuzzle mapping with Docker
 
-If you need to add a default mapping on Kuzzle start, from Kuzzle's root directory:
+If you need to add a default mapping on Kuzzle start, set the <code>DEFAULT_MAPPING</code> environment variable like:
 
-```shell
-$ FIXTURES=path/to/the/fixtures/file.json DEFAULT_MAPPING=path/to/the/mapping/file.json docker-compose up
+```bash
+$ DEFAULT_MAPPING=path/to/the/mapping/file.json docker-compose up
 ```
 
 examples:
@@ -90,8 +110,8 @@ Remember that the default mapping must be in the Docker container scope !
 
 You can, of course, use all those option altogether like:
 
-```shell
-$ LIKE_A_VIRGIN=1 FIXTURES=fixtures/file.json DEFAULT_MAPPING=mapping/file.json docker-compose up
+```bash
+$ FIXTURES=fixtures/file.json DEFAULT_MAPPING=mapping/file.json docker-compose up
 ```
 
 #### Useful tips
@@ -101,7 +121,7 @@ $ LIKE_A_VIRGIN=1 FIXTURES=fixtures/file.json DEFAULT_MAPPING=mapping/file.json 
 
 When you already have installed an old version of kuzzle, don't forget to update kuzzle's containers with:
 
-```shell
+```bash
 $ docker-compose -f <docker-compose-file.yml> pull 
 ```
 
@@ -109,7 +129,7 @@ $ docker-compose -f <docker-compose-file.yml> pull
 
 To ensure that Kuzzle's dependencies are up-to-date, run the command directly without log-in into the container:
 
-```shell
+```bash
 $ docker exec -ti <docker-compose-file.yml> run kuzzle npm install
 $ docker exec -ti <docker-compose-file.yml> run kuzzle bin/kuzzle install
 ```
@@ -126,13 +146,15 @@ Prerequisites:
 
 From the root directory:
 
-```shell
-    $ vagrant up
+```bash
+$ vagrant up
 ```
 
 ### Manual install
 
-**Note:** we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
+<aside class="notice">
+we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
+</aside> 
 
 #### Prerequisites
 
@@ -144,14 +166,14 @@ From the root directory:
 
 Retrieve the Kuzzle source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle.git):
 
-```shell
+```bash
 $ git clone https://github.com/kuzzleio/kuzzle.git
 $ cd kuzzle
 ```
 
 then install the dependencies:
 
-```shell
+```bash
 $ npm install
 ```
 
@@ -159,7 +181,7 @@ $ npm install
 
 Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:
 
-```shell
+```bash
 $ export READ_ENGINE_HOST=localhost:9200
 $ export WRITE_ENGINE_HOST=localhost:9200
 $ export CACHE_HOST=localhost
@@ -171,7 +193,7 @@ $ export CACHE_PORT=6379
 
 Install the default plugins:
 
-```shell
+```bash
 $ ./bin/kuzzle install
 ```
 
@@ -179,25 +201,25 @@ $ ./bin/kuzzle install
 
 Start a server instance:
 
-```shell
+```bash
 $ ./bin/kuzzle start --server
 ```
 
 And then start as many worker instances as you want. At least one worker is required:
 
-```shell
+```bash
 $ bin/kuzzle start --worker
 ```
 
 For more information, you can execute:
 
-```shell
+```bash
 $ bin/kuzzle start --help
 ```
 
 #### All steps in one
 
-```shell
+```bash
 $ git clone https://github.com/kuzzleio/kuzzle.git
 $ cd kuzzle
 $ npm install
@@ -218,7 +240,7 @@ Kuzzle comes along with a [CLI](https://en.wikipedia.org/wiki/Command-line_inter
 
 To get a list of available options, you can run
 
-```shell
+```bash
 $ ./bin/kuzzle start -h
 ```
 
@@ -228,7 +250,7 @@ If you are running some of the service(s) externally, you can configure their ho
 
 examples:
 
-```shell
+```bash
 # Elastic Search (read/write engine):
 $ export READ_ENGINE_HOST=myelasticsearch:9200
 $ export WRITE_ENGINE_HOST=myelasticsearch:9200

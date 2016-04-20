@@ -484,7 +484,7 @@ html, body {
   }
 
   img {
-    max-width: 100%;
+    max-width: 60%;
   }
 
   code {
@@ -502,24 +502,46 @@ html, body {
   }
 
   aside {
-    padding: 1.5em;
-    @include text-shadow(0 1px 0 lighten($aside-notice-bg, 15%));
-    margin: 1.4em 40% 1.5em $main-padding;
-    background: $aside-notice-bg;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    @include text-shadow(0 1px 0 #01484E);
+    margin-top: 1.4em;
+    margin-bottom: 1.5em;
+    background: #00757F;
+    color: #D4E7E8;
     line-height: 1.6;
     clear: left;
+    position: relative;
+
+    &.notice {
+      * {
+        text-shadow: 0 1px 0 #01484E;
+        color: #D4E7E8;
+      }
+    }
 
     &.warning {
       //background-color: $aside-warning-bg;
       //@include text-shadow(0 1px 0 lighten($aside-warning-bg, 15%));
-      background-color: #c97a7e;
-      text-shadow: none;
-      color: #222;
+      background-color: #d54f58;
+      text-shadow: 0 1px 0 #9E2029;
+      color: #F9EAEB;
+
+      * {
+        text-shadow: 0 1px 0 #9E2029;
+        color: #F9EAEB;
+      }
     }
 
     &.success {
-      background-color: $aside-success-bg;
-      @include text-shadow(0 1px 0 lighten($aside-success-bg, 15%));
+      background-color: #45B29D;
+      text-shadow: 0 1px 0 #288C79;
+      color: #DAF3EE;
+
+      * {
+        text-shadow: 0 1px 0 #288C79;
+        color: #DAF3EE;
+      }
     }
   }
 
@@ -527,6 +549,10 @@ html, body {
     vertical-align: middle;
     padding-right: 0.5em;
     font-size: 14px;
+
+    position: absolute;
+    top: 18px;
+    left: 10px;
   }
 
   aside.notice:before {
@@ -559,6 +585,7 @@ html, body {
 .content {
   border-right: solid 30px #EEE;
   border-bottom: solid 60px #EEE;
+  padding-bottom: 40px;
 
   pre, blockquote {
     background-color: $code-bg;
@@ -1231,6 +1258,11 @@ h3 .heading-links {
 .content li a:visited,
 .content p a:visited {
   color: #8AAAB7
+}
+.content aside a:visited,
+.content aside a {
+  color: #FFF;
+  font-weight: 600;
 }
 
 .content .panels {

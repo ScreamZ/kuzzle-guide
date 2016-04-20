@@ -16,12 +16,13 @@ You can then use the Back Office to administrate your user rights.
 The first step to secure your data is to be able to identify your users. Kuzzle ships by default with a local login/password strategy.
 
 Kuzzle uses [passportjs](http://passportjs.org/) to enable authentication with a potentially large amount of providers, for example:
-* local username/password authentication (enabled by default)
-* oauth2 providers like github or google
-* SAML providers
-* etc.
 
-You can also use Kuzzle's [Github authentication plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github) or [develop your own](./authentication.md).
+- local username/password authentication (enabled by default)
+- oauth2 providers like github or google
+- SAML providers
+- etc.
+
+You can also use Kuzzle's [Github authentication plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github) or develop your own.
 
 #### How it works
 
@@ -30,102 +31,9 @@ Kuzzle provides a **auth** controller which delegates the authentication strateg
 If the passportjs _authenticate_ method resolves an existing user, Kuzzle generates a [JSON Web Token](https://tools.ietf.org/html/rfc7519) that should be used in subsequent requests.
 
 See more details:
-* [Authentication scenarios](../request_scenarios/auth.md)
-* [Kuzzle API Documentation about Auth Controller](http://kuzzleio.github.io/kuzzle-api-documentation/#auth-controller) and [JWT token usage](http://kuzzleio.github.io/kuzzle-api-documentation/#authorization-header) in Kuzzle requests.
 
-#### How to provide your own strategy
-
-Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see [plugins documentation](../plugins.md)).
-
-Take example in [Passport Local plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local), an authentication plugin must provide following steps:
-
-##### The strategy module
-
-This module is a wrapper to the needed passportjs strategy:
-
-```javascript
-// lib/passport/strategy.js
-var
-  q = require('q'),
-  MyNewStrategy = require('passport-my-new-strategy').Strategy;
-
-module.exports = function(context){
-  (...)
-};
-```
-
-It implements:
-
-* a __load__ method to activate the strategy:
-
-```javascript
-    this.load = function(passport) {
-      passport.use(new MyNewStrategy(this.verify));
-    };
-```
-
-* a __verify__ method that implements the strategy's [verify callback](http://passportjs.org/docs#verify-callback).
-
-This method accepts a variable numbers of arguments, depending on the strategy, and a _done_ callback that should be invoked when authentication succeed.
-
-NB: because passportjs uses the Callback pattern while Kuzzle uses Promises, you must **promisify** the _done_ callback:
-
-```javascript
-    this.verify = function(<params>, done) {
-      var deferred = q.defer();
-
-        myCustomVerificationMethod(<params>)
-        .then(function (userObject) {
-          if (userObject !== null) {
-            deferred.resolve(userObject);
-          }
-          else {
-            deferred.reject(new context.ForbiddenError('Bad Credentials'));
-          }
-        })
-        .catch(function (err) {
-          deferred.reject(err);
-        });
-
-      deferred.promise.nodeify(done);
-      return deferred.promise;
-    };
-```
-
-##### The hook activation
-
-The authController initialization triggers the "auth:loadStrategies" hook event, that can be used to load plugin's strategy, like that:
-
-* declare the hook mapping:
-
-```javascript
-// lib/config/hooks.js
-module.exports = {
-  'auth:loadStrategies': 'loadStrategy',
-};
-```
-
-* implement the hook method:
-
-```javascript
-// lib/index.js
-var
-  hooks = require('./config/hooks'),
-  Strategy = require('./passport/strategy');
-
-module.exports = function () {
-
-  (...)
-
-  this.hooks = hooks;
-
-  this.loadStrategy = function(passport, event) {
-    var strategy = new Strategy(this.context);
-    strategy.load(passport);
-  };
-
-};
-```
+- [Authentication scenarios](../request_scenarios/auth.md)
+- [Kuzzle API Documentation about Auth Controller](/api-reference/#auth-controller) and [JWT token usage](/api-reference/#authorization-header) in Kuzzle requests.
 
 
 ### Permissions
@@ -180,8 +88,9 @@ var myRoleDefinition = {
 Each entry of the `indexes`, `collections`, `controllers`, `actions` tree can be set to either an explicit value or the "&#42;" wildcard.
 
 The `action permission` value can be set either to:
-* a boolean. When set to `true`, the user is allowed to perform the action.
-* an object that describes a function (more about it in the [action permissions functions section](#actions-permissions-functions)).
+
+- a boolean. When set to `true`, the user is allowed to perform the action.
+- an object that describes a function (more about it in the [action permissions functions section](#actions-permissions-functions)).
 
 example:
 
@@ -221,8 +130,8 @@ Some permissions are not related to an index or a collection like for instance c
 
 To handle such cases, the role definition accepts the `_canDelete` and `_canCreate` parameters.
 
-* `_canCreate` needs to be defined _at the level above_ of the target.
-* `_canDelete` needs to be defined at the first sub-level of the target.
+- `_canCreate` needs to be defined _at the level above_ of the target.
+- `_canDelete` needs to be defined at the first sub-level of the target.
 
 Example:
 
@@ -243,7 +152,9 @@ The above example allows the user to create any index and forbids to delete the 
 
 The composition rule is:
 
-> The more specific overrides the less specific.
+<aside class="success">
+The more specific overrides the less specific.
+</aside>
 
 Example:
 
@@ -413,7 +324,7 @@ The optional _args_ parameter given to the permission function is the result of 
 
 Using this ability, you can pass some documents fetches from Kuzzle's database layer to your permission function.
 
-In our chat example above, we fetch a _document_ variable which contains the the document that was requested for deletion and that we use in the permission function to test if it is owned by the current user.
+In our chat example above, we fetch a _document_ variable which contains the document that was requested for deletion and that we use in the permission function to test if it is owned by the current user.
 
 ##### args element structure
 
@@ -496,13 +407,13 @@ var args = {
 };
 ```
 
-The action.search value is sent to Kuzzle's database layer directly, being Elasticsearch 1.7.
+The action.search value is sent to Kuzzle's database layer directly, being Elasticsearch 2.2.
 
-Please refer to [Elasticsearch search API documentation](https://www.elastic.co/guide/en/elasticsearch/reference/1.7/search-request-body.html) for additional information on how to build your query.
+Please refer to [Elasticsearch search API documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html) for additional information on how to build your query.
 
 ###### available variables
 
 Some variables are exposed by Kuzzle and can be used within your fetch function definition:
 
-* `$currentId`: The current request document id. Shortcut to $requestObject.data.&#95;id.
-* `$requestObject`: The complete request object being evaluated.
+- `$currentId`: The current request document id. Shortcut to $requestObject.data.&#95;id.
+- `$requestObject`: The complete request object being evaluated.

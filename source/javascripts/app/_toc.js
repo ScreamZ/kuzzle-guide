@@ -144,7 +144,7 @@
       $(node).replaceWith(
         '<div class="heading">' +
         '<div class="left">' +
-          '<' + node.tagName + ' id="' + node.id + '">' +
+          '<' + node.tagName + '>' +
             '<span class="heading-title">' +
               node.innerHTML +
             '</span>' +

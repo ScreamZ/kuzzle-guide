@@ -1,25 +1,26 @@
 ---
-title: Kuzzle API Reference
+title: Kuzzle Guide
 
 language_tabs:
 
 toc_footers:
-  - <a href="https://kuzzle.io">Kuzzle official website</a>
+  - <a href="http://kuzzle.io">Kuzzle official website</a>
   - <a href="http://github.com/kuzzleio/kuzzle">Kuzzle on GitHub</a>
   - <a href="http://github.com/tripit/slate">Documentation Powered by Slate</a>
 
 includes:
   - quickstart/index
   - tutorial/index
-  - basics/index
-  - basics/01-installation-linux
-  - basics/02-installation-windows
-  - basics/03-filters
-  - basics/04-status-code
-  - basics/05-security
-  - basics/06-architecture
-  - basics/07-plugins
-  - cookbook/index
+  - user_guide/index
+  - user_guide/01-installation-linux
+  - user_guide/02-installation-windows
+  - user_guide/03-cli
+  - user_guide/04-filters
+  - user_guide/05-status-code
+  - user_guide/06-security
+  - core_documentation/index
+  - core_documentation/01-architecture
+  - core_documentation/02-plugins
 
 search: true
 ---
@@ -51,21 +52,21 @@ Welcome to the Kuzzle developer guide
 </div>
 
 <div class="panel">
-    <a href="#basics">
-        <div class="panel-title"><i class="icon icon-get-started"></i> Basics</div>
+    <a href="#user-guide">
+        <div class="panel-title"><i class="icon icon-get-started"></i> User guide</div>
         <div class="panel-content">
-            <span>Learn more about Kuzzle</span>
+            <span>Learn more about how to use Kuzzle</span>
             <button>Read the guide</button>
         </div>
     </a>
 </div>
 
 <div class="panel">
-    <a href="#cookbook">
-        <div class="panel-title"><i class="icon icon-reading"></i> Cookbook</div>
+    <a href="#core-documentation">
+        <div class="panel-title"><i class="icon icon-get-started"></i> Core documentation</div>
         <div class="panel-content">
-            <span>Usefull concepts with Kuzzle</span>
-            <button>Read the cookbook</button>
+            <span>Learn more about how Kuzzle works</span>
+            <button>Read the documentation</button>
         </div>
     </a>
 </div>

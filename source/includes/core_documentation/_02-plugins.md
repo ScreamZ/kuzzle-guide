@@ -112,7 +112,7 @@ Where:
 * ``context``: the plugin context (see above)
 * ``isDummy``: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)
 
-##### Listener plugins
+### > Listener plugins
 
 Hook events are triggered and are non-blocking functions. Listener plugins are configured to be called on these hooks.
 
@@ -146,7 +146,7 @@ module.exports = function () {
 }
 ```
 
-##### Pipe plugins
+### > Pipe plugins
 
 When a pipe event is triggered, we are waiting for all plugins attached on this event. A plugin attached on a pipe event has access to the data and can even change them.
 A pipe plugin constructor must take in its last parameter a callback. This callback must be called at the end of the function with `callback(error, object)`:
@@ -192,7 +192,7 @@ module.exports = function () {
 
 In this example, in Kuzzle, the `modifiedRequestObject` has now a `createdAt` attribute.
 
-##### Controllers
+### > Controllers
 
 A plugin controller is a plugin that adds new controller and actions to Kuzzle.
 It must expose to Kuzzle:
@@ -267,7 +267,7 @@ which can be used by the controller actions.<br>
 (see [List of injected prototypes](../lib/api/core/pluginsContext.js) ).
 
 
-##### How it works
+#### How it works
 
 * With non-REST protocols, the _controller_ attribute is prefixed with the plugin name.
 
@@ -301,12 +301,12 @@ POST http://kuzzle:7511/api/1.0/_plugin/myplugin/foo
 {"name": "John Doe"}
 ```
 
-#### Protocol plugins
+### > Protocol plugins
 
 Kuzzle core only supports REST communications. All other supported protocols are implemented as protocol plugins.  
 By default, the Kuzzle official docker image is shipped with the [Socket.io](https://github.com/kuzzleio/kuzzle-plugin-socketio) protocol.
 
-##### How it works
+#### How it works
 
 Protocol plugins allow Kuzzle to support any existing protocol. These plugins ensure a two-way communication between clients and Kuzzle.  
 
@@ -319,7 +319,7 @@ Messages emanating from Kuzzle are emitted using the following hooks. Protocol p
 | ``protocol:notify`` | `{channel, id, payload}` | Asks protocol plugins to emit a data `payload` to the connection `id`, on the channel `channel` |
 | ``protocol:broadcast`` | `{channel, payload}` | Asks protocol plugins to emit a data `payload` to clients connected to the channel `channel` |
 
-*For more information about channels, see our [API Documentation](http://kuzzleio.github.io/kuzzle-api-documentation/#on)*
+*For more information about channels, see our [API Documentation](/api-reference/#on)*
 
 
 
@@ -332,7 +332,7 @@ To access these methods, simply call ``context.getRouter().<router method>``:
 | ``execute`` | ``optional JWT Headers`` (string)<br/>``RequestObject`` (object)<br/>``context`` (obtained with ``newConnection``)<br/>A node callback resolved with the request response |  | Execute a client request. |
 | ``removeConnection`` | ``context`` (obtained with ``newConnection``) | | Asks Kuzzle to remove the corresponding connection and all its subscriptions |
 
-##### Example
+#### Example
 
 First, link protocol hooks to their corresponding implementation methods:
 
@@ -422,6 +422,105 @@ module.exports = function () {
 * [kuzzle-plugin-logger](https://github.com/kuzzleio/kuzzle-plugin-logger)
 * [kuzzle-plugin-helloworld](https://github.com/kuzzleio/kuzzle-plugin-helloworld)
 * [kuzzle-plugin-socketio](https://github.com/kuzzleio/kuzzle-plugin-socketio)
+
+### > Authentication plugin
+
+Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see [plugins documentation](#plugins)).
+
+Take example in [Passport Local plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local), an authentication plugin must provide following steps:
+
+#### The strategy module
+
+This module is a wrapper to the needed passportjs strategy:
+
+```javascript
+// lib/passport/strategy.js
+var
+  q = require('q'),
+  MyNewStrategy = require('passport-my-new-strategy').Strategy;
+
+module.exports = function(context){
+  (...)
+};
+```
+
+It implements:
+
+- a __load__ method to activate the strategy:
+
+```javascript
+    this.load = function(passport) {
+      passport.use(new MyNewStrategy(this.verify));
+    };
+```
+
+- a __verify__ method that implements the strategy's [verify callback](http://passportjs.org/docs#verify-callback).
+
+This method accepts a variable numbers of arguments, depending on the strategy, and a _done_ callback that should be invoked when authentication succeed.
+
+<aside class="notice">
+because passportjs uses the Callback pattern while Kuzzle uses Promises, you must <strong>promisify</strong> the <em>done</em> callback:
+</aside>
+
+```javascript
+    this.verify = function(<params>, done) {
+      var deferred = q.defer();
+
+        myCustomVerificationMethod(<params>)
+        .then(function (userObject) {
+          if (userObject !== null) {
+            deferred.resolve(userObject);
+          }
+          else {
+            deferred.reject(new context.ForbiddenError('Bad Credentials'));
+          }
+        })
+        .catch(function (err) {
+          deferred.reject(err);
+        });
+
+      // here is the promisification of the done callback
+      deferred.promise.nodeify(done);
+      
+      return deferred.promise;
+    };
+```
+
+#### The hook activation
+
+The authController initialization triggers the `auth:loadStrategies` hook event, that can be used to load plugin's strategy, like that:
+
+- declare the hook mapping:
+
+```javascript
+// lib/config/hooks.js
+module.exports = {
+  'auth:loadStrategies': 'loadStrategy',
+};
+```
+
+- implement the hook method:
+
+```javascript
+// lib/index.js
+var
+  hooks = require('./config/hooks'),
+  Strategy = require('./passport/strategy');
+
+module.exports = function () {
+
+  (...)
+
+  this.hooks = hooks;
+
+  this.loadStrategy = function(passport, event) {
+    var strategy = new Strategy(this.context);
+    strategy.load(passport);
+  };
+
+};
+```
+
 
 ### Troubleshooting
 

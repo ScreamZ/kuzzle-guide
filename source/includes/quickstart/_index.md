@@ -116,7 +116,7 @@ var document = {
 }
 
 // persist the document into the collection
-collection.createDocument('mydocument', document)
+collection.createDocument(document)
 ```
 
 - Run your file with `node create.js`

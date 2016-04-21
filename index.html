@@ -1,0 +1,2855 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Kuzzle Guide</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600' rel='stylesheet' type='text/css'>
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all.js" type="text/javascript"></script>
+
+  </head>
+
+  <body class="index">
+    <header>
+      <div class="wrapper">
+        <!--<div class="container-logo">
+          <img alt="kuzzle logo" width="260px" src="/public/images/Kuzzle_developers_blue.svg">
+        </div>-->
+        <div id="logo">
+            <a href="/">&nbsp;</a>
+        </div>
+
+        <nav>
+          <ul>
+            <li>
+              <a href="http://kuzzle.io/" target="" class="nav-item">Home</a>
+            </li>
+
+            <li>
+              <a href="#" target="" class="nav-item developers">Documentation</a>
+            </li>
+
+            <li>
+              <a href="http://kuzzle.io/demos-tutorials/" target="_blank" class="nav-item ">Demos</a>
+            </li>
+
+            <li>
+              <a href="http://kuzzle.io/blog/" target="" class="nav-item ">Blog</a>
+            </li>
+
+            <li>
+              <a href="https://github.com/kuzzleio/kuzzle" target="_blank" class="nav-item github">
+                <i class="icon icon-github icon-small"></i>
+              </a>
+            </li>
+
+            <!--<li class="nav nav-index"><a href="/"><span>Getting started</span></a></li>
+            <li class="nav nav-kuzzle active"><a href="/api-reference"><span>Kuzzle API Reference</span></a></li>
+            <li class="nav nav-sdk"><a href="/sdk-documentation"><span>SDK Documentation</span></a></li>-->
+          </ul>
+        </nav>
+      </div>
+      <div class="developer-nav open">
+        <ul>
+            <li class="active"><a href="/guide"><span>Guide</span></a></li>
+            <li><a href="/sdk-documentation"><span>SDK Documentation</span></a></li>
+            <li><a href="/api-reference"><span>API Reference</span></a></li>
+        </ul>
+        <div class="search">
+          <input type="text" class="search" id="input-search" tabindex="1" placeholder="Search in the guide">
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <a href="#" id="nav-button">
+        <span>
+          NAV
+          <img src="images/navbar.png" />
+        </span>
+      </a>
+      <div class="tocify-wrapper">
+          <ul class="search-results"></ul>
+        <div id="toc">
+        </div>
+          <ul class="toc-footer">
+              <li><a href="http://kuzzle.io">Kuzzle official website</a></li>
+              <li><a href="http://github.com/kuzzleio/kuzzle">Kuzzle on GitHub</a></li>
+              <li><a href="http://github.com/tripit/slate">Documentation Powered by Slate</a></li>
+          </ul>
+      </div>
+      <div class="page-wrapper">
+        <div class="dark-box"></div>
+        <div class="content">
+          <h1 id="introduction">Introduction</h1>
+
+<p>Welcome to the Kuzzle developer guide</p>
+
+<div class="panels">
+
+<div class="panel">
+    <a href="#quickstart">
+        <div class="panel-title"><i class="icon icon-play_arrow"></i> Quickstart</div>
+        <div class="panel-content">
+            <span>First steps into Kuzzle</span>
+            <button>Read the first steps</button>
+        </div>
+    </a>
+</div>
+
+<div class="panel">
+    <a href="#tutorial">
+        <div class="panel-title"><i class="icon icon-code"></i> Tutorial: Klack</div>
+        <div class="panel-content">
+            <span>Build an application step by step</span>
+            <button>Read the tutorial</button>
+        </div>
+    </a>
+</div>
+
+<div class="panel">
+    <a href="#user-guide">
+        <div class="panel-title"><i class="icon icon-get-started"></i> User guide</div>
+        <div class="panel-content">
+            <span>Learn more about how to use Kuzzle</span>
+            <button>Read the guide</button>
+        </div>
+    </a>
+</div>
+
+<div class="panel">
+    <a href="#core-documentation">
+        <div class="panel-title"><i class="icon icon-get-started"></i> Core documentation</div>
+        <div class="panel-content">
+            <span>Learn more about how Kuzzle works</span>
+            <button>Read the documentation</button>
+        </div>
+    </a>
+</div>
+
+<p></div></p>
+
+            <h1 id="quickstart">Quickstart</h1>
+
+<p>In this quickstart tutorial you will learn in a few steps how to launch your own Kuzzle server 
+and how to interact with it by indexing data (persisted data) and being informed when data is updated (pub/sub)</p>
+
+<h2 id="setup-a-kuzzle-server">Setup a Kuzzle server</h2>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>Docker, see <a href="https://docs.docker.com/engine/installation/">instruction here</a></li>
+<li>Docker-compose, see <a href="https://docs.docker.com/compose/install/">intruction here</a></li>
+<li>That&rsquo;s it</li>
+</ul>
+
+<h3 id="make-your-own-compose-file">Make your own compose file</h3>
+
+<aside class="notice">
+You don&rsquo;t have to clone kuzzle to use it.
+</aside>
+
+<ul>
+<li>Create a <code class="prettyprint">docker-compose.yml</code> with:</li>
+</ul>
+<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle:latest</span>
+  <span class="s">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
+  <span class="s">links</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">elasticsearch</span>
+    <span class="pi">-</span> <span class="s">redis</span>
+
+<span class="s">redis</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">redis:3.0</span>
+
+<span class="s">elasticsearch</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">elasticsearch:2.2</span>
+</code></pre>
+
+<aside class="notice">
+You can also retrieve this file directly with curl/wget : <br />
+<code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
+</aside>
+
+<ul>
+<li>run: </li>
+</ul>
+<pre class="highlight shell"><code><span class="gp">$ </span>docker-compose up
+</code></pre>
+
+<aside class="success">
+Kuzzle is running on: 
+<ul>
+    <li><code>localhost:7512</code> for <strong>Websocket</strong></li>
+    <li><code>localhost:7511</code> for <strong>REST</strong></li>
+</ul>
+</aside>
+
+<p><em>You can view/contribute to this compose file directly on <a href="https://github.com/kuzzleio/kuzzle/blob/master/docker-compose.yml">github</a></em></p>
+
+<aside class="notice">
+Read more on how to do a <a href="#install-on-linux">custom installation</a> for kuzzle on the basic guide
+</aside>
+
+<h2 id="setup-a-kuzzle-backoffice">Setup a Kuzzle Backoffice</h2>
+
+<p><a href="https://raw.githubusercontent.com/kuzzleio/kuzzle-bo/master/docs/images/metrics.png"><img alt="kuzzle's backoffice preview" src="https://raw.githubusercontent.com/kuzzleio/kuzzle-bo/master/docs/images/metrics.png" /></a></p>
+
+<p>Kuzzle has a backoffice which permit you to see, create, watch and manage everything you can do with kuzzle.</p>
+
+<p>The backoffice is not mandatory to run kuzzle, and it&rsquo;s not incuded by default, the easiest way to use the kuzzle&rsquo;s backoffice is to add this section into your <code class="prettyprint">docker-compose.yml</code> file:</p>
+<pre class="highlight yaml"><code><span class="s">kuzzleBo</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/bo:latest</span>
+  <span class="s">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">3000:3000"</span>
+  <span class="s">links</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">kuzzle</span>
+</code></pre>
+
+<aside class="success">
+Kuzzle&rsquo;s backoffice is running on <code>localhost:3000</code>
+</aside>
+
+<aside class="notice">
+Read more on how to do a custom installation for the backoffice <a href="https://github.com/kuzzleio/kuzzle-bo#installation">on github</a>
+</aside>
+
+<h2 id="send-your-first-quot-hello-world-quot-document">Send your first &ldquo;Hello World&rdquo; document</h2>
+
+<p>We will show you how to persist a document into kuzzle with the <a href="/sdk-documentation">Javascript SDK</a></p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>NodeJS, see <a href="https://nodejs.org/en/download/">instruction here</a> (&gt; v4.3.1)</li>
+<li>A kuzzle server running</li>
+<li>That&rsquo;s it</li>
+</ul>
+
+<h3 id="create-your-first-script-to-interact-with-kuzzle">Create your first script to interact with kuzzle</h3>
+
+<ul>
+<li>Install the <a href="/sdk-documentation">Javascript SDK</a> with <code class="prettyprint">npm install kuzzle-sdk</code></li>
+<li>Create <code class="prettyprint">create.js</code> file with :</li>
+</ul>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">Kuzzle</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kuzzle-sdk'</span><span class="p">)</span>
+
+<span class="c1">// connection to the kuzzle server</span>
+<span class="kd">var</span> <span class="nx">kuzzle</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Kuzzle</span><span class="p">(</span><span class="s1">'http://localhost:7512'</span><span class="p">)</span>
+
+<span class="c1">// create a reference to the data collection</span>
+<span class="kd">var</span> <span class="nx">collection</span> <span class="o">=</span> <span class="nx">kuzzle</span><span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'myindex'</span><span class="p">,</span> <span class="s1">'mycollection'</span><span class="p">)</span>
+
+<span class="c1">// define the document itself</span>
+<span class="kd">var</span> <span class="nb">document</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">message</span><span class="p">:</span> <span class="s1">'hello world'</span>
+<span class="p">}</span>
+
+<span class="c1">// persist the document into the collection</span>
+<span class="nx">collection</span><span class="p">.</span><span class="nx">createDocument</span><span class="p">(</span><span class="s1">'mydocument'</span><span class="p">,</span> <span class="nb">document</span><span class="p">)</span>
+</code></pre>
+
+<ul>
+<li>Run your file with <code class="prettyprint">node create.js</code></li>
+</ul>
+
+<aside class="success">
+You have persisted your first document into kuzzle
+</aside>
+
+<p><em>If you want to go further, you may read the <a href="/sdk-documentation">SDK Documentation</a> part</em></p>
+
+<h2 id="subscribe-to-data-changes-pub-sub">Subscribe to data changes (pub/sub)</h2>
+
+<p>Kuzzle embeds real-time features allowing you to be informed on interactions made with kuzzle (data modifications, another user listening the same changes than you, &hellip;).</p>
+
+<p>Here we will show you how to be informed when a document, matching a query filter, is updated</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>NodeJS, see <a href="https://nodejs.org/en/download/">instruction here</a> (&gt; v0.10)</li>
+<li>A kuzzle server running</li>
+<li>That&rsquo;s it</li>
+</ul>
+
+<h3 id="create-your-first-script-to-let-kuzzle-interact-with-you">Create your first script to let kuzzle interact with you</h3>
+
+<ul>
+<li>Install the <a href="/sdk-documentation">Javascript SDK</a> with <code class="prettyprint">npm install kuzzle-sdk</code></li>
+<li>Create <code class="prettyprint">subscribe.js</code> file with :</li>
+</ul>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">Kuzzle</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kuzzle-sdk'</span><span class="p">)</span>
+
+<span class="c1">// connection to the kuzzle server</span>
+<span class="k">new</span> <span class="nx">Kuzzle</span><span class="p">(</span><span class="s1">'http://localhost:7512'</span><span class="p">)</span>
+
+<span class="c1">// create a reference to the data collection</span>
+<span class="kd">var</span> <span class="nx">collection</span> <span class="o">=</span> <span class="nx">kuzzle</span><span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'myindex'</span><span class="p">,</span> <span class="s1">'mycollection'</span><span class="p">)</span>
+
+<span class="c1">// define a filter</span>
+<span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">exists</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">field</span><span class="p">:</span> <span class="s1">'message'</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// create a subscription on the collection matching given filters </span>
+<span class="nx">collection</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// this function is called each time kuzzle notifies us with a document matching our filters</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'message received from kuzzle:'</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<ul>
+<li>Run your file with <code class="prettyprint">node subscribe.js</code></li>
+</ul>
+
+<aside class="success">
+While your script is running you will be notified about document entering in your filter. <br/>
+Try to run the <code>create.js</code> script <a href="#create-your-first-script-to-interact-with-kuzzle">previously created</a> to view the result.
+</aside>
+
+            <h1 id="tutorial">Tutorial</h1>
+
+<p>We have made a tutorial to present the kuzzle beta version.</p>
+
+<p>We are providing an application called &ldquo;klack&rdquo; which is a &ldquo;slack&rdquo; like application, 
+you will implement online features with kuzzle.</p>
+
+<h4 id="you-will-learn">You will learn</h4>
+
+<ul>
+<li>How to connect your application to Kuzzle</li>
+<li>How to send and receive volatile messages</li>
+<li>How to list available channels</li>
+<li>How to create new channels and subscribe to changes</li>
+<li>How to listen only to current channel messages</li>
+<li>How to persist and reload messages</li>
+<li>How to delete messages</li>
+<li>How to limit search results</li>
+<li>How to perform a fuzzy search</li>
+<li>How to add authentication to your application</li>
+<li>How to restrict users to delete only their own messages</li>
+</ul>
+
+<aside class="notice">
+This tutorial use <strong>ES2015 (ES6) javascript</strong> syntax with <a href="https://vuejs.org/">vue.js</a> framework.
+</aside>
+
+<h4 id="start-the-tutorial">Start the tutorial</h4>
+
+<p>The tutorial is hosted on <a href="https://github.com/kuzzleio/kuzzle-challenge-klack">github</a></p>
+
+<p>To start working on a step you have to switch on the corresponding git tag by typing <code class="prettyprint">git checkout stepXX</code></p>
+
+<p><a href="https://github.com/kuzzleio/kuzzle-challenge-klack">let&rsquo;s start !</a></p>
+
+            <h1 id="user-guide">User guide</h1>
+
+<h4 id="api-specifications">API Specifications</h4>
+
+<p>Kuzzle supports a variety of communication protocols.<br>
+For the time being, Kuzzle implements the following protocols:</p>
+
+<ul>
+<li>REST</li>
+<li>Web Socket</li>
+<li>AMQP</li>
+<li>MQTT</li>
+<li>STOMP</li>
+</ul>
+
+<p>You can directly interact with kuzzle using the <a href="/api-reference">Kuzzle&rsquo;s API reference</a>.<br />
+But you may also choose a <a href="/sdk-documentation">SDK</a> among the list of available:</p>
+
+<ul>
+<li>Javascript (NodeJS &amp; Browsers)</li>
+<li>Android</li>
+<li><em>iOS (coming soon)</em></li>
+<li><em>C (planned)</em></li>
+<li><em>PHP (planned)</em></li>
+</ul>
+
+<h4 id="realtime">Realtime</h4>
+
+<p>For an overview about the filtering syntax, check the <a href="#filtering-syntax">Filtering syntax</a> section.</p>
+
+<h4 id="plugins">Plugins</h4>
+
+<p>See the <a href="#plugins">Plugins</a> section</p>
+
+<h4 id="authentication">Authentication</h4>
+
+<p>See the <a href="#security">Security</a> section</p>
+
+<h4 id="advanced-documentation-not-required-for-a-basic-development">Advanced documentation (not required for a basic development)</h4>
+
+<p>For a deeper dive into Kuzzle you can read the <a href="#architecture">Architecture</a> section.</p>
+
+            <h2 id="install-on-linux">Install on Linux</h2>
+
+<h3 id="using-docker">Using Docker</h3>
+
+<p>If you are running Docker and just want to get your own Kuzzle running, you can use the provided docker-compose file.</p>
+
+<h4 id="prerequisites">Prerequisites</h4>
+
+<ul>
+<li><a href="https://docs.docker.com/installation/#installation">Docker</a></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
+</ul>
+
+<aside class="notice">
+You don&rsquo;t have to clone kuzzle to use it.
+</aside>
+
+<ul>
+<li>Create a <code class="prettyprint">docker-compose.yml</code> with:</li>
+</ul>
+<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle:latest</span>
+  <span class="s">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
+  <span class="s">links</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">elasticsearch</span>
+    <span class="pi">-</span> <span class="s">redis</span>
+
+<span class="s">redis</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">redis:3.0</span>
+
+<span class="s">elasticsearch</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">elasticsearch:2.2</span>
+</code></pre>
+
+<aside class="notice">
+You can also retrieve this file directly with curl/wget : <br />
+<code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
+</aside>
+
+<ul>
+<li>run: </li>
+</ul>
+<pre class="highlight shell"><code><span class="gp">$ </span>docker-compose up
+</code></pre>
+
+<h4 id="reset-kuzzle-and-insert-some-fixtures-with-docker">Reset Kuzzle and insert some fixtures with Docker</h4>
+
+<p>If you need to get a fresh start with all persistent data erased and populate it with default fixtures, set the <code>FIXTURES</code> environment variable like:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">FIXTURES</span><span class="o">=</span>path/to/the/fixtures/file.json docker-compose up
+</code></pre>
+
+<p>examples:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="s2">"index"</span><span class="err">:</span> <span class="p">{</span>
+    <span class="s2">"collection"</span><span class="err">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">"index"</span><span class="p">:</span> <span class="p">{}</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"a"</span><span class="p">:</span> <span class="s2">"document"</span><span class="p">,</span> <span class="s2">"with"</span><span class="p">:</span> <span class="s2">"any"</span><span class="p">,</span> <span class="s2">"number"</span><span class="p">:</span> <span class="s2">"of fields"</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"index"</span><span class="p">:</span> <span class="p">{}</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"another"</span><span class="p">:</span> <span class="s2">"document"</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"index"</span><span class="p">:</span> <span class="p">{}</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"and"</span><span class="p">:</span> <span class="p">{</span> <span class="nl">another</span><span class="p">:</span> <span class="s2">"one"</span><span class="p">}</span> <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s2">"otherCollection"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">"index"</span><span class="p">:</span> <span class="p">{}</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"foo"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">,</span> <span class="s2">"baz"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"bar"</span><span class="p">:</span> <span class="s2">"foo"</span><span class="p">},</span> <span class="s2">"done"</span><span class="p">:</span> <span class="kc">true</span> <span class="p">},</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="s2">"otherindex"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"collection"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">"index"</span><span class="p">:</span> <span class="p">{}</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">"..."</span><span class="p">:</span> <span class="s2">"..."</span> <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Remember that the fixtures must be in the Docker container scope !</p>
+
+<h4 id="initialize-kuzzle-mapping-with-docker">Initialize Kuzzle mapping with Docker</h4>
+
+<p>If you need to add a default mapping on Kuzzle start, set the <code>DEFAULT_MAPPING</code> environment variable like:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">DEFAULT_MAPPING</span><span class="o">=</span>path/to/the/mapping/file.json docker-compose up
+</code></pre>
+
+<p>examples:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="s2">"index"</span><span class="err">:</span> <span class="p">{</span>
+    <span class="s2">"collection"</span><span class="err">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="s2">"properties"</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">"position"</span> <span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span> <span class="p">:</span> <span class="s2">"geo_point"</span> <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Remember that the default mapping must be in the Docker container scope !</p>
+
+<p>You can, of course, use all those option altogether like:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">FIXTURES</span><span class="o">=</span>fixtures/file.json <span class="nv">DEFAULT_MAPPING</span><span class="o">=</span>mapping/file.json docker-compose up
+</code></pre>
+
+<h4 id="useful-tips">Useful tips</h4>
+
+<h5 id="updating-kuzzle-39-s-containers">Updating kuzzle&rsquo;s containers</h5>
+
+<p>When you already have installed an old version of kuzzle, don&rsquo;t forget to update kuzzle&rsquo;s containers with:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>docker-compose -f &lt;docker-compose-file.yml&gt; pull 
+</code></pre>
+
+<h5 id="updating-kuzzle-39-s-dependencies">Updating kuzzle&rsquo;s dependencies</h5>
+
+<p>To ensure that Kuzzle&rsquo;s dependencies are up-to-date, run the command directly without log-in into the container:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>docker <span class="nb">exec</span> -ti &lt;docker-compose-file.yml&gt; run kuzzle npm install
+<span class="gp">$ </span>docker <span class="nb">exec</span> -ti &lt;docker-compose-file.yml&gt; run kuzzle bin/kuzzle install
+</code></pre>
+
+<h3 id="using-vagrant">Using Vagrant</h3>
+
+<p>If you are not running Docker on your system, for instance if you are running Windows or MacOs, you can pop a virtual machine to run Kuzzle.</p>
+
+<p>Prerequisites:</p>
+
+<ul>
+<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox</a></li>
+<li><a href="https://www.vagrantup.com/">Vagrant</a></li>
+</ul>
+
+<p>From the root directory:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>vagrant up
+</code></pre>
+
+<h3 id="manual-install">Manual install</h3>
+
+<aside class="notice">
+we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
+</aside> 
+
+<h4 id="prerequisites">Prerequisites</h4>
+
+<ul>
+<li>A service <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> running on localhost:9200</li>
+<li>A service <a href="http://redis.io/">Redis</a> running on localhost:6379</li>
+<li>A properly installed <a href="https://nodejs.org/en/download/package-manager/">nodeJs</a> <strong>version 4</strong> or upper</li>
+</ul>
+
+<h4 id="step-one">Step one</h4>
+
+<p>Retrieve the Kuzzle source code from the <a href="https://github.com/kuzzleio/kuzzle.git">GitHub repo</a>:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle
+</code></pre>
+
+<p>then install the dependencies:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>npm install
+</code></pre>
+
+<h4 id="step-two">Step two</h4>
+
+<p>Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+</code></pre>
+
+<h4 id="step-three">Step three</h4>
+
+<p>Install the default plugins:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
+</code></pre>
+
+<h4 id="finally">Finally</h4>
+
+<p>Start a server instance:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle start --server
+</code></pre>
+
+<p>And then start as many worker instances as you want. At least one worker is required:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>bin/kuzzle start --worker
+</code></pre>
+
+<p>For more information, you can execute:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>bin/kuzzle start --help
+</code></pre>
+
+<h4 id="all-steps-in-one">All steps in one</h4>
+<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle
+<span class="gp">$ </span>npm install
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+<span class="gp">$ </span>./bin/kuzzle install
+<span class="gp">$ </span>./bin/kuzzle start --server
+<span class="gp">$ </span>./bin/kuzzle start --worker
+</code></pre>
+
+<h4 id="going-further">Going further</h4>
+
+<h5 id="command-line-interface">Command Line Interface</h5>
+
+<p>Kuzzle comes along with a <a href="https://en.wikipedia.org/wiki/Command-line_interface">CLI</a></p>
+
+<p>To get a list of available options, you can run</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle start -h
+</code></pre>
+
+<h5 id="change-external-services-hosts-or-ports">Change external services hosts or ports</h5>
+
+<p>If you are running some of the service(s) externally, you can configure their host and port using some environment variables:</p>
+
+<p>examples:</p>
+<pre class="highlight shell"><code><span class="c"># Elastic Search (read/write engine):</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>myelasticsearch:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>myelasticsearch:9200
+
+<span class="c"># Redis (cache services):</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>myredis
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+
+<span class="c"># Rabbit MQ (external broker for AMQP/MQTT/STOMP clients):</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">MQ_BROKER_HOST</span><span class="o">=</span>myrabbitmq
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">MQ_BROKER_PORT</span><span class="o">=</span>5672
+
+<span class="gp">$ </span>./bin/kuzzle start
+</code></pre>
+
+            <h2 id="install-on-windows">Install on Windows</h2>
+
+<h3 id="using-docker">Using Docker</h3>
+
+<h4 id="prerequisites">Prerequisites</h4>
+
+<ul>
+<li>Install <a href="https://docs.docker.com/engine/installation/windows/">Docker</a> properly and do not forget to restart the computer</li>
+<li>Note that Git for Windows™ will be installed too</li>
+<li>Note the machine name and machine IP when launching docker toolbox (you can retrieve the machine IP later by typing <code class="prettyprint">docker-machine ip &lt;machine name&gt;</code>)</li>
+<li>Note that, by default, the machine name is just <code class="prettyprint">default</code></li>
+</ul>
+
+<h4 id="step-one">Step one</h4>
+
+<p>Clone the Kuzzle Git repo:</p>
+<pre class="highlight shell"><code>git clone https://github.com/kuzzleio/kuzzle.git
+</code></pre>
+
+<h4 id="step-two">Step two</h4>
+
+<p>Go into the kuzzle directory and launch it:</p>
+<pre class="highlight shell"><code><span class="nb">cd </span>kuzzle <span class="o">&amp;&amp;</span> docker-compose up
+</code></pre>
+
+<p>A bunch of logs should appear, and the last line should ends with </p>
+<pre class="highlight shell"><code>log:info: <span class="o">==</span> DB preparation <span class="k">done</span>.
+</code></pre>
+
+<p>Then you can access <code class="prettyprint">http://&lt;docker-machine IP&gt;:7511/api/1.0</code> in your browser and you should read </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+    <span class="s2">"error"</span><span class="err">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="s2">"result"</span><span class="err">:</span> <span class="s2">"Hello from Kuzzle :)"</span><span class="p">,</span>
+    <span class="s2">"status"</span><span class="err">:</span> <span class="mi">200</span>
+<span class="p">}</span>
+</code></pre>
+
+            <h2 id="command-line-interface">Command line interface</h2>
+
+<p>Kuzzle embed a <a href="https://en.wikipedia.org/wiki/Command-line_interface">Command line interface</a> which permit you to :</p>
+
+<ul>
+<li>Install dependencies <em>(plugins, npm dependencies, &hellip;)</em></li>
+<li>Run kuzzle</li>
+<li>Toggle on/off internal services <em>(mqBroker, logger, monitoring, writeEngine, &hellip;)</em></li>
+<li>Create first administrator</li>
+<li>Reset persisted data <em>(use with caution !)</em></li>
+</ul>
+
+<aside class="warning">
+If you have launched kuzzle with docker, you have to enter in the kuzzle container to run theses commands
+</aside>
+
+<h3 id="install-dependencies">Install dependencies</h3>
+
+<p>Before start kuzzle, you have to install his dependencies, 
+to do that just run the following command in the root folder of your kuzzle installation</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
+</code></pre>
+
+<aside class="notice">
+The plugins configuration is located into 2 files: 
+<ul>
+    <li><code>config/defaultPlugins.json</code> which contains default plugins configuration embed with kuzzle</li>
+    <li><code>config/customPlugins.json</code> which contains plugins configuration for your own installation</li>
+</ul>
+</aside>
+
+<h3 id="start-kuzzle">Start kuzzle</h3>
+
+<p>To run kuzzle, you just have to run :</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle start
+</code></pre>
+
+<aside class="notice">
+The start command have a lot of options which permit you to:
+<ul>
+    <li>change the port used by kuzzle</li>
+    <li>reset the persistent layer before start</li>
+    <li>import fixtures/mapping before start</li>
+</ul>
+<br />
+To get the full list of available options, just type <code>./bin/kuzzle start --help</code>
+</aside>
+
+<h3 id="enable-disable-services">Enable/Disable services</h3>
+
+<p>You can enable services in a running Kuzzle without restarting it with a simple command line:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle <span class="nb">enable</span> &lt;service&gt; &lt;PID|all&gt;
+</code></pre>
+
+<p>Where:</p>
+
+<ul>
+<li>service is the Kuzzle service name you want to activate (for instance: mqBroker)</li>
+<li>PID is the processus ID of the Kuzzle server or worker you want to control. Use &lsquo;all&rsquo; if you want to broadcast a service activation to a Kuzzle server and all its workers.</li>
+</ul>
+
+<p>You can disable a service with:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle disable &lt;service&gt; &lt;PID|all&gt;
+</code></pre>
+
+<aside class="notice">
+All services containing a toggle() method can be activated or deactivated on the fly. Some vital services can not be toggled. 
+</aside>
+
+<h3 id="create-the-first-administrative-user-account">Create the first administrative user account</h3>
+
+<p>You will need a first admin to connect to the back-office</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle createFirstAdmin
+</code></pre>
+
+<aside class="notice">
+This command is interactive and let you choose to reset the roles rights or not.
+</aside>
+
+<h3 id="reset-kuzzle">Reset Kuzzle</h3>
+
+<p>To empty the persistent data storage into kuzzle without restarting it, you have to run this command: </p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle likeAvirgin
+</code></pre>
+
+<h4 id="reset-and-add-fixtures-or-mappings">Reset and add fixtures or mappings</h4>
+
+<p>You can perform a reset followed by a fixtures and/or mappings import by doing:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle likeAvirgin --fixtures /path/to/the/fixtures/file.json --mappings /path/to/the/mappings/file.json
+</code></pre>
+
+<h3 id="getting-help">Getting help</h3>
+
+<p>You can, of course, get some help by using the  <code class="prettyprint">--help</code> option. </p>
+
+<p>Try those: </p>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle --help
+<span class="gp">$ </span>./bin/kuzzle start --help
+<span class="gp">$ </span>./bin/kuzzle likeAvirgin --help
+</code></pre>
+
+            <h2 id="filtering-syntax">Filtering Syntax</h2>
+
+<p>For real-time subscription we use a sub language of Elasticsearch DSL, only for <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-filters.html">Filters</a>.</p>
+
+<p>For no-real-time, like search, get, etc, we directly pass information to Elasticsearch. You can use the whole <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">Elasticsearch DSL</a></p>
+
+<p>You can also take a look at the internally used <a href="https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html">Elasticsearch API</a> for Javascript</p>
+
+<h3 id="and">and</h3>
+
+<p>The and filter allow to filter documents on two or more terms.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first document: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">and</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">and</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="bool">bool</h3>
+
+<p>A filter that matches documents matching boolean combinations of other queries. </p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">age</span><span class="err">:</span> <span class="mi">85</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">36</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'Paris'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'radium'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the second document: </p>
+<pre class="highlight javascript"><code><span class="nx">bool</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">must</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">terms</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="na">firstName</span> <span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+          <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s1">'must_not'</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="na">should</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">term</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="na">hobby</span> <span class="p">:</span> <span class="s1">'computer'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">exists</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="na">field</span> <span class="p">:</span> <span class="s1">'lastName'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">bool</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">must</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="na">terms</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="na">firstName</span> <span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+              <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="s1">'must_not'</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="na">should</span> <span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="na">term</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="na">hobby</span> <span class="p">:</span> <span class="s1">'computer'</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="na">exists</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="na">field</span> <span class="p">:</span> <span class="s1">'lastName'</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="exists">exists</h3>
+
+<p>Returns documents that have at least one non-null value in the original field.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first document: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">exists</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">exists</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="missing">missing</h3>
+
+<p>Returns documents that have only null values or no value in the original field</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the second document:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">missing</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">missing</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="not">not</h3>
+
+<p>A filter that filters out matched documents.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first document: </p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="err">not:</span><span class="w"> </span><span class="err">{</span><span class="w">
+    </span><span class="err">term:</span><span class="w"> </span><span class="err">{</span><span class="w">
+      </span><span class="err">city:</span><span class="w"> </span><span class="err">'London'</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="err">}</span><span class="w">
+</span><span class="err">}</span><span class="w">
+</span></code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">not</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="or">or</h3>
+
+<p>A filter that matches documents using the OR boolean operator on other filters.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'Paris'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'radium'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first and second documents: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">or</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nl">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">or</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="term">term</h3>
+
+<p>Filters documents that have fields that contain a term.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first document: </p>
+<pre class="highlight javascript"><code><span class="nx">term</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="terms">terms</h3>
+
+<p>Filters documents that have fields that match any of the provided terms.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the two first documents: </p>
+<pre class="highlight javascript"><code><span class="nx">terms</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="ids">ids</h3>
+
+<p>Filters documents that only have the provided ids.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">_id</span><span class="p">:</span> <span class="s1">'a'</span><span class="p">,</span>
+  <span class="nx">firstName</span><span class="err">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">_id</span><span class="p">:</span> <span class="s1">'b'</span><span class="p">,</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">_id</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">,</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the first document: </p>
+<pre class="highlight javascript"><code><span class="nx">ids</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">values</span><span class="p">:</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="range">range</h3>
+
+<p>Filters documents with fields that have terms within a certain range.</p>
+
+<p>The range filter accepts the following parameters:</p>
+
+<p><code class="prettyprint">gte</code> Greater-than or equal to</p>
+
+<p><code class="prettyprint">gt</code> Greater-than</p>
+
+<p><code class="prettyprint">lte</code> Less-than or equal to</p>
+
+<p><code class="prettyprint">lt</code> Less-than</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">age</span><span class="err">:</span> <span class="mi">85</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">36</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'Paris'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'radium'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter can be made, and will be validated on the two last documents, not the first: </p>
+<pre class="highlight javascript"><code><span class="nx">range</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+    <span class="nx">lt</span><span class="err">:</span> <span class="mi">85</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+      <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="geospacial">Geospacial</h3>
+
+<p>The geospacial filters allows you to find or discriminate documents containing a geolocalisation field (ie: a point).</p>
+
+<p>There are some inherent objects and concepts wich are good to understand before to go further. Most of them are following the ElasticSearch DSL format, some has been simplified.</p>
+
+<h4 id="geospacial-objects-and-concepts">Geospacial objects and concepts</h4>
+
+<ul>
+<li><a href="#point">Point</a></li>
+<li><a href="#bounding-box">Bounding Box</a> aka BBox</li>
+<li><a href="#polygon">Polygon</a></li>
+<li><a href="#distance">Distance</a></li>
+</ul>
+
+<h5 id="point">Point</h5>
+
+<p>A point is&hellip; well you know, a point, defined by a longitude and a latitude.
+The following notations are valid: </p>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="mf">40.73</span> <span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
+
+<aside class="warning">
+When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+</aside>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">]</span> <span class="p">}</span>
+</code></pre>
+
+<aside class="warning">
+As a string, the coordinates format is &ldquo;lat, lon&rdquo;
+</aside>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span> <span class="p">}</span>
+</code></pre>
+
+<p>Here is the <a href="https://en.wikipedia.org/wiki/Geohash">geoHash</a> representation</p>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span> <span class="p">}</span>
+</code></pre>
+
+<h5 id="bounding-box">Bounding Box</h5>
+
+<p>A bounding box (also known as BBox) is a 2D box that can be defined via:</p>
+
+<ol>
+<li>2 points coordinates tuples, defining the top left and bottom right corners of the box</li>
+<li>4 values defining the 4 BBox sides. <code class="prettyprint">top</code> and <code class="prettyprint">bottom</code> are latitudes and <code class="prettyprint">left</code> and <code class="prettyprint">right</code> are longitudes</li>
+</ol>
+
+<p>All of these representations are defining the same BBox: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">top</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span>
+  <span class="nx">left</span><span class="err">:</span> <span class="mf">40.73</span><span class="p">,</span>
+  <span class="nx">bottom</span><span class="err">:</span> <span class="o">-</span><span class="mf">71.12</span><span class="p">,</span>
+  <span class="nx">right</span><span class="err">:</span> <span class="mf">40.01</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">},</span>
+  <span class="nx">bottomRight</span><span class="err">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.01</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">71.12</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<aside class="warning">
+When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+</aside>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">],</span> 
+  <span class="nx">bottomRight</span><span class="err">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">71.12</span><span class="p">,</span> <span class="mf">40.01</span> <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<aside class="warning">
+As a string, the coordinates format is &ldquo;lat, lon&rdquo;
+</aside>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span><span class="p">,</span> 
+  <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"40.01, -71.12"</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Here is the <a href="https://en.wikipedia.org/wiki/Geohash">geoHash</a> representation</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span><span class="p">,</span> 
+  <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"drj7teegp"</span>
+<span class="p">}</span>
+</code></pre>
+
+<h5 id="polygon">Polygon</h5>
+
+<p>Unlike the GeoJSON representation, a polygon, here, must contain at least, 3 <a href="#point">points</a> ; the last point do not have to be the same as the first one, but the points must be in the right order. The polygon is automatically closed.</p>
+
+<p>For each polygon points, all the possible point notations are valid.</p>
+
+<p>Example of a valid polygon representation: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">points</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">{</span><span class="na">lon</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">lat</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+    <span class="s1">'2,1'</span><span class="p">,</span>
+    <span class="s1">'s037ms06g'</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<h5 id="distance">Distance</h5>
+
+<p>By default, when it is not specified, the distance unit is meters.
+You can use other units accepted by the excellent <a href="https://github.com/brettlangdon/node-units">node-units</a> library, so all units and prefix that library can handle are supported, such as the following, using a lower, upper or camelized notation:</p>
+
+<table><thead>
+<tr>
+<th>Units</th>
+<th>Notations</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>meters</td>
+<td>meter, m</td>
+</tr>
+<tr>
+<td>feet</td>
+<td>feet, ft</td>
+</tr>
+<tr>
+<td>inches</td>
+<td>inch, in</td>
+</tr>
+<tr>
+<td>yards</td>
+<td>yard, yd</td>
+</tr>
+<tr>
+<td>miles</td>
+<td>mile, mi</td>
+</tr>
+</tbody></table>
+
+<p>According to this, all these notations are equivalent: </p>
+<pre class="highlight plaintext"><code>1000
+1000 m
+1km
+3280.839895013123 ft
+3280.839895013123FT
+39370.078740157485 inches
+39370.078740157485 inch
+39370.078740157485 in
+1 093,6132983377079 yd
+0.6213727366498067 miles
+</code></pre>
+
+<h4 id="geospacial-filters">Geospacial filters</h4>
+
+<h5 id="geoboundingbox">geoBoundingBox</h5>
+
+<p>Filter documents wich have a location field and are located into a <a href="#bounding-box">bounding box</a>.</p>
+
+<p><img alt="Illustration of geoBoundingBox" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoBoundingBox.png?raw=true" /></p>
+
+<p>Given the following documents: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter will match the second document only:</p>
+<pre class="highlight javascript"><code><span class="nx">geoBoundingBox</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">top</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.939744</span><span class="p">,</span>
+    <span class="nx">left</span><span class="err">:</span> <span class="mf">52.394484</span><span class="p">,</span>
+    <span class="nx">bottom</span><span class="err">:</span> <span class="mf">1.180129</span><span class="p">,</span>
+    <span class="nx">right</span><span class="err">:</span> <span class="mf">51.143628</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">geoBoundingBox</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">top</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.939744</span><span class="p">,</span>
+      <span class="na">left</span><span class="p">:</span> <span class="mf">52.394484</span><span class="p">,</span>
+      <span class="na">bottom</span><span class="p">:</span> <span class="mf">1.180129</span><span class="p">,</span>
+      <span class="na">right</span><span class="p">:</span> <span class="mf">51.143628</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h5 id="geodistance">geoDistance</h5>
+
+<p>Filter documents wich have a location field and are located into a given <a href="#distance">distance</a> from a given point.</p>
+
+<p><img alt="Illustration of geoDistance" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistance.png?raw=true" /></p>
+
+<p>Given the following documents: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter will match the second document only:</p>
+<pre class="highlight javascript"><code><span class="nx">geoDistance</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">51.5029017</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">0.1606903</span>
+  <span class="p">},</span>
+  <span class="nx">distance</span><span class="err">:</span> <span class="s1">'10km'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">geoDistance</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">location</span><span class="p">:</span> <span class="p">{</span> <span class="c1">// Buckingham Palace</span>
+      <span class="na">lat</span><span class="p">:</span> <span class="mf">51.5029017</span><span class="p">,</span>
+      <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1606903</span>
+    <span class="p">},</span>
+    <span class="na">distance</span><span class="p">:</span> <span class="s1">'10km'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h5 id="geodistancerange">geoDistanceRange</h5>
+
+<p>Filter documents wich have a location field and are located into a given <a href="#distance">distances</a> range from a given point.</p>
+
+<p><img alt="Illustration of geoDistanceRange" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistanceRange.png?raw=true" /></p>
+
+<p>Given the following documents: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter will match the second document only:</p>
+<pre class="highlight javascript"><code><span class="nx">geoDistanceRange</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">51.5029017</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">0.1606903</span>
+  <span class="p">},</span>
+  <span class="nx">from</span><span class="err">:</span> <span class="s1">'1km'</span><span class="p">,</span>
+  <span class="nx">to</span><span class="err">:</span> <span class="s1">'10km'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">geoDistanceRange</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">location</span><span class="p">:</span> <span class="p">{</span> <span class="c1">// Buckingham Palace</span>
+      <span class="na">lat</span><span class="p">:</span> <span class="mf">51.5029017</span><span class="p">,</span>
+      <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1606903</span>
+    <span class="p">},</span>
+    <span class="nx">from</span> <span class="s1">'1km'</span><span class="p">,</span>
+    <span class="na">to</span><span class="p">:</span> <span class="s1">'10km'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h5 id="geopolygon">geoPolygon</h5>
+
+<p>Filter documents wich have a location field and are located into a given <a href="#polygon">polygon</a>.</p>
+
+<p><img alt="Illustration of geoPolygon" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoPolygon.png?raw=true" /></p>
+
+<p>Given the following documents: </p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter will match the second document only:</p>
+<pre class="highlight javascript"><code><span class="nx">geoPolygon</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">points</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.523029</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.160793</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.522842</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.145043</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.518303</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.146116</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.516487</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.162295</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.520226</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.158432</span> <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">geoPolygon</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">points</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.523029</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.160793</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.522842</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.145043</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.518303</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.146116</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.516487</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.162295</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="na">lat</span><span class="p">:</span> <span class="mf">51.520226</span><span class="p">,</span> <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.158432</span> <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+            <h2 id="status-codes-and-error-format">Status Codes and Error format</h2>
+
+<h3 id="kuzzle-response-objects">Kuzzle response objects</h3>
+
+<p>A Kuzzle response is a JSON object with the following structure:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="cm">/*
+  Integer containing the status code (HTTP-like: 200 if OK, 4xx or 5xx in case of error)
+  */</span>
+  <span class="nl">status</span><span class="p">:</span> <span class="nx">xxx</span><span class="p">,</span>  
+
+  <span class="cm">/*
+  Complex object containing error information, if something went wrong (null if OK)
+  */</span>
+  <span class="nx">error</span><span class="err">:</span> <span class="p">{...},</span>  
+
+  <span class="cm">/*
+  Complex object, depending on your query
+  */</span>
+  <span class="nx">result</span><span class="err">:</span> <span class="p">{...}</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="status-codes">Status codes</h3>
+
+<p><code class="prettyprint">status</code> attribute is a numeric code similar to <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status codes</a>.
+It is used to inform the client about the real status of his request (if an error occurred or not).</p>
+
+<h4 id="list-of-status-codes-supported-by-kuzzle">List of status codes supported by Kuzzle</h4>
+
+<h5 id="2xx-success">2xx Success</h5>
+
+<ul>
+<li><code class="prettyprint">200</code>: standard status for a successful request.</li>
+<li><code class="prettyprint">206</code>: the request (typically a bulk import) is partially successful, but some actions encountered an error.
+(in this case, error details are returned within <em>error.errors</em>)</li>
+</ul>
+
+<h5 id="4xx-client-error">4xx Client Error</h5>
+
+<ul>
+<li><code class="prettyprint">400</code>: the request is misformed (usually: an argument is missing).</li>
+<li><code class="prettyprint">403</code>: the client is not allowed to perform the requested action.</li>
+<li><code class="prettyprint">404</code>: the requested resource cannot be found.</li>
+</ul>
+
+<h5 id="5xx-server-error">5xx Server Error</h5>
+
+<ul>
+<li><code class="prettyprint">500</code>: Kuzzle encountered an unexpected error (standard code for internal error).</li>
+<li><code class="prettyprint">503</code>: an external service is unavailable</li>
+</ul>
+
+<h3 id="error-objects-format">Error objects format</h3>
+
+<p>When an error occurred, the <code class="prettyprint">error</code> object returned within the response has the following JSON format:</p>
+
+<p>A Kuzzle response is a JSON object with the following structure:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="cm">/*
+  String containing the error message:
+  */</span>
+  <span class="nl">message</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">,</span>
+
+  <span class="cm">/*
+  Integer containing the occurrence number of the error (in case of multiple errors for bulk actions)
+  */</span>
+  <span class="nx">count</span><span class="err">:</span> <span class="mi">1</span><span class="p">,</span>
+
+  <span class="cm">/*
+  Complex object, with details of the error (kept empty for other than "500" errors)
+  */</span>
+  <span class="nx">stack</span><span class="err">:</span> <span class="p">{...}</span>
+
+  <span class="cm">/*
+  [Optional, only in case of "bulk" requests] Complex object, with list of errors for a partial error case
+  */</span>
+  <span class="nl">errors</span><span class="p">:</span> <span class="p">{...}</span>
+
+<span class="p">}</span>
+</code></pre>
+
+            <h2 id="security">Security</h2>
+
+<p>Kuzzle provides a full set of functionalities to finely define the permissions for your data.</p>
+
+<h3 id="fresh-installation-default-rights">Fresh installation default rights.</h3>
+
+<p>When installing Kuzzle for the very first time, no default user is created and the Anonymous user is allowed to perform any action on the data. The only restriction is on the internal data storage used by Kuzzle to store its configuration.</p>
+
+<p>Once a first admin user is created, either by accessing <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a> for the first time or by using the <a href="https://github.com/kuzzleio/kuzzle/tree/master/bin">CLI</a>, the Anonymous permissions are dropped.</p>
+
+<p>You can then use the Back Office to administrate your user rights.</p>
+
+<h3 id="authentication">Authentication</h3>
+
+<p>The first step to secure your data is to be able to identify your users. Kuzzle ships by default with a local login/password strategy.</p>
+
+<p>Kuzzle uses <a href="http://passportjs.org/">passportjs</a> to enable authentication with a potentially large amount of providers, for example:</p>
+
+<ul>
+<li>local username/password authentication (enabled by default)</li>
+<li>oauth2 providers like github or google</li>
+<li>SAML providers</li>
+<li>etc.</li>
+</ul>
+
+<p>You can also use Kuzzle&rsquo;s <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github">Github authentication plugin</a> or develop your own.</p>
+
+<h4 id="how-it-works">How it works</h4>
+
+<p>Kuzzle provides a <strong>auth</strong> controller which delegates the authentication strategy to passportjs.</p>
+
+<p>If the passportjs <em>authenticate</em> method resolves an existing user, Kuzzle generates a <a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a> that should be used in subsequent requests.</p>
+
+<p>See more details:</p>
+
+<ul>
+<li><a href="../request_scenarios/auth.md">Authentication scenarios</a></li>
+<li><a href="/api-reference/#auth-controller">Kuzzle API Documentation about Auth Controller</a> and <a href="/api-reference/#authorization-header">JWT token usage</a> in Kuzzle requests.</li>
+</ul>
+
+<h3 id="permissions">Permissions</h3>
+
+<p>Once you know who is connected, you need a way to attach your users some permission policies to control their access to data.</p>
+
+<h4 id="users-profiles-and-roles">Users, profiles and roles</h4>
+
+<p>Kuzzle associates <code class="prettyprint">users</code> to a <code class="prettyprint">profile</code>.<br>
+You can think to a <code class="prettyprint">profile</code> as a user group. All the <code class="prettyprint">users</code> that share the same <code class="prettyprint">profile</code> will get the same accesses.</p>
+
+<p>Because some sets of permissions can be shared between several <code class="prettyprint">profiles</code>, Kuzzle includes an additional level of abstraction below the <code class="prettyprint">profile</code>: the <code class="prettyprint">roles</code>.</p>
+
+<p>A <code class="prettyprint">profile</code> is a set of <code class="prettyprint">role</code>. Each <code class="prettyprint">role</code> defines a set of permissions.</p>
+
+<p><img alt="Users, profiles and roles" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_security_readme_profiles-roles.png?raw=true" /></p>
+
+<p>In the simple example above, the <em>editor</em> profile is a superset of the <em>contributor</em> one, which, in turn, extends the <em>default</em> profile.</p>
+
+<h3 id="roles-definition">Roles definition</h3>
+
+<p><code class="prettyprint">roles</code> can be edited in <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a>. A <code class="prettyprint">role</code> definition is a hierarchical JSON object in which permissions can be defined at each data level, from the <code class="prettyprint">index</code> down to the <code class="prettyprint">action</code>.</p>
+
+<p>The <code class="prettyprint">role</code> definition is represented as a hierarchical object for one or more <code class="prettyprint">indexes</code>.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">myRoleDefinition</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
+    <span class="o">&lt;</span> <span class="nx">index</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
+      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
+        <span class="o">&lt;</span> <span class="nx">collection</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
+          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="o">&lt;</span> <span class="nx">controller</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
+                <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
+                <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
+                <span class="p">...</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>Each entry of the <code class="prettyprint">indexes</code>, <code class="prettyprint">collections</code>, <code class="prettyprint">controllers</code>, <code class="prettyprint">actions</code> tree can be set to either an explicit value or the &ldquo;&#42;&rdquo; wildcard.</p>
+
+<p>The <code class="prettyprint">action permission</code> value can be set either to:</p>
+
+<ul>
+<li>a boolean. When set to <code class="prettyprint">true</code>, the user is allowed to perform the action.</li>
+<li>an object that describes a function (more about it in the <a href="#actions-permissions-functions">action permissions functions section</a>).</li>
+</ul>
+
+<p>example:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">anonymousRole</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">auth</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">login</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">checkToken</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">getCurrentUser</span><span class="p">:</span> <span class="kc">true</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>The example above is the permission definition set by Kuzzle for the Anonymous user after the first admin user has been created.</p>
+
+<p>In this example, the role denies every action to the user, except the <code class="prettyprint">login</code>, <code class="prettyprint">checkToken</code> and <code class="prettyprint">getCurrentUser</code> actions of the <code class="prettyprint">auth</code> controller.</p>
+
+<h4 id="95-candelete-and-95-cancreate">&#95;canDelete and &#95;canCreate</h4>
+
+<p>Some permissions are not related to an index or a collection like for instance creating or deleting an index or a collection.</p>
+
+<p>To handle such cases, the role definition accepts the <code class="prettyprint">_canDelete</code> and <code class="prettyprint">_canCreate</code> parameters.</p>
+
+<ul>
+<li><code class="prettyprint">_canCreate</code> needs to be defined <em>at the level above</em> of the target.</li>
+<li><code class="prettyprint">_canDelete</code> needs to be defined at the first sub-level of the target.</li>
+</ul>
+
+<p>Example:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="p">...</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>The above example allows the user to create any index and forbids to delete the <em>myIndex</em> index.</p>
+
+<h4 id="composition-rules">Composition rules</h4>
+
+<p>The composition rule is:</p>
+
+<aside class="success">
+The more specific overrides the less specific.
+</aside>
+
+<p>Example:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nl">controllers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"*"</span><span class="p">:</span> <span class="kc">true</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">forbiddenCollection</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"*"</span><span class="p">:</span> <span class="kc">false</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>In the example above, the user is granted any action on any collection of <em>myIndex</em> <strong>except</strong> for the <em>forbiddenCollection</em>, for which he is denied any action.</p>
+
+<h4 id="actions-permissions-functions">Actions permissions functions</h4>
+
+<p>So far, we&rsquo;ve seen how to set permissions based on the users profiles only.</p>
+
+<p>Now, let&rsquo;s say we have a chat application and want the users to be allowed to edit &amp; delete their own messages only.</p>
+
+<p>This type of rules depends on the context and cannot be expressed as a simple boolean.</p>
+
+<p>Kuzzle lets you define some more complex permissions using a custom function, which can dynamically decide wether the user is allowed to proceed or not depending on the context.</p>
+
+<p>In our chat example, the rule can be expressed as:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">chatMessages</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">write</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">create</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                <span class="na">delete</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="na">args</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="na">document</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="na">collection</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+                      <span class="na">index</span><span class="p">:</span> <span class="s2">"chatMessages"</span><span class="p">,</span>
+                      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
+                      <span class="p">}</span>
+                    <span class="p">}</span>
+                  <span class="p">},</span>
+                  <span class="na">test</span><span class="p">:</span> <span class="s2">"return args.document.content.user.id === $currentUserId"</span>
+                <span class="p">}</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<h4 id="the-permission-function">The permission function</h4>
+
+<p>The permission function has the following signature:</p>
+<pre class="highlight javascript"><code><span class="cm">/**
+ * @param {RequestObject} $requestObject  The current action request.
+ * @param {Object} context                The current connection context. Contains the connection type and the current user.
+ * @param {string} $currentUserId         The current user Id. Shortcut to context.token.user._id
+ * @param {Object} args                   The result of the evaluated args definition.
+ *
+ * @return {Boolean}
+ */</span>
+<span class="kd">function</span> <span class="p">(</span><span class="nx">$requestObject</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">$currentUserId</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// the function body is built from the "test" parameter</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>The permission function is executed in a sandbox with a limited scope. Its body is the evaluation of the <em>test</em> parameter given in the definition.</p>
+
+<h5 id="parameters">Parameters</h5>
+
+<h6 id="requestobject">$requestObject</h6>
+
+<p>The request object is the request that is currently being evaluated.<br>
+A typical request object will look like:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">requestObject</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+  <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+  <span class="na">controller</span><span class="p">:</span> <span class="s2">"write"</span><span class="p">,</span>
+  <span class="na">action</span><span class="p">:</span> <span class="s2">"update"</span><span class="p">,</span>
+  <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_id</span><span class="p">:</span> <span class="s2">"id_1"</span><span class="p">,</span>
+    <span class="na">body</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">foo</span><span class="p">:</span> <span class="s2">"bar"</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">someHeader</span><span class="p">:</span> <span class="s2">"some header value"</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="na">metadata</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">someMetadata</span><span class="p">:</span> <span class="s2">"some metadata value"</span>
+  <span class="p">},</span>
+  <span class="na">requestId</span><span class="p">:</span> <span class="s2">"66978665-1ac5-4770-890c-59cc88f89098"</span><span class="p">,</span>
+  <span class="na">timestamp</span><span class="p">:</span> <span class="mi">14582100322345</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="context">context</h6>
+
+<p>The context object stores some information about the current connection.<br>
+A typical context object will look like:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="s2">"/#O3u2-yCDXsYyqLr5AAAA"</span><span class="p">,</span>
+    <span class="na">type</span><span class="p">:</span> <span class="s2">"socketio"</span>
+  <span class="p">},</span>
+  <span class="na">token</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_id</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+    <span class="na">expiresAt</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="na">ttl</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">_id</span><span class="p">:</span> <span class="s2">"login"</span><span class="p">,</span>
+      <span class="na">name</span><span class="p">:</span> <span class="s2">"Username"</span><span class="p">,</span>
+      <span class="na">profile</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// user profile object.</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="currentuserid">$currentUserId</h6>
+
+<p>The <em>$currentUserId</em> variable contains the current user id. It is an alias for <code class="prettyprint">context.token.user._id</code>.</p>
+
+<h6 id="args">args</h6>
+
+<p>The <em>args</em> object contains the result of the evaluation of the fetch definition (cf below).</p>
+
+<h4 id="the-fetch-definition">The fetch definition</h4>
+
+<p>The optional <em>args</em> parameter given to the permission function is the result of the evaluation of some fetch definition given in the args section of the role definition.</p>
+
+<p>Using this ability, you can pass some documents fetches from Kuzzle&rsquo;s database layer to your permission function.</p>
+
+<p>In our chat example above, we fetch a <em>document</em> variable which contains the document that was requested for deletion and that we use in the permission function to test if it is owned by the current user.</p>
+
+<h5 id="args-element-structure">args element structure</h5>
+
+<p>The <em>args</em> element has the following structure:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">&lt;</span><span class="nx">some</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nl">index</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">from</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">fetch</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="na">collection</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">collection</span> <span class="k">in</span> <span class="nx">which</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>  <span class="nx">are</span> <span class="nx">fetched</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+        <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="p">(</span><span class="nx">get</span><span class="o">|</span><span class="nx">mget</span><span class="o">|</span><span class="nx">search</span><span class="p">)</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="nx">specific</span> <span class="nx">parameters</span><span class="o">&gt;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="o">&lt;</span><span class="nx">another</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="p">...</span>
+    <span class="p">},</span>
+    <span class="p">...</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>You can define one or more <em>variables</em> inside the args element and, for each of them, the action to use to populate them.</p>
+
+<p>The <em>variable</em> will then be availalbe from your permission function under args.<em><variable></em>.</p>
+
+<h6 id="get-action-type"><em>get</em> action type</h6>
+
+<p>The <code class="prettyprint">get</code> action type performs a read/get call. It takes a document id for entry and returns the matching document.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">myDocument</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+      <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="mget-action-type"><em>mget</em> action type</h6>
+
+<p>The <code class="prettyprint">mget</code> action type takes a list of document ids for entry and returns the list of matching documents.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">mget</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"id_1"</span><span class="p">,</span>
+        <span class="s2">"id_2"</span><span class="p">,</span>
+        <span class="p">...</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="search-action-type"><em>search</em> action type</h6>
+
+<p>The <code class="prettyprint">search</code> action type makes a search in Kuzzle&rsquo;s database layer and returns the related documents.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">search</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">filter</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">match</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">name</span><span class="p">:</span> <span class="s2">"$requestObject.data.body.name"</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>The action.search value is sent to Kuzzle&rsquo;s database layer directly, being Elasticsearch 2.2.</p>
+
+<p>Please refer to <a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html">Elasticsearch search API documentation</a> for additional information on how to build your query.</p>
+
+<h6 id="available-variables">available variables</h6>
+
+<p>Some variables are exposed by Kuzzle and can be used within your fetch function definition:</p>
+
+<ul>
+<li><code class="prettyprint">$currentId</code>: The current request document id. Shortcut to $requestObject.data.&#95;id.</li>
+<li><code class="prettyprint">$requestObject</code>: The complete request object being evaluated.</li>
+</ul>
+
+            <h1 id="core-documentation">Core documentation</h1>
+
+            <h2 id="architecture">Architecture</h2>
+
+<p><img alt="archi_fonctionnal" src="images/global-overview.png" /></p>
+
+<p>Kuzzle Kernel API can be accessed from 3 different paths:</p>
+
+<ol>
+<li>a <a href="/api-reference/?rest">RESTFul API</a></li>
+<li>a <a href="/api-reference/?websocket">Websocket connexion</a>, using Kuzzle <a href="/sdk-documentation">Javascript SDK</a></li>
+<li>or any other custom protocol, using a Protocol Plugin (examples: <a href="/api-reference/?amqp">AMQP</a>, <a href="/api-reference/?mqtt">MQTT</a>, <a href="/api-reference/?stomp">STOMP</a>)</li>
+</ol>
+
+<p>In the background, Kuzzle uses:</p>
+
+<ul>
+<li>a noSQL engine to store, index and search contents (we use Elasticsearch by default).</li>
+<li>a cache engine to store subscription lists (we use redis by default).</li>
+</ul>
+
+<h3 id="core-architecture">Core architecture</h3>
+
+<p>Focus on the above &ldquo;Kuzzle kernel&rdquo;:</p>
+
+<p><img alt="archi_core" src="images/core-architecture.png" /></p>
+
+<h4 id="main-core-components">Main core components</h4>
+
+<ul>
+<li><strong>Router Controller</strong>: implements the 3 API routers, normalizes the input message and sends them to the Funnel Controller</li>
+<li><strong>Funnel Controller</strong>: analyses the input message and calls the appropriate controller (see <a href="api-specifications.md">API specification</a>)</li>
+<li><strong>Admin Controller</strong>, <strong>Auth Controller</strong>, <strong>Bulk Controller</strong>, <strong>Write Controller</strong>, <strong>Subscribe Controller</strong>, <strong>Read Controller</strong>: handles the input message (see <a href="/api-reference">API reference</a>)</li>
+<li><strong>Internal Components</strong>: Any component used internally by controllers and any other internal component to interact with services</li>
+</ul>
+
+<h3 id="gt-hooks">&gt; Hooks</h3>
+
+<p>Hooks allow to attach actions to Kuzzle events.</p>
+
+<p>For example, Admin, Bulk and Writer controllers emit a &ldquo;data:create&rdquo; event to handle some writing actions through the storage engine.
+This event will trigger the execution of the <em>add</em> method and of the <em>write</em> hook, which will send the received message to the internal broker.</p>
+
+<p>Then it is possible to implement custom hooks to trigger any event emitted by Kuzzle.</p>
+
+<p>The list of available events and their default attached actions can be found in the <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/config/hooks.js">config/hooks.js</a> file.</p>
+
+<p>As an example, when the &ldquo;data:afterCreate&rdquo; event is emitted by kuzzle, it will trigger the execution of the <em>add</em> method of the <em>write</em> hook, which will send the received message to the broker.</p>
+
+<h5 id="contributing">Contributing</h5>
+
+<p>You can define and add your own custom hooks.</p>
+
+<p>A hook must be a valid node.js module that implements an init() function.</p>
+
+<p>The init function is passed to the current kuzzle instance object.</p>
+
+<p>Your module must be placed in the /lib/hooks directory.</p>
+
+<p>You can then attach your hook to some events by editing the <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/config/hooks.js">config/hooks.js</a> configuration file.</p>
+
+<h3 id="gt-services">&gt; Services</h3>
+
+<p>In Kuzzle, a Service module is the implementation of the interface to different components of the application (think of a <em>system</em> service).</p>
+
+<p>Kuzzle currently implements the following Services:</p>
+
+<ul>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/rabbit.js">rabbit.js</a>: interface to <a href="https://www.rabbitmq.com/">RabbitMQ</a></li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/elasticsearch.js">elasticsearch.js</a>: interface to <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a>, used for persistent data storage.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/redis.js">redis.js</a>: interface to the <a href="http://redis.io">redis</a> cache server.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/logger.js">logger.js</a>: interface to the <a href="https://www.elastic.co/products/logstash">Logstash</a> server.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/ipc.js">ipc.js</a>: IPC implementation of the internal message broker</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/index.js">index.js</a>: module entry point. Used to initialize all implemented services.</li>
+</ul>
+
+<p>A Service can be added to different engines. For example, Elasticsearch is used by both the writeEngine and the readEngine (see <a href="./index.js">index.js</a>).</p>
+
+<h4 id="workers">Workers</h4>
+
+<p>A worker is an independant component, detachable from a Kuzzle server container. It can be run in another container or even on another machine.</p>
+
+<p>Workers attach themselves to the internal broker service fed by Kuzzle to perform any kind of task.</p>
+
+<p>For instance, writing persistent data on Kuzzle is implemented as a write worker.</p>
+
+<p>Additionally, serveral Workers of the same type can be launched in parallel, on the same or on a different host.</p>
+
+<p>This flexibility allows administrators of Kuzzle system to leverage their resource consumption and distribute and/or scale their services to better fit their needs.</p>
+
+            <h2 id="plugins">Plugins</h2>
+
+<p>Plugins are external components allowing to execute functions on specific event triggering.<br>
+There are several types of plugins:</p>
+
+<ul>
+<li><strong>Hook events</strong>: just listen to events and perform other actions (ie: a log plugin). They do not respond to anything directly, they just listen.</li>
+<li><strong>Pipe events</strong>: perform an action and return something. Kuzzle is waiting that all pipe events are performed before continuing.</li>
+<li><strong>Controllers</strong>: add a specific controller to Kuzzle.</li>
+</ul>
+
+<h3 id="plugins-configuration">Plugins Configuration</h3>
+
+<p>Some plugins can be configured. To customize these plugins, all you have to do is to create a file <code class="prettyprint">config/customPlugins.json</code>, and to put it in the <code class="prettyprint">config/</code> Kuzzle directory.  </p>
+
+<p>If your Kuzzle is running inside a docker image, you&rsquo;ll have to inject this file in the image.<br>
+In <code class="prettyprint">docker-compose.yml</code> file, you can have something like:</p>
+<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
+  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle</span>
+  <span class="s">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">host/path/to/customPlugins.json:/var/app/config/customPlugins.json"</span>
+  <span class="s">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
+    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
+  <span class="s">links</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">elasticsearch</span>
+    <span class="pi">-</span> <span class="s">redis</span>
+</code></pre>
+
+<p>Plugins configuration have the following default attributes:</p>
+
+<ul>
+<li><code class="prettyprint">path</code>: The local path where the plugin is hosted on the server.</li>
+<li><code class="prettyprint">url</code>: a git URL where the plugin can be found and cloned.</li>
+<li><code class="prettyprint">version</code>: the NPM package version to download</li>
+<li><code class="prettyprint">customConfig</code>: config for the plugin. Each plugin has a different configuration (required or optional), check the corresponding plugin documentation for more information.</li>
+<li><code class="prettyprint">defaultConfig</code>: Don&rsquo;t edit this attribute. The defaultConfig is provided by the plugin itself. If you need to change the configuration, edit the <code class="prettyprint">customConfig</code> attribute</li>
+</ul>
+
+<p><strong>Note:</strong>
+* A <code class="prettyprint">path</code>, a <code class="prettyprint">url</code>, or a <code class="prettyprint">version</code> parameter is required. Priority is <code class="prettyprint">path</code>, <code class="prettyprint">url</code>, <code class="prettyprint">version</code>; if more than one paramater is set, highest priority parameter is used and others will be ignored.</p>
+
+<h3 id="default-plugins">Default plugins</h3>
+
+<h4 id="logger">Logger</h4>
+
+<p>By default, the logger plugin is enabled and configured to use the service <code class="prettyprint">winston</code> (refer to <a href="https://github.com/kuzzleio/kuzzle-plugin-logger">kuzzle-plugin-logger documentation</a> for more information).  </p>
+
+<h4 id="quot-passport-local-quot-authentication">&ldquo;Passport Local&rdquo; Authentication</h4>
+
+<p>By default, the standard &ldquo;passport-local&rdquo; plugin is enabled to authenticate users with their username/password (refer to <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local">kuzzle-plugin-auth-passport-local documentation</a> for more information).</p>
+
+<p>See also the <a href="#authentication">global authentication mechanism documentation</a>.</p>
+
+<h4 id="socket-io-communication-support">Socket.io communication support</h4>
+
+<p>By default, the protocol plugin <a href="https://github.com/kuzzleio/kuzzle-plugin-socketio">socket.io</a> is installed, allowing to access Kuzzle using Socket.io clients.</p>
+
+<p>The default plugin configuration opens the port <code class="prettyprint">7512</code>. This can be changed by injecting a custom plugin configuration file.</p>
+
+<h3 id="how-to-create-a-plugin">How to create a plugin</h3>
+
+<p>A plugin is a Javascript module that can be installed with NPM or via a public GIT repository.</p>
+
+<h4 id="configuration">Configuration</h4>
+
+<p>The module must have a <code class="prettyprint">package.json</code> file with a <code class="prettyprint">pluginInfo</code> entry. The optional <code class="prettyprint">defaultConfig</code> will be copied in files <code class="prettyprint">config/defaultPlugins.json</code> and <code class="prettyprint">config/customPlugins.json</code> in Kuzzle.</p>
+<pre class="highlight json"><code><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"service"</span><span class="p">:</span><span class="w"> </span><span class="s2">"winston"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"level"</span><span class="p">:</span><span class="w"> </span><span class="s2">"info"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"addDate"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>The <code class="prettyprint">loadedBy</code> option tells Kuzzle to install and load the plugin only by corresponding instance types.<br>
+The accepted values are: <code class="prettyprint">all</code>, <code class="prettyprint">server</code> and <code class="prettyprint">worker</code>. Default value: <code class="prettyprint">all</code>.</p>
+
+<h4 id="the-plugin-context">The plugin context</h4>
+
+<p>Plugins don&rsquo;t have access to the Kuzzle instance. Instead, Kuzzle provides a plugin <code class="prettyprint">context</code> to the <code class="prettyprint">plugin.init()</code> function.</p>
+
+<p>Here is the list of shared objects contained in the provided <code class="prettyprint">context</code>:</p>
+
+<table><thead>
+<tr>
+<th>Object</th>
+<th>Purpose</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">RequestObject</code></td>
+<td>Constructor for standardized requests sent to Kuzzle</td>
+</tr>
+<tr>
+<td><code class="prettyprint">ResponseObject</code></td>
+<td>Constructor for the standardized Kuzzle non-realtime response objects</td>
+</tr>
+<tr>
+<td><code class="prettyprint">RealTimeResponseObject</code></td>
+<td>Constructor for the standardized Kuzzle realtime response objects</td>
+</tr>
+<tr>
+<td>Errors&hellip;</td>
+<td>Kuzzle error constructors. The complete list can be found in the <code class="prettyprint">lib/api/core/errors</code> directory</td>
+</tr>
+<tr>
+<td><code class="prettyprint">repositories()</code></td>
+<td>Getter function to the security roles, profiles and users repositories</td>
+</tr>
+<tr>
+<td><code class="prettyprint">getRouter()</code></td>
+<td>Getter function to the Kuzzle protocol communication system</td>
+</tr>
+</tbody></table>
+
+<h4 id="architecture">Architecture</h4>
+
+<p>Your main javascript file in your plugin must have a function <code class="prettyprint">init</code> and expose a <code class="prettyprint">hooks</code> and/or a <code class="prettyprint">pipes</code> and/or a <code class="prettyprint">controllers</code> object. All functions defined in these files must be exposed as main object.</p>
+
+<h4 id="the-plugin-init-function">The plugin init function</h4>
+
+<p>All plugins must expose a <code class="prettyprint">init</code> function. Its purpose is to initialize the plugins according to its configuration.</p>
+
+<p>Kuzzle calls these <code class="prettyprint">init</code> function at startup, during initialization.</p>
+
+<p>Expected arguments:
+<code class="prettyprint">function (config, context, isDummy)</code></p>
+
+<p>Where:
+* <code class="prettyprint">config</code>: JSON object containing the plugin configuration (the content of the <code class="prettyprint">defaultConfig</code> or the <code class="prettyprint">customConfig</code> configuration)
+* <code class="prettyprint">context</code>: the plugin context (see above)
+* <code class="prettyprint">isDummy</code>: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)</p>
+
+<h3 id="gt-listener-plugins">&gt; Listener plugins</h3>
+
+<p>Hook events are triggered and are non-blocking functions. Listener plugins are configured to be called on these hooks.</p>
+<pre class="highlight javascript"><code><span class="c1">// Somewhere in Kuzzle</span>
+<span class="nx">kuzzle</span><span class="p">.</span><span class="nx">pluginsManager</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">'event:hookEvent'</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="cm">/*
+  Plugin hooks configuration.
+  Let's assume that we store this configuration in a "hooks.js" file
+ */</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'event:hookEvent'</span><span class="p">:</span> <span class="s1">'myFunction'</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// Plugin implementation</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">hooks</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/hooks.js'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do something</span>
+  <span class="p">}</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">myFunction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Event'</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="s1">'is triggered'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Here is the message'</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="gt-pipe-plugins">&gt; Pipe plugins</h3>
+
+<p>When a pipe event is triggered, we are waiting for all plugins attached on this event. A plugin attached on a pipe event has access to the data and can even change them.
+A pipe plugin constructor must take in its last parameter a callback. This callback must be called at the end of the function with <code class="prettyprint">callback(error, object)</code>:</p>
+
+<ul>
+<li>error: if there is an error during the function, this parameter must be set with one of the available Error types. If everything is ok, you can call the function with null</li>
+<li>object: the object to pass to the next function</li>
+</ul>
+
+<p>Plugins are called in chain. When the <code class="prettyprint">callback()</code> function is called, the next function attached on the event is triggered.<br>
+If the plugin fails to call the callback before timeout, Kuzzle will raise an error and forward it to the requesting clients.</p>
+
+<p>Pipe plugins are useful when you want to modify or validate an object.</p>
+<pre class="highlight javascript"><code><span class="c1">// Somewhere in Kuzzle</span>
+<span class="nx">kuzzle</span><span class="p">.</span><span class="nx">pluginsManager</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">'event:pipeEvent'</span><span class="p">,</span> <span class="nx">requestObject</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">modifiedRequestObject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do something</span>
+  <span class="p">});</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// Plugin pipes configuration</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'event:pipeEvent'</span><span class="p">:</span> <span class="s1">'addCreatedAt'</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// In main plugin index file</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">pipes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/pipes.js'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do something</span>
+  <span class="p">}</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">addCreatedAt</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">requestObject</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">requestObject</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">requestObject</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>In this example, in Kuzzle, the <code class="prettyprint">modifiedRequestObject</code> has now a <code class="prettyprint">createdAt</code> attribute.</p>
+
+<h3 id="gt-controllers">&gt; Controllers</h3>
+
+<p>A plugin controller is a plugin that adds new controller and actions to Kuzzle.
+It must expose to Kuzzle:</p>
+
+<p><strong>A <code class="prettyprint">controllers</code> object listing one or more controllers:</strong></p>
+<pre class="highlight javascript"><code><span class="c1">// Plugin controller configuration</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'mycontroller'</span><span class="p">:</span> <span class="s1">'MyController'</span>
+<span class="p">};</span>
+</code></pre>
+
+<p><strong>A <code class="prettyprint">routes</code> object listing the HTTP routes for the REST API:</strong></p>
+<pre class="highlight javascript"><code><span class="c1">// Plugin REST routes configuration</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">verb</span><span class="p">:</span> <span class="s1">'get'</span><span class="p">,</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/foo/:name'</span><span class="p">,</span> <span class="na">controller</span><span class="p">:</span> <span class="s1">'mycontroller'</span><span class="p">,</span> <span class="na">action</span><span class="p">:</span> <span class="s1">'myAction'</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">verb</span><span class="p">:</span> <span class="s1">'post'</span><span class="p">,</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="na">controller</span><span class="p">:</span> <span class="s1">'mycontroller'</span><span class="p">,</span> <span class="na">action</span><span class="p">:</span> <span class="s1">'myAction'</span><span class="p">},</span>
+<span class="p">];</span>
+</code></pre>
+
+<p><em>NB: you can describe any routes you want, according to the actions you need to implement.<br>
+For each action, you can declare either a GET action, or a POST action, or both of them.</em></p>
+
+<p><strong>The controller code, implementing your actions:</strong></p>
+<pre class="highlight javascript"><code><span class="c1">// Controller implementation</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">MyController</span> <span class="p">(</span><span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">myAction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">requestObject</span><span class="p">)</span>
+    <span class="kd">var</span>
+      <span class="nx">responseBody</span> <span class="o">=</span> <span class="p">{},</span>
+      <span class="nx">response</span><span class="p">;</span>
+
+    <span class="c1">// implement here the result of this controller action</span>
+
+    <span class="c1">// Sample response object creation with the context variable:</span>
+    <span class="nx">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">context</span><span class="p">.</span><span class="nx">ResponseObject</span><span class="p">(</span><span class="nx">requestObject</span><span class="p">,</span> <span class="nx">responseBody</span><span class="p">);</span>
+
+    <span class="c1">// the function must return a Promise:</span>
+    <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="c1">// Main plugin file</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">controllers</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/controllers.js'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">routes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/routes.js'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+    <span class="c1">// do something</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">MyController</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">MyController</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./controllers/myController'</span><span class="p">),</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyController</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>Notes:</p>
+
+<ul>
+<li>Action methods must return a promise.</li>
+<li>The controller constructor must use a &ldquo;<em>context</em>&rdquo; variable, which contains
+some Kuzzle prototypes such as ResponseObject or KuzzleError,
+which can be used by the controller actions.<br>
+(see <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/api/core/pluginsContext.js">List of injected prototypes</a> ).</li>
+</ul>
+
+<h4 id="how-it-works">How it works</h4>
+
+<ul>
+<li>With non-REST protocols, the <em>controller</em> attribute is prefixed with the plugin name.</li>
+</ul>
+
+<p>Sample:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">controller</span><span class="p">:</span> <span class="s1">'myplugin/mycontroller'</span><span class="p">,</span>
+  <span class="nx">action</span><span class="err">:</span> <span class="s1">'myAction'</span><span class="p">,</span>
+  <span class="nx">body</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">name</span><span class="p">:</span> <span class="s2">"John Doe"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<ul>
+<li>With REST protocol, we use the routes configured in <em>routes.js</em>.<br>
+These routes are automatically prefixed with &ldquo;_plugin/&rdquo; + the plugin name.</li>
+</ul>
+
+<p>Samples:</p>
+
+<p>GET action:</p>
+<pre class="highlight plaintext"><code>GET http://kuzzle:7511/api/1.0/_plugin/myplugin/foo/John%20Doe
+</code></pre>
+
+<p>POST action:</p>
+<pre class="highlight plaintext"><code>POST http://kuzzle:7511/api/1.0/_plugin/myplugin/foo
+{"name": "John Doe"}
+</code></pre>
+
+<h3 id="gt-protocol-plugins">&gt; Protocol plugins</h3>
+
+<p>Kuzzle core only supports REST communications. All other supported protocols are implemented as protocol plugins.<br>
+By default, the Kuzzle official docker image is shipped with the <a href="https://github.com/kuzzleio/kuzzle-plugin-socketio">Socket.io</a> protocol.</p>
+
+<h4 id="how-it-works">How it works</h4>
+
+<p>Protocol plugins allow Kuzzle to support any existing protocol. These plugins ensure a two-way communication between clients and Kuzzle.  </p>
+
+<p>Messages emanating from Kuzzle are emitted using the following hooks. Protocol plugins are free to ignore some or all of these hooks:</p>
+
+<table><thead>
+<tr>
+<th>Hook</th>
+<th>Emitted object</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">protocol:joinChannel</code></td>
+<td><code class="prettyprint">{channel, id}</code></td>
+<td>Tells protocol plugins that the connection <code class="prettyprint">id</code> subscribed to the channel <code class="prettyprint">channel</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:leaveChannel</code></td>
+<td><code class="prettyprint">{channel, id}</code></td>
+<td>Tells protocol plugins that the connection <code class="prettyprint">id</code> left the channel <code class="prettyprint">channel</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:notify</code></td>
+<td><code class="prettyprint">{channel, id, payload}</code></td>
+<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> to the connection <code class="prettyprint">id</code>, on the channel <code class="prettyprint">channel</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:broadcast</code></td>
+<td><code class="prettyprint">{channel, payload}</code></td>
+<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> to clients connected to the channel <code class="prettyprint">channel</code></td>
+</tr>
+</tbody></table>
+
+<p><em>For more information about channels, see our <a href="/api-reference/#on">API Documentation</a></em></p>
+
+<p>Requests sent by clients to Kuzzle can be forwarded by protocol plugins using methods exposed in the plugin context.<br>
+To access these methods, simply call <code class="prettyprint">context.getRouter().&lt;router method&gt;</code>:</p>
+
+<table><thead>
+<tr>
+<th>Router method</th>
+<th>Arguments</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">newConnection</code></td>
+<td><code class="prettyprint">protocol name</code> (string) <br/><code class="prettyprint">connection ID</code> (string)</td>
+<td>A promise resolving to a <code class="prettyprint">context</code> object</td>
+<td>Declare a new connection to Kuzzle.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">execute</code></td>
+<td><code class="prettyprint">optional JWT Headers</code> (string)<br/><code class="prettyprint">RequestObject</code> (object)<br/><code class="prettyprint">context</code> (obtained with <code class="prettyprint">newConnection</code>)<br/>A node callback resolved with the request response</td>
+<td></td>
+<td>Execute a client request.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">removeConnection</code></td>
+<td><code class="prettyprint">context</code> (obtained with <code class="prettyprint">newConnection</code>)</td>
+<td></td>
+<td>Asks Kuzzle to remove the corresponding connection and all its subscriptions</td>
+</tr>
+</tbody></table>
+
+<h4 id="example">Example</h4>
+
+<p>First, link protocol hooks to their corresponding implementation methods:</p>
+<pre class="highlight javascript"><code><span class="c1">// Content of a hooks.js file:</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'protocol:broadcast'</span><span class="p">:</span> <span class="s1">'broadcast'</span><span class="p">,</span>
+  <span class="s1">'protocol:notify'</span><span class="p">:</span> <span class="s1">'notify'</span><span class="p">,</span>
+  <span class="s1">'protocol:joinChannel'</span><span class="p">:</span> <span class="s1">'join'</span><span class="p">,</span>
+  <span class="s1">'protocol:leaveChannel'</span><span class="p">:</span> <span class="s1">'leave'</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>Then, implement the corresponding methods:</p>
+<pre class="highlight javascript"><code><span class="c1">// Protocol plugin implementation</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">hooks</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./hooks.js'</span><span class="p">);</span>
+  <span class="c1">// for instance, maintain client contexts in a global object</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">contexts</span> <span class="o">=</span> <span class="p">{};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Protocol initialization. Usually opens a network port to listen to</span>
+    <span class="c1">// incoming messages</span>
+
+    <span class="c1">// whenever a client is connected</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">getRouter</span><span class="p">().</span><span class="nx">newConnection</span><span class="p">(</span><span class="s2">"this protocol name"</span><span class="p">,</span> <span class="s2">"connection unique ID"</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">context</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">contexts</span><span class="p">[</span><span class="s2">"connection unique ID"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+      <span class="p">});</span>
+
+    <span class="c1">// whenever a client sends a request</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">getRouter</span><span class="p">().</span><span class="nx">execute</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">requestObject</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">contexts</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// errors are encapsulated in a ResponseObject. You may simply</span>
+        <span class="c1">// forward it to the client too</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// forward the response to the client</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="c1">// whenever a client is disconnected</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">getRouter</span><span class="p">().</span><span class="nx">removeConnection</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">contexts</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]);</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">broadcast</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*
+     Linked to the protocol:broadcast hook, emitted
+     by Kuzzle when a "data.payload" needs to be broadcasted to the
+     "data.channel" channel
+
+     The payload is a ResponseObject
+    */</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">notify</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*
+     Linked to the protocol:notify hook, emitted
+     by Kuzzle when a "data.payload" needs to be emitted to the
+     connection "data.id", on the channel "data.channel"
+
+     The payload is a ResponseObject
+    */</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*
+      Linked to the protocol:joinChannel hook, emitted  
+      by Kuzzle when the connection "data.id" joins the
+      channel "data.channel"
+     */</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">leave</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/*
+      Linked to the protocol:leaveChannel hook, emitted  
+      by Kuzzle when the connection "data.id" leaves the
+      channel "data.channel"
+     */</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre>
+
+<h4 id="examples">Examples</h4>
+
+<ul>
+<li><a href="https://github.com/kuzzleio/kuzzle-plugin-logger">kuzzle-plugin-logger</a></li>
+<li><a href="https://github.com/kuzzleio/kuzzle-plugin-helloworld">kuzzle-plugin-helloworld</a></li>
+<li><a href="https://github.com/kuzzleio/kuzzle-plugin-socketio">kuzzle-plugin-socketio</a></li>
+</ul>
+
+<h3 id="gt-authentication-plugin">&gt; Authentication plugin</h3>
+
+<p>Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see <a href="#plugins">plugins documentation</a>).</p>
+
+<p>Take example on <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local">Passport Local plugin</a>, an authentication plugin must provide following steps:</p>
+
+<h4 id="the-strategy-module">The strategy module</h4>
+
+<p>This module is a wrapper to the needed passportjs strategy:</p>
+<pre class="highlight javascript"><code><span class="c1">// lib/passport/strategy.js</span>
+<span class="kd">var</span>
+  <span class="nx">q</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'q'</span><span class="p">),</span>
+  <span class="nx">MyNewStrategy</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'passport-my-new-strategy'</span><span class="p">).</span><span class="nx">Strategy</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">context</span><span class="p">){</span>
+  <span class="p">(...)</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>It implements:</p>
+
+<ul>
+<li>a <strong>load</strong> method to activate the strategy:</li>
+</ul>
+<pre class="highlight javascript"><code>    <span class="k">this</span><span class="p">.</span><span class="nx">load</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">passport</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">passport</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyNewStrategy</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">verify</span><span class="p">));</span>
+    <span class="p">};</span>
+</code></pre>
+
+<ul>
+<li>a <strong>verify</strong> method that implements the strategy&rsquo;s <a href="http://passportjs.org/docs#verify-callback">verify callback</a>.</li>
+</ul>
+
+<p>This method accepts a variable numbers of arguments, depending on the strategy, and a <em>done</em> callback that should be invoked when authentication succeed.</p>
+
+<aside class="notice">
+because passportjs uses the Callback pattern while Kuzzle uses Promises, you must <strong>promisify</strong> the <em>done</em> callback:
+</aside>
+<pre class="highlight javascript"><code>    <span class="k">this</span><span class="p">.</span><span class="nx">verify</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">params</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+        <span class="nx">myCustomVerificationMethod</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">params</span><span class="o">&gt;</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userObject</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">userObject</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">userObject</span><span class="p">);</span>
+          <span class="p">}</span>
+          <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">deferred</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="k">new</span> <span class="nx">context</span><span class="p">.</span><span class="nx">ForbiddenError</span><span class="p">(</span><span class="s1">'Bad Credentials'</span><span class="p">));</span>
+          <span class="p">}</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">deferred</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+        <span class="p">});</span>
+
+      <span class="c1">// here is the promisification of the done callback</span>
+      <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">.</span><span class="nx">nodeify</span><span class="p">(</span><span class="nx">done</span><span class="p">);</span>
+
+      <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h4 id="the-hook-activation">The hook activation</h4>
+
+<p>The authController initialization triggers the <code class="prettyprint">auth:loadStrategies</code> hook event, that can be used to load plugin&rsquo;s strategy, like that:</p>
+
+<ul>
+<li>declare the hook mapping:</li>
+</ul>
+<pre class="highlight javascript"><code><span class="c1">// lib/config/hooks.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">'auth:loadStrategies'</span><span class="p">:</span> <span class="s1">'loadStrategy'</span><span class="p">,</span>
+<span class="p">};</span>
+</code></pre>
+
+<ul>
+<li>implement the hook method:</li>
+</ul>
+<pre class="highlight javascript"><code><span class="c1">// lib/index.js</span>
+<span class="kd">var</span>
+  <span class="nx">hooks</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/hooks'</span><span class="p">),</span>
+  <span class="nx">Strategy</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./passport/strategy'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">(...)</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">hooks</span> <span class="o">=</span> <span class="nx">hooks</span><span class="p">;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">loadStrategy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">passport</span><span class="p">,</span> <span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">strategy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Strategy</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">);</span>
+    <span class="nx">strategy</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">passport</span><span class="p">);</span>
+  <span class="p">};</span>
+
+<span class="p">};</span>
+</code></pre>
+
+<h3 id="troubleshooting">Troubleshooting</h3>
+
+<h4 id="proxy">Proxy</h4>
+
+<p>If you are using Docker and your network is behind a proxy, you may need to run this <a href="https://hub.docker.com/r/klabs/forgetproxy/">container</a>. This image lets other docker images accessing to external networks using the server proxy configuration.</p>
+
+        </div>
+        <div class="dark-box">
+        </div>
+      </div>
+    </div>
+    <script>
+      ((window.gitter = {}).chat = {}).options = {
+        room: 'kuzzleio/kuzzle'
+      };
+    </script>
+    <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+  </body>
+</html>

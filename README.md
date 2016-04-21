@@ -7,3 +7,4 @@ If you came here to help us update and improve our guide, you're at the right pl
 You may need to read the [Slate documentation](./README.slate.md) before contributing to this project.
 
 Kuzzle's guide [can be found here](http://kuzzle.io/guide).
+

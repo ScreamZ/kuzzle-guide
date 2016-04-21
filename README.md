@@ -1,4 +1,4 @@
-# Kuzzle API Documentation
+# Kuzzle Guide
 
 Welcome to the Kuzzle Guide builder project!
 

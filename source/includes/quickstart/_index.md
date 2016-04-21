@@ -105,20 +105,18 @@ We will show you how to persist a document into kuzzle with the [Javascript SDK]
 var Kuzzle = require('kuzzle-sdk')
 
 // connection to the kuzzle server
-new Kuzzle('http://localhost:7512', function(error, kuzzle) {
+var kuzzle = new Kuzzle('http://localhost:7512')
 
-    // create a reference to the data collection
-    var collection = kuzzle.dataCollectionFactory('myindex', 'mycollection');
-    
-    // define the document itself
-    var document = {
-        _id: 'mydocument', // this field is the unique identifier of your document and will be filled with an uuid-v4 if it's omitted
-        message: 'hello world'
-    }
-    
-    // persist the document into the collection
-    collection.createDocument(document);
-});
+// create a reference to the data collection
+var collection = kuzzle.dataCollectionFactory('myindex', 'mycollection')
+
+// define the document itself
+var document = {
+    message: 'hello world'
+}
+
+// persist the document into the collection
+collection.createDocument('mydocument', document)
 ```
 
 - Run your file with `node create.js`
@@ -150,24 +148,23 @@ Here we will show you how to be informed when a document, matching a query filte
 var Kuzzle = require('kuzzle-sdk')
 
 // connection to the kuzzle server
-new Kuzzle('http://localhost:7512', function(error, kuzzle) {
+new Kuzzle('http://localhost:7512')
 
-    // create a reference to the data collection
-    var collection = kuzzle.dataCollectionFactory('myindex', 'mycollection');
+// create a reference to the data collection
+var collection = kuzzle.dataCollectionFactory('myindex', 'mycollection')
     
-    // define the document itself
-    var filter = {
-        exists: {
-            field: 'message'
-        }
+// define a filter
+var filter = {
+    exists: {
+        field: 'message'
     }
+}
     
-    // create a subscription on the collection matching given filters 
-    collection.subscribe(filter, function(error, result) {
-        // this function is called each time kuzzle notifies us with a document matching our filters
-        console.log('message received from kuzzle:', result)
-    }
-});
+// create a subscription on the collection matching given filters 
+collection.subscribe(filter, function(error, result) {
+    // this function is called each time kuzzle notifies us with a document matching our filters
+    console.log('message received from kuzzle:', result)
+}
 ```
 
 - Run your file with `node subscribe.js`

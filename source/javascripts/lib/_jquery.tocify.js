@@ -91,6 +91,7 @@
             // **scrollTo**: Accepts Number (pixels)
             // The amount of space between the top of page and the selected table of contents item after the page has been scrolled
             scrollTo: 0,
+            scrollTo2: 0,
 
             // **showAndHideOnScroll**: Accepts a boolean: true or false
             // Determines if table of contents nested items should be shown and hidden while scrolling
@@ -1032,12 +1033,22 @@
 
             var self = this,
                 duration = self.options.smoothScroll || 0,
+                scrollTo2 = self.options.scrollTo2,
                 scrollTo = self.options.scrollTo;
 
             // Once all animations on the page are complete, this callback function will be called
             $("html, body").promise().done(function() {
 
                 // Animates the html and body element scrolltops
+                var targetTagName = $('div[data-unique="' + elem.attr("data-unique") + '"]').next().find('.heading-title').parent()[0].tagName;
+
+                if (targetTagName.toLowerCase() === "h3") {
+                    scrollTo = self.options.scrollTo2
+                }
+                else {
+                    scrollTo = self.options.scrollTo
+                }
+
                 $("html, body").animate({
 
                     // Sets the jQuery `scrollTop` to the top offset of the HTML div tag that matches the current list item's `data-unique` tag

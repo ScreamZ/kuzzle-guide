@@ -46,9 +46,9 @@ By default, the logger plugin is enabled and configured to use the service `wins
 
 #### "Passport Local" Authentication
 
-By default, the a standard "passport-local" plugin is enabled to authenticate users with their username/password (refer to [kuzzle-plugin-auth-passport-local documentation](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local) for more information).
+By default, the standard "passport-local" plugin is enabled to authenticate users with their username/password (refer to [kuzzle-plugin-auth-passport-local documentation](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local) for more information).
 
-See also the [global authentication mechanism documentation](security/authentication.md).
+See also the [global authentication mechanism documentation](#authentication).
 
 #### Socket.io communication support
 
@@ -151,7 +151,7 @@ module.exports = function () {
 When a pipe event is triggered, we are waiting for all plugins attached on this event. A plugin attached on a pipe event has access to the data and can even change them.
 A pipe plugin constructor must take in its last parameter a callback. This callback must be called at the end of the function with `callback(error, object)`:
 
-* error: if there is an error during the function, this parameter must be set. If everything is ok, you can call the function with null
+* error: if there is an error during the function, this parameter must be set with one of the available Error types. If everything is ok, you can call the function with null
 * object: the object to pass to the next function
 
 Plugins are called in chain. When the `callback()` function is called, the next function attached on the event is triggered.  
@@ -260,16 +260,17 @@ module.exports = function () {
 ```
 
 Notes:
-* Action methods must return a promise.
-* The controller constructor must use a "_context_" variable, which contains
+
+- Action methods must return a promise.
+- The controller constructor must use a "_context_" variable, which contains
 some Kuzzle prototypes such as ResponseObject or KuzzleError,
 which can be used by the controller actions.<br>
-(see [List of injected prototypes](../lib/api/core/pluginsContext.js) ).
+(see [List of injected prototypes](https://github.com/kuzzleio/kuzzle/blob/master/lib/api/core/pluginsContext.js) ).
 
 
 #### How it works
 
-* With non-REST protocols, the _controller_ attribute is prefixed with the plugin name.
+- With non-REST protocols, the _controller_ attribute is prefixed with the plugin name.
 
 Sample:
 
@@ -283,7 +284,7 @@ Sample:
 }
 ```
 
-* With REST protocol, we use the routes configured in _routes.js_.  
+- With REST protocol, we use the routes configured in _routes.js_.  
 These routes are automatically prefixed with "\_plugin/" + the plugin name.
 
 Samples:
@@ -427,7 +428,7 @@ module.exports = function () {
 
 Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see [plugins documentation](#plugins)).
 
-Take example in [Passport Local plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local), an authentication plugin must provide following steps:
+Take example on [Passport Local plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local), an authentication plugin must provide following steps:
 
 #### The strategy module
 

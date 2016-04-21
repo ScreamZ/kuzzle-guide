@@ -27,7 +27,7 @@ Focus on the above "Kuzzle kernel":
 * **Internal Components**: Any component used internally by controllers and any other internal component to interact with services
 
 
-#### Hooks
+### > Hooks
 
 Hooks allow to attach actions to Kuzzle events.
 
@@ -52,11 +52,21 @@ Your module must be placed in the /lib/hooks directory.
 
 You can then attach your hook to some events by editing the [config/hooks.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/config/hooks.js) configuration file.
 
-#### Services
+### > Services
 
-In Kuzzle, a Service module is the implementation of the interface to external services used by the application (internal broker, storage engine, cache engine, etc.)
 
-_For more details, see [services description](../lib/services/README.md)_
+In Kuzzle, a Service module is the implementation of the interface to different components of the application (think of a *system* service).
+
+Kuzzle currently implements the following Services:
+
+* [rabbit.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/rabbit.js): interface to [RabbitMQ](https://www.rabbitmq.com/)
+* [elasticsearch.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/elasticsearch.js): interface to [Elasticsearch](https://www.elastic.co/products/elasticsearch), used for persistent data storage.
+* [redis.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/redis.js): interface to the [redis](http://redis.io) cache server.
+* [logger.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/logger.js): interface to the [Logstash](https://www.elastic.co/products/logstash) server.
+* [ipc.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/ipc.js): IPC implementation of the internal message broker
+* [index.js](https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/index.js): module entry point. Used to initialize all implemented services.
+
+A Service can be added to different engines. For example, Elasticsearch is used by both the writeEngine and the readEngine (see [index.js](./index.js)).
 
 #### Workers
 
@@ -69,10 +79,3 @@ For instance, writing persistent data on Kuzzle is implemented as a write worker
 Additionally, serveral Workers of the same type can be launched in parallel, on the same or on a different host.
 
 This flexibility allows administrators of Kuzzle system to leverage their resource consumption and distribute and/or scale their services to better fit their needs.
-
-
-_For more details, see [workers description](../lib/workers/README.md)_
-
-### Next steps
-
-See [Request Scenarios documentation](request_scenarios/README.md) to see how these components are used together to handle a client's action.

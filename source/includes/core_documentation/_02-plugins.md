@@ -235,7 +235,7 @@ module.exports = function MyController (pluginContext) {
     // implement here the result of this controller action
 
     // Sample response object creation with the context variable:
-    response = new this.pluginContext.context.ResponseObject(requestObject, responseBody);
+    response = new this.pluginContext.ResponseObject(requestObject, responseBody);
 
     // the function must return a Promise:
     return Promise.resolve(response);

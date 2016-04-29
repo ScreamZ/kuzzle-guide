@@ -209,6 +209,8 @@ On each of following events, you can attach a function to execute in your plugin
 |`auth:getCurrentUser`	| `auth` | `getCurrentUser` |Triggered before controller `auth` and action `getCurrentUser`.|Type: Request object|
 |`auth:beforeCheckToken`| `auth` | `checkToken` |Triggered before controller `auth` and action `checkToken`.|Type: Request object|
 |`auth:afterCheckToken`	| `auth` | `checkToken` |Triggered after controller `auth` and action `checkToken`.|Type: Response object|
+|`auth:beforeUpdateSelf`| `auth` | `updateSelf` |Triggered before controller `auth` and action `updateSelf`.|Type: Request object|
+|`auth:afterUpdateSelf`	| `auth` | `updateSelf` |Triggered after controller `auth` and action `updateSelf`.|Type: Response object|
 |`auth:loadStrategies`	| /      |    /         |Triggered during authentication. This event allows to load the corresponding strategy. Take a look at the [Github Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github) |Type: Passport|
 |**passport**|||
 |`passport:loadScope`		| / | / |Triggered during authentication. This event allow plugins to modify the scope with rights. Take a look at the [Github Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github#configuration) |Type: Object.<br> `{scope}`|
@@ -582,13 +584,13 @@ module.exports = function () {
      The payload is a ResponseObject
     */
   };
-  
+
   this.notify = function (data) {
     /*
      Linked to the protocol:notify hook, emitted
      by Kuzzle when a "data.payload" needs to be emitted to the
      connection "data.id", on the channel "data.channel"
-     
+
      The payload is a ResponseObject
     */
   };
@@ -675,7 +677,7 @@ because passportjs uses the Callback pattern while Kuzzle uses Promises, you mus
 
       // here is the promisification of the done callback
       deferred.promise.nodeify(done);
-      
+
       return deferred.promise;
     };
 ```

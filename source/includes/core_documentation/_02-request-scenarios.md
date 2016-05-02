@@ -463,9 +463,9 @@ Detailed workflow:
 
 \#8. The ```Write Engine``` service performs a request to send the data to the data storage.
 
-\#9. Callback functions are triggered to transmit the response message back to the ```Write Worker```
+\#9. Promises functions are resolved to forward the response message back to the ```Write Worker```
 
-\#10. The worker sends the feedback message from ElasticSearch to the input task queue (see \#5).
+\#10. The worker sends the feedback message from ElasticSearch to the worker _response_ queue (see \#5).
 
 The worker also sends a notification message to the internal broker, to notify subscribing clients, if any (see next section).
 
@@ -481,7 +481,7 @@ Detailed workflow:
 
 \#11. The ```Worker Listener``` that the ```Write Controller``` registered in step \#5. receive a notification from the ```Internal Broker```...
 
-\#12. ... and forwards it back to the ```Router Controller```...
+\#12. ... and forwards it to the ```Write Controller```, who then forwards it to the ```Funnel Controller```, who in turn forwards it to ```Router Controller```...
 
 \#13. ... which sends a feedback to the client.
 
@@ -520,7 +520,7 @@ For instance, to be notified about all contents posted to the collection "users"
 
 
 The client then listens to the ```<requestId>``` event on the socket.
-Kuzzle will get back to him with a corresponding Room ID using this event.
+Kuzzle will get back to him with a corresponding Room ID and a Room Channel using this event.
 
 Sample Javascript code, using Websocket:
 

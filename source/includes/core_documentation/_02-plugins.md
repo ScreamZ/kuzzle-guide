@@ -422,8 +422,11 @@ __The controller code, implementing your actions:__
 
 ```javascript
 // Controller implementation
-module.exports = function MyController (context) {
-  this.myAction = function (requestObject)
+module.exports = function MyController (pluginContext) {
+
+  this.pluginContext = pluginContext;
+  
+  this.myAction = function (requestObject, context)
     var
       responseBody = {},
       response;
@@ -431,7 +434,7 @@ module.exports = function MyController (context) {
     // implement here the result of this controller action
 
     // Sample response object creation with the context variable:
-    response = new context.ResponseObject(requestObject, responseBody);
+    response = new this.pluginContext.ResponseObject(requestObject, responseBody);
 
     // the function must return a Promise:
     return Promise.resolve(response);
@@ -445,15 +448,16 @@ module.exports = function () {
 
   this.controllers = require('./config/controllers.js');
   this.routes = require('./config/routes.js');
-  this.context = null;
-  this.init = function (config, context, isDummy) {
-    this.context = context;
+  this.pluginContext = null;
+  
+  this.init = function (config, pluginContext, isDummy) {
+    this.pluginContext = pluginContext;
     // do something
   };
 
   this.MyController = function () {
-    MyController = require('./controllers/myController'),
-    return new MyController(this.context);
+    var Controller = require('./controllers/myController'),
+    return new Controller(this.pluginContext);
   };
 };
 ```

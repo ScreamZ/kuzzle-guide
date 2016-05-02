@@ -23,7 +23,7 @@ Manage plugins
 Options:
 
   -h, --help                  output usage information
-  --install                   *If plugin [name] is provided, install it using --version, --url or --path. Otherwise, (re-)install all listed plugins
+  --install                   *If plugin [name] is provided, install it using --npmVersion, --gitUrl or --path. Otherwise, (re-)install all listed plugins
   --get                       *Gets the plugin [name] current stored configuration
   --set <JSONObject>          *Updates the plugin configuration with new properties
   --replace <JSONObject>      *Replaces a plugin configuration with a new one
@@ -76,7 +76,6 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 ```
 
 ### Modifying a plugin configuration
@@ -96,16 +95,11 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 
 $ kuzzle plugins --set '{"room": "foobar", "foo": "bar"}' kuzzle-plugin-socketio
-Done
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { room: 'foobar', port: '7512', loadedBy: 'server', foo: 'bar' } }
-Done
 ```
 
 Replacing a plugin configuration:
@@ -115,16 +109,11 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 
 $ kuzzle plugins --replace '{"foo": "bar"}' kuzzle-plugin-socketio
-Done
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { foo: 'bar' } }
-Done
 ```
 
 ### Removing a plugin configuration property
@@ -136,16 +125,11 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 
 $ kuzzle plugins --unset room kuzzle-plugin-socketio
-Done
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: '7512', loadedBy: 'server' } }
-Done
 ```
 
 ### Uninstalling a plugin
@@ -154,11 +138,10 @@ Plugins can be uninstalled using the ``--remove`` option. If the plugin has been
 
 ```sh
 $ kuzzle plugins --remove kuzzle-plugin-socketio
-███ kuzzle-install: Loading Kuzzle configuration...
-███ kuzzle-install: Removing plugin kuzzle-plugin-socketio...
-███ kuzzle-install: Plugin configuration deleted
-███ kuzzle-install: Plugin directory deleted
-Done
+███ kuzzle-plugin: Loading Kuzzle configuration...
+███ kuzzle-plugin: Removing plugin kuzzle-plugin-socketio...
+███ kuzzle-plugin: Plugin configuration deleted
+███ kuzzle-plugin: Plugin directory deleted
 ```
 
 
@@ -172,36 +155,19 @@ To deactivate a plugin:
 
 ```sh
 $ kuzzle plugins --deactivate kuzzle-plugin-socketio
-███ kuzzle-install: Loading Kuzzle configuration...
-███ kuzzle-install: Deactivating plugin kuzzle-plugin-socketio...
-Done
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
-███ kuzzle-install: Loading Kuzzle configuration...
-███ kuzzle-install: Getting configuration for plugin kuzzle-plugin-socketio...
 { npmVersion: '1.0.7',
   activated: false,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 ```
 
 To activate a plugin:
 
 ```sh
 $ kuzzle plugins --activate kuzzle-plugin-socketio
-███ kuzzle-install: Loading Kuzzle configuration...
-███ kuzzle-install: Activating plugin kuzzle-plugin-socketio...
-Done
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
-███ kuzzle-install: Loading Kuzzle configuration...
-███ kuzzle-install: Getting configuration for plugin kuzzle-plugin-socketio...
 { npmVersion: '1.0.7',
   activated: true,
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-Done
 ```
-
 
 ### Default plugins
 

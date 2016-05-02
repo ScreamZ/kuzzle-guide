@@ -77,8 +77,11 @@ The module must have a `package.json` file with a `pluginInfo` entry. The option
 ```
 
 The `loadedBy` option tells Kuzzle to install and load the plugin only by corresponding instance types.  
+
 The accepted values are: `all`, `server` and `worker`. Default value: `all`.
+
 The `threads` option tells Kuzzle to load the plugin into different process and scale up to two process.
+
 Check [Worker communication](#worker-plugins) for more information.
 
 ####  Events triggered
@@ -283,6 +286,7 @@ Expected arguments:
 ``function (config, context, isDummy)``
 
 Where:
+
 * ``config``: JSON object containing the plugin configuration (the content of the ``defaultConfig`` or the ``customConfig`` configuration)
 * ``context``: the plugin context (see above)
 * ``isDummy``: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)

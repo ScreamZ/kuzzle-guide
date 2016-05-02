@@ -2272,6 +2272,7 @@ There are several types of plugins:</p>
 
 <ul>
 <li><strong>Hook events</strong>: just listen to events and perform other actions (ie: a log plugin). They do not respond to anything directly, they just listen.</li>
+<li><strong>Workers</strong>: just like Hook plugins, they only listen without responding but Workers are running on another process. Useful when a plugin has many complex computation to perform.</li>
 <li><strong>Pipe events</strong>: perform an action and return something. Kuzzle is waiting that all pipe events are performed before continuing.</li>
 <li><strong>Controllers</strong>: add a specific controller to Kuzzle.</li>
 </ul>
@@ -2343,7 +2344,1172 @@ In <code class="prettyprint">docker-compose.yml</code> file, you can have someth
 </span></code></pre>
 
 <p>The <code class="prettyprint">loadedBy</code> option tells Kuzzle to install and load the plugin only by corresponding instance types.<br>
-The accepted values are: <code class="prettyprint">all</code>, <code class="prettyprint">server</code> and <code class="prettyprint">worker</code>. Default value: <code class="prettyprint">all</code>.</p>
+The accepted values are: <code class="prettyprint">all</code>, <code class="prettyprint">server</code> and <code class="prettyprint">worker</code>. Default value: <code class="prettyprint">all</code>.
+The <code class="prettyprint">threads</code> option tells Kuzzle to load the plugin into different process and scale up to two process.
+Check <a href="#worker-plugins">Worker communication</a> for more information.</p>
+
+<h4 id="events-triggered">Events triggered</h4>
+
+<p>On each of following events, you can attach a function to execute in your plugin. In this function you <strong>HAVE</strong> to return an object similar to the input, because Kuzzle need it for internal purpose.</p>
+
+<table><thead>
+<tr>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><strong>data</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeUpdateMapping</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">updateMapping</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">updateMapping</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterUpdateMapping</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">updateMapping</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">updateMapping</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeGetMapping</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getMapping</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getMapping</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterGetMapping</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getMapping</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getMapping</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeGetStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getStats</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getStats</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterGetStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getStats</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getStats</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeGetLastStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getLastStats</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getLastStats</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterGetLastStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getLastStats</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getLastStats</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeGetAllStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getAllStats</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getAllStats</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterGetAllStats</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">getAllStats</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">getAllStats</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeTruncateCollection</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">truncateCollection</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">truncateCollection</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterTruncateCollection</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">truncateCollection</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">truncateCollection</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeDeleteIndexes</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">deleteIndexes</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">deleteIndexes</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterDeleteIndexes</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">deleteIndexes</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">deleteIndexes</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreateIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">createIndex</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">createIndex</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterCreateIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">createIndex</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">createIndex</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeDeleteIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">deleteIndex</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">deleteIndex</code></td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterDeleteIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">deleteIndex</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">deleteIndex</code></td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeRefreshIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">refreshIndex</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">refreshIndex</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterRefreshIndex</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">refreshIndex</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">refreshIndex</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeBulkImport</code></td>
+<td><code class="prettyprint">bulk</code></td>
+<td><code class="prettyprint">import</code></td>
+<td>Triggered before controller <code class="prettyprint">bulk</code> and action <code class="prettyprint">import</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterBulkImport</code></td>
+<td><code class="prettyprint">bulk</code></td>
+<td><code class="prettyprint">import</code></td>
+<td>Triggered after controller <code class="prettyprint">bulk</code> and action <code class="prettyprint">import</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeSearch</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">search</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">search</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterSearch</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">search</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">search</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeGet</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">get</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">get</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterGet</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">get</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">get</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCount</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">count</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">count</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterCount</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">count</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">count</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeListCollections</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">listCollections</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">listCollections</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterListCollections</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">listCollections</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">listCollections</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeNow</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">now</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">now</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterNow</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">now</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">now</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeListIndexes</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">listIndexes</code></td>
+<td>Triggered before controller <code class="prettyprint">read</code> and action <code class="prettyprint">listIndexes</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterListIndexes</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">listIndexes</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">listIndexes</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterServerInfo</code></td>
+<td><code class="prettyprint">read</code></td>
+<td><code class="prettyprint">serverInfo</code></td>
+<td>Triggered after controller <code class="prettyprint">read</code> and action <code class="prettyprint">serverInfo</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreate</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">create</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">create</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreate</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">create</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">create</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterCreate</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">create</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">create</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforePublish</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">publish</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">publish</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterPublish</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">publish</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">publish</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreateOrReplace</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createOrReplace</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">createOrReplace</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterPublish</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createOrReplace</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">createOrReplace</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreateOrReplace</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createOrReplace</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">createOrReplace</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterPublish</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createOrReplace</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">createOrReplace</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeUpdate</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">update</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">update</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterUpdate</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">update</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">update</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeReplace</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">replace</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">replace</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterReplace</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">replace</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">replace</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeDelete</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">delete</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">delete</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterDelete</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">delete</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">delete</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeDeleteByQuery</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">deleteByQuery</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">deleteByQuery</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterDeleteByQuery</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">deleteByQuery</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">deleteByQuery</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:beforeCreateCollection</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createCollection</code></td>
+<td>Triggered before controller <code class="prettyprint">write</code> and action <code class="prettyprint">createCollection</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">data:afterCreateCollection</code></td>
+<td><code class="prettyprint">write</code></td>
+<td><code class="prettyprint">createCollection</code></td>
+<td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">createCollection</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><strong>memoryStorage</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">memoryStorage:before&lt;Action&gt;</code></td>
+<td><code class="prettyprint">memoryStorage</code></td>
+<td>/</td>
+<td>All actions in <code class="prettyprint">memoryStorage</code> controller have a trigger before</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">memoryStorage:after&lt;Action&gt;</code></td>
+<td><code class="prettyprint">memoryStorage</code></td>
+<td>/</td>
+<td>All actions in <code class="prettyprint">memoryStorage</code> controller have a trigger after</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><strong>subscription</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeRemoveRooms</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">removeRooms</code></td>
+<td>Triggered before controller <code class="prettyprint">admin</code> and action <code class="prettyprint">removeRooms</code>. This action remove all rooms for a given collection</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterRemoveRooms</code></td>
+<td><code class="prettyprint">admin</code></td>
+<td><code class="prettyprint">removeRooms</code></td>
+<td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">removeRooms</code>. When the remove is done</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><strong>security</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:formatUserForSerialization</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered before serialize a user. Useful to clean a user like attribute <code class="prettyprint">password</code></td>
+<td>Type: User</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeGetRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getRole</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">getRole</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterGetRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getRole</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">getRole</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeMGetRoles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">mGetRoles</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">mGetRoles</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterMGetRoles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">mGetRoles</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">mGetRoles</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeSearchRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchRoles</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchRoles</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterSearchRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchRoles</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchRoles</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateOrReplaceRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceRole</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceRole</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateOrReplaceRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceRole</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceRole</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createRole</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createRole</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createRole</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createRole</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeDeleteRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteRole</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteRole</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterDeleteRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteRole</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteRole</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeGetProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getProfile</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">getProfile</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterGetProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getProfile</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">getProfile</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeMGetProfiles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">mGetProfiles</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">mGetProfiles</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterMGetProfiles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">mGetProfiles</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">mGetProfiles</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateOrReplaceProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceProfile</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceProfile</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateOrReplaceProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceProfile</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceProfile</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createProfile</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createProfile</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createProfile</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createProfile</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeDeleteProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteProfile</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteProfile</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterDeleteProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteProfile</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteProfile</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeSearchProfiles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchProfiles</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchProfiles</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterSearchProfiles</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchProfiles</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchProfiles</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeGetUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getUser</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">getUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterGetUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">getUser</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">getUser</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeSearchUsers</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchUsers</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchUsers</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterSearchUsers</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">searchUsers</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">searchUsers</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeDeleteUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteUser</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterDeleteUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">deleteUser</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">deleteUser</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createUser</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createUser</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createUser</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeUpdateUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateUser</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterUpdateUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateUser</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateUser</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeUpdateProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateProfile</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateProfile</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterUpdateProfile</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateProfile</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateProfile</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeUpdateRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateRole</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateRole</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterUpdateRole</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">updateRole</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">updateRole</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:beforeCreateOrReplaceUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceUser</code></td>
+<td>Triggered before controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">security:afterCreateOrReplaceUser</code></td>
+<td><code class="prettyprint">security</code></td>
+<td><code class="prettyprint">createOrReplaceUser</code></td>
+<td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceUser</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><strong>subscription</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeOn</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">on</code></td>
+<td>Triggered before controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">on</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterOn</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">on</code></td>
+<td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">on</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeJoin</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">join</code></td>
+<td>Triggered before controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">join</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterJoin</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">join</code></td>
+<td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">join</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeOff</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">off</code></td>
+<td>Triggered before controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">off</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterOff</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">off</code></td>
+<td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">off</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeCount</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">count</code></td>
+<td>Triggered before controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">count</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterCount</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">count</code></td>
+<td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">count</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:beforeList</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">list</code></td>
+<td>Triggered before controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">list</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">subscription:afterList</code></td>
+<td><code class="prettyprint">subscribe</code></td>
+<td><code class="prettyprint">list</code></td>
+<td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">list</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><strong>auth</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:beforeLogout</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">logout</code></td>
+<td>Triggered before controller <code class="prettyprint">auth</code> and action <code class="prettyprint">logout</code>.</td>
+<td>Type: Context user.<br> <code class="prettyprint">{profile, role, user, token}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:afterLogout</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">logout</code></td>
+<td>Triggered after controller <code class="prettyprint">auth</code> and action <code class="prettyprint">logout</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:beforeLogin</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">login</code></td>
+<td>Triggered before controller <code class="prettyprint">auth</code> and action <code class="prettyprint">login</code>.</td>
+<td>Type: Object.<br> <code class="prettyprint">{context, requestObject}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:afterLogin</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">login</code></td>
+<td>Triggered after controller <code class="prettyprint">auth</code> and action <code class="prettyprint">login</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:getCurrentUser</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">getCurrentUser</code></td>
+<td>Triggered before controller <code class="prettyprint">auth</code> and action <code class="prettyprint">getCurrentUser</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:beforeCheckToken</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">checkToken</code></td>
+<td>Triggered before controller <code class="prettyprint">auth</code> and action <code class="prettyprint">checkToken</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:afterCheckToken</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">checkToken</code></td>
+<td>Triggered after controller <code class="prettyprint">auth</code> and action <code class="prettyprint">checkToken</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:beforeUpdateSelf</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">updateSelf</code></td>
+<td>Triggered before controller <code class="prettyprint">auth</code> and action <code class="prettyprint">updateSelf</code>.</td>
+<td>Type: Request object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:afterUpdateSelf</code></td>
+<td><code class="prettyprint">auth</code></td>
+<td><code class="prettyprint">updateSelf</code></td>
+<td>Triggered after controller <code class="prettyprint">auth</code> and action <code class="prettyprint">updateSelf</code>.</td>
+<td>Type: Response object</td>
+</tr>
+<tr>
+<td><code class="prettyprint">auth:loadStrategies</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during authentication. This event allows to load the corresponding strategy. Take a look at the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github">Github Plugin</a></td>
+<td>Type: Passport</td>
+</tr>
+<tr>
+<td><strong>passport</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">passport:loadScope</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during authentication. This event allow plugins to modify the scope with rights. Take a look at the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github#configuration">Github Plugin</a></td>
+<td>Type: Object.<br> <code class="prettyprint">{scope}</code></td>
+</tr>
+<tr>
+<td><strong>room</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">room:new</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when a new room is added in the rooms list. You can&rsquo;t modify the input on this event.</td>
+<td>Type: Object. <br> <code class="prettyprint">{roomId, index, collection, formattedFilters}</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">room:remove</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered after a room is removed from the list. You can&rsquo;t modify the input on this event.</td>
+<td>Type: String.<br> The room id</td>
+</tr>
+<tr>
+<td><strong>protocol</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:leaveChannel</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered before a room is removed for the user. You can&rsquo;t modify the input on this event.</td>
+<td>Type: Object.<br>  <code class="prettyprint">{channel, id}</code> <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:joinChannel</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered after attach a user to a room. You can&rsquo;t modify the input on this event.</td>
+<td>Type: Object.<br>  <code class="prettyprint">{channel, id}</code> <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:notify</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered before notify a connection id.</td>
+<td>Type: Object.<br>  <code class="prettyprint">{payload, channel, id}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
+</tr>
+<tr>
+<td><code class="prettyprint">protocol:broadcast</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered before broadcast. You can&rsquo;t modify the input on this event.</td>
+<td>Type: Object.<br>  <code class="prettyprint">{payload, channel}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channel</code> is the channel name.</td>
+</tr>
+<tr>
+<td><strong>cleanDb</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">cleanDb:deleteIndexes</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during <code class="prettyprint">cleanDb</code> process just before indexes deletion.</td>
+<td>Type: Request object.<br> Contains all indexes to delete in <code class="prettyprint">requestObject.data.body.indexes</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">cleanDb:done</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered after indexes deletion.</td>
+<td>/</td>
+</tr>
+<tr>
+<td><code class="prettyprint">cleanDb:error</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when an error occurred on clean db</td>
+<td>Type: Error</td>
+</tr>
+<tr>
+<td><strong>prepareDb</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:createInternalIndex</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered on Kuzzle start for creating the internal index <code class="prettyprint">%kuzzle</code></td>
+<td>Type: Request object.<br> Contains the internal index in <code class="prettyprint">requestObject.index</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:updateMappingRoles</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered on Kuzzle start for creating the internal mapping for Roles collection</td>
+<td>Type: Request object.<br> Contains the default mapping in <code class="prettyprint">requestObject.data.body</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:updateMappingProfiles</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered on Kuzzle start for creating the internal mapping for Profiles collection</td>
+<td>Type: Request object.<br> Contains the default mapping in <code class="prettyprint">requestObject.data.body</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:updateMappingUsers</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered on Kuzzle start for creating the internal mapping for Users collection</td>
+<td>Type: Request object.<br> Contains the default mapping in <code class="prettyprint">requestObject.data.body</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:createFixturesIndex</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during database preparation. Called for each index in fixtures</td>
+<td>Type: Request object.<br> Contains the index to create in <code class="prettyprint">requestObject.index</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:importMapping</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during database preparation. Called for each mapping to import</td>
+<td>Type: Request object.<br> Contains the index in <code class="prettyprint">requestObject.index</code> and mapping in <code class="prettyprint">requestObject.data.body</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:importFixtures</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered during database preparation. Called for each fixtures to import</td>
+<td>Type: Request object.<br> Contains the index in <code class="prettyprint">requestObject.index</code> and bulk in <code class="prettyprint">requestObject.data.body</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">prepareDb:error</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when an error occurred during database preparation</td>
+<td>Type: Error</td>
+</tr>
+<tr>
+<td><strong>server</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">server:httpStarted</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the http server is started.</td>
+<td>Type: String</td>
+</tr>
+<tr>
+<td><code class="prettyprint">server:mqStarted</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the MQ server is started.</td>
+<td>Type: String</td>
+</tr>
+<tr>
+<td><code class="prettyprint">server:overload</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the server overload</td>
+<td>Type: String.<br> Contains the overload percentage with &rsquo;%&rsquo; character</td>
+</tr>
+<tr>
+<td><strong>internalBroker</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">internalBroker:started</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the internal broker is started</td>
+<td>Type: String.<br> <code class="prettyprint">&#39;Internal broker server started&#39;</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">internalBroker:connected</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the internal broker is connected</td>
+<td>Type: String.<br> <code class="prettyprint">&#39;Connected to Kuzzle server&#39;</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">internalBroker:reregistering</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the internal broker is reregistered</td>
+<td>Type: String.<br> <code class="prettyprint">&#39;Re-registering room: &#39; + room</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">internalBroker:error</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when an error occured in internal broker</td>
+<td>Type: Object.<br> {host, port, message, retry}</td>
+</tr>
+<tr>
+<td><code class="prettyprint">internalBroker:socketClosed</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the socket is closed</td>
+<td>Type: String</td>
+</tr>
+<tr>
+<td><strong>workerGroup</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">workerGroup:loaded</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when workers are loaded</td>
+<td>Type: String.<br> Worker group name</td>
+</tr>
+<tr>
+<td><strong>rabbit</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code class="prettyprint">rabbit:started</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when rabbit MQ service is started</td>
+<td>Type: String.<br> <code class="prettyprint">&#39;RabbitMQ Service started&#39;</code></td>
+</tr>
+<tr>
+<td><code class="prettyprint">rabbit:error</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when an error occured on rabbit connection</td>
+<td>Type: Error</td>
+</tr>
+<tr>
+<td><code class="prettyprint">rabbit:stopped</code></td>
+<td>/</td>
+<td>/</td>
+<td>Triggered when the rabbit MQ service is stopped</td>
+<td>Type: String.<br> <code class="prettyprint">&#39;RabbitMQ Service stopped&#39;</code></td>
+</tr>
+</tbody></table>
 
 <h4 id="the-plugin-context">The plugin context</h4>
 
@@ -2428,6 +3594,22 @@ The accepted values are: <code class="prettyprint">all</code>, <code class="pret
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+
+<h3 id="gt-worker-plugins">&gt; Worker plugins</h3>
+
+<p>Every Hook plugin can be used as a Worker plugin, but Worker plugins can only be launched by the Server. If you set your configuration as <code class="prettyprint">&quot;loadedBy&quot;: &quot;worker&quot;</code>, the plugin will be ignored.<br>
+You can convert a Hook plugin into a Worker plugin by adding a <code class="prettyprint">threads</code> attribute to your plugin definition:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/var/kuzzle-plugin-very-useful"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"server"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"threads"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"activated"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>The <code class="prettyprint">threads</code> value correspond to the number of processes that will be launched.</p>
 
 <h3 id="gt-pipe-plugins">&gt; Pipe plugins</h3>
 

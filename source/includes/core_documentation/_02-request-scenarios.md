@@ -467,8 +467,6 @@ Detailed workflow:
 
 \#10. The worker sends the feedback message from ElasticSearch to the worker _response_ queue (see \#5).
 
-The worker also sends a notification message to the internal broker, to notify subscribing clients, if any (see next section).
-
 ##### 3rd step: Send feedback
 
 Involved components overview:
@@ -606,7 +604,7 @@ The "_publish_" method can be triggered:
 
 ![pubsub_scenario_details2](./images/request-scenarios/pubsub/details3.png)
 
-\#1. The ```Notifier``` component is notified about a new action by the ```Internal Broker``` (see [step \#10. in write scenario](#writing-persistent-data)).
+\#1. The ```Notifier``` component is notified about a new action by the ```Write Controller``` (see [step \#11. in write scenario](#writing-persistent-data)).
 
 \#2. The ```Notifier``` calls the ```Notification Cache``` to get the rooms related to the content.
 

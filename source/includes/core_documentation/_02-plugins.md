@@ -185,7 +185,7 @@ See also the [global authentication mechanism documentation](#authentication).
 
 By default, the protocol plugin [socket.io](https://github.com/kuzzleio/kuzzle-plugin-socketio) is installed, allowing to access Kuzzle using Socket.io clients.
 
-The default plugin configuration opens the port `7512`. This can be changed by injecting a custom plugin configuration file.
+The default plugin configuration opens the port `7512`. This can be changed using the `kuzzle plugins` command-line interface.
 
 ### How to create a plugin
 

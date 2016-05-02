@@ -3684,8 +3684,11 @@ For each action, you can declare either a GET action, or a POST action, or both 
 
 <p><strong>The controller code, implementing your actions:</strong></p>
 <pre class="highlight javascript"><code><span class="c1">// Controller implementation</span>
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">MyController</span> <span class="p">(</span><span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">myAction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">requestObject</span><span class="p">)</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">MyController</span> <span class="p">(</span><span class="nx">pluginContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">pluginContext</span> <span class="o">=</span> <span class="nx">pluginContext</span><span class="p">;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">myAction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">requestObject</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
     <span class="kd">var</span>
       <span class="nx">responseBody</span> <span class="o">=</span> <span class="p">{},</span>
       <span class="nx">response</span><span class="p">;</span>
@@ -3693,7 +3696,7 @@ For each action, you can declare either a GET action, or a POST action, or both 
     <span class="c1">// implement here the result of this controller action</span>
 
     <span class="c1">// Sample response object creation with the context variable:</span>
-    <span class="nx">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">context</span><span class="p">.</span><span class="nx">ResponseObject</span><span class="p">(</span><span class="nx">requestObject</span><span class="p">,</span> <span class="nx">responseBody</span><span class="p">);</span>
+    <span class="nx">response</span> <span class="o">=</span> <span class="k">new</span> <span class="k">this</span><span class="p">.</span><span class="nx">pluginContext</span><span class="p">.</span><span class="nx">ResponseObject</span><span class="p">(</span><span class="nx">requestObject</span><span class="p">,</span> <span class="nx">responseBody</span><span class="p">);</span>
 
     <span class="c1">// the function must return a Promise:</span>
     <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
@@ -3705,15 +3708,16 @@ For each action, you can declare either a GET action, or a POST action, or both 
 
   <span class="k">this</span><span class="p">.</span><span class="nx">controllers</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/controllers.js'</span><span class="p">);</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">routes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/routes.js'</span><span class="p">);</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">pluginContext</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">pluginContext</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">pluginContext</span> <span class="o">=</span> <span class="nx">pluginContext</span><span class="p">;</span>
     <span class="c1">// do something</span>
   <span class="p">};</span>
 
   <span class="k">this</span><span class="p">.</span><span class="nx">MyController</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">MyController</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./controllers/myController'</span><span class="p">),</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyController</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">Controller</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./controllers/myController'</span><span class="p">),</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">Controller</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pluginContext</span><span class="p">);</span>
   <span class="p">};</span>
 <span class="p">};</span>
 </code></pre>

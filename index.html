@@ -2343,10 +2343,13 @@ In <code class="prettyprint">docker-compose.yml</code> file, you can have someth
   </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>The <code class="prettyprint">loadedBy</code> option tells Kuzzle to install and load the plugin only by corresponding instance types.<br>
-The accepted values are: <code class="prettyprint">all</code>, <code class="prettyprint">server</code> and <code class="prettyprint">worker</code>. Default value: <code class="prettyprint">all</code>.
-The <code class="prettyprint">threads</code> option tells Kuzzle to load the plugin into different process and scale up to two process.
-Check <a href="#worker-plugins">Worker communication</a> for more information.</p>
+<p>The <code class="prettyprint">loadedBy</code> option tells Kuzzle to install and load the plugin only by corresponding instance types.  </p>
+
+<p>The accepted values are: <code class="prettyprint">all</code>, <code class="prettyprint">server</code> and <code class="prettyprint">worker</code>. Default value: <code class="prettyprint">all</code>.</p>
+
+<p>The <code class="prettyprint">threads</code> option tells Kuzzle to load the plugin into different process and scale up to two process.</p>
+
+<p>Check <a href="#worker-plugins">Worker communication</a> for more information.</p>
 
 <h4 id="events-triggered">Events triggered</h4>
 
@@ -3562,10 +3565,13 @@ Check <a href="#worker-plugins">Worker communication</a> for more information.</
 <p>Expected arguments:
 <code class="prettyprint">function (config, context, isDummy)</code></p>
 
-<p>Where:
-* <code class="prettyprint">config</code>: JSON object containing the plugin configuration (the content of the <code class="prettyprint">defaultConfig</code> or the <code class="prettyprint">customConfig</code> configuration)
-* <code class="prettyprint">context</code>: the plugin context (see above)
-* <code class="prettyprint">isDummy</code>: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)</p>
+<p>Where:</p>
+
+<ul>
+<li><code class="prettyprint">config</code>: JSON object containing the plugin configuration (the content of the <code class="prettyprint">defaultConfig</code> or the <code class="prettyprint">customConfig</code> configuration)</li>
+<li><code class="prettyprint">context</code>: the plugin context (see above)</li>
+<li><code class="prettyprint">isDummy</code>: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)</li>
+</ul>
 
 <h3 id="gt-listener-plugins">&gt; Listener plugins</h3>
 

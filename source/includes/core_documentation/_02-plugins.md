@@ -44,7 +44,7 @@ Plugins can be installed from NPM, a GIT repository, or a plain directory access
 
 With no plugin `name` argument, the CLI will re-install (if needed) and refresh plugins configuration of all currently registered plugins.
 
-Here are a few examples to install and register to plugins to Kuzzle:
+Here are a few examples to install and register plugins to Kuzzle:
 
 **Using NPM:**
 

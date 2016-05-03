@@ -2265,6 +2265,585 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 
 <p>This flexibility allows administrators of Kuzzle system to leverage their resource consumption and distribute and/or scale their services to better fit their needs.</p>
 
+            <h2 id="request-scenarios">Request Scenarios</h2>
+
+<p>These following scenarios explain the message flow between Kuzzle components.</p>
+
+<h3 id="reading-content-from-kuzzle">Reading content from Kuzzle</h3>
+
+<p>By &ldquo;reading&rdquo;, we mean any action involving getting content from the persistent layer: getting a single document, count documents, or search contents with advanced filters.</p>
+
+<h4 id="http-rest-request">HTTP REST Request</h4>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by reading actions:
+<img alt="read_scenario_http_overview" src="images/request-scenarios/read-http/overview.png" /></p>
+
+<p>The following diagram shows how request data is exchanged between the client application, the different Kuzzle components, and the external services:</p>
+
+<p><img alt="read_scenario_http_details" src="images/request-scenarios/read-http/details.png" /></p>
+
+<p>#1. The REST client asks for a content using a HTTP GET Request</p>
+
+<p>For instance, to retrieve the document &lsquo;739c26bc-7a09-469a-803d-623c4045b0cb&rsquo; in the collection &#39;users&rsquo;:
+<code class="prettyprint">GET http://kuzzle:7511/api/users/739c26bc-7a09-469a-803d-623c4045b0cb</code></p>
+
+<p>#2. The HTTP router handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code>.</p>
+
+<p>Sample message:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the data before sending the request to the <code class="prettyprint">Read Controller</code></p>
+
+<p>#4. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
+
+<p>#5. The <code class="prettyprint">readEngine service</code> performs an HTTP Rest request to get the data from the data storage</p>
+
+<p>Sample content retrieval from Elasticsearch:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#6. Promises functions are resolved to forward the response message back to the HTTP Router</p>
+
+<p>Sample content resolved:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#7. The HTTP Router sends the response to the REST client.</p>
+
+<p>Sample response content:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h4 id="websocket-connection">Websocket connection</h4>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by reading actions:
+<img alt="read_scenario_websocket_overview" src="images/request-scenarios/read-websocket/overview.png" /></p>
+
+<p>The following diagram shows how request data is exchanged between the client application, the different Kuzzle components, and the external services:</p>
+
+<p><img alt="read_scenario_websocket_details" src="images/request-scenarios/read-websocket/details.png" /></p>
+
+<p>#1. The client application opens a Websocket connection and emit a &ldquo;read&rdquo; event containing the request</p>
+
+<p>(see details in <a href="http://kuzzleio.github.io/kuzzle-api-documentation/#socket-io">API Documentation</a>)</p>
+
+<p>For instance, to retrieve the document <code class="prettyprint">739c26bc-7a09-469a-803d-623c4045b0cb</code> in the collection <code class="prettyprint">users</code>:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"requestId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ed4faaff-253a-464f-a6b3-387af9d8483d"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>The client then listens to the <code class="prettyprint">&lt;requestId&gt;</code> event on the socket. The result of his request will be sent using this event.</p>
+
+<p>Sample JS code :
+<code class="prettyprint">javascript
+  this.socket.once(&quot;ed4faaff-253a-464f-a6b3-387af9d8483d&quot;, function(response) {
+    callback(response);
+  });
+</code></p>
+
+<p>#2. The SocketIO plugin handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code></p>
+
+<p>Sample message:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Read Controller</code></p>
+
+<p>#4. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
+
+<p>#5. The <code class="prettyprint">readEngine service</code> performs an HTTP REST request to get the data from the data storage</p>
+
+<p>Sample content retrieval from Elasticsearch:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#6. Promises functions are resolved to forward the response message back to the SocketIO plugin</p>
+
+<p>Sample content resolved:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#7. The SocketIO plugin emits a <code class="prettyprint">&lt;requestId&gt;</code> event to the websocket client</p>
+
+<p>Sample response content:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h4 id="mq-broker">MQ broker</h4>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by reading actions:
+<img alt="read_scenario_mq_overview" src="images/request-scenarios/read-mq/overview.png" /></p>
+
+<p>The following diagram shows how request data is exchanged between the client application, the different Kuzzle components, and the external services:</p>
+
+<p><img alt="read_scenario_mq_details" src="images/request-scenarios/read-mq/details.png" /></p>
+
+<p>#1. The client application sends a message to a topic (MQTT), an <code class="prettyprint">amq.topic/kuzzle</code> routing key (AMQP) or an <code class="prettyprint">amq.topic/kuzzle</code> destination (STOMP).</p>
+
+<p>(see details in <a href="http://kuzzle.io/api-reference/#message-queuing-protocols">API Documentation</a>).</p>
+
+<p>A MQTT client wishing to get responses back from Kuzzle must add a <code class="prettyprint">mqttClientId</code> field to his message, and to subscribe to the <code class="prettyprint">mqtt.&lt;mqttClientId&gt;</code> topic.</p>
+
+<p>AMQP and STOMP clients simply have to fill the <code class="prettyprint">replyTo</code> metadata and to listen to the corresponding queue/destination.</p>
+
+<p>Sample STOMP request: retrieve the document <code class="prettyprint">739c26bc-7a09-469a-803d-623c4045b0cb</code> in the collection <code class="prettyprint">users</code>:</p>
+<pre class="highlight plaintext"><code>SEND
+destination:/exchange/amq.topic/kuzzle
+reply-to:/temp-queue/739c26bc-7a09-469a-803d-623c4045b0cb
+content-type:application/json
+
+{
+  "index": "mainindex",
+  "collection": "users",
+  "controller": "read",
+  "action": "get",
+  "_id": "739c26bc-7a09-469a-803d-623c4045b0cb"
+}
+
+^@
+</code></pre>
+
+<p>#2. The MQ plugin handles the input message and forwards it to the <code class="prettyprint">Funnel Controller</code>.</p>
+
+<p>Sample message:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Read Controller</code></p>
+
+<p>#4. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
+
+<p>#5. The <code class="prettyprint">readEngine service</code> performs an HTTP Rest request to get the data from the data storage</p>
+
+<p>Sample content retrieval from Elasticsearch:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#6. Promises functions are resolved to forward the response message back to the MQ plugin</p>
+
+<p>Sample content resolved:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#7. The MQ plugin notifies the client with the response content.</p>
+
+<p>Sample response content:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="subscribing-and-writing-content-to-kuzzle">Subscribing and writing content to Kuzzle</h3>
+
+<p>This section explains what happens when clients send new content to Kuzzle</p>
+
+<p>Kuzzle is able to manage two different types of data:
+* persistent data =&gt; using the &ldquo;<em>create</em>&rdquo;, &ldquo;<em>createOrUpdate</em>&rdquo;, or &ldquo;<em>delete</em>&rdquo; actions.
+* volatile/realtime data =&gt; using the &ldquo;<em>publish</em>&rdquo; action.</p>
+
+<p>Kuzzle handles data differently, depending if it&rsquo;s persistent or not.</p>
+
+<h4 id="writing-persistent-data">Writing persistent data</h4>
+
+<p>This subsection describes the process for <strong>persistent</strong> data, with an example using the &ldquo;<em>create</em>&rdquo; action.
+(see also <a href="http://kuzzle.io/api-reference/#create">API Documentation</a>)</p>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a></p>
+
+<p>Kuzzle persistent data writing is a 3-steps process:</p>
+
+<h5 id="1st-step-send-a-write-request-to-a-task-queue">1st step: Send a Write request to a task queue</h5>
+
+<p>Involved components overview:</p>
+
+<p><img alt="persistence_overview1" src="images/request-scenarios/persistence/overview1.png" /></p>
+
+<p>Detailed workflow:</p>
+
+<p><img alt="persistence_scenario_details1" src="images/request-scenarios/persistence/details1.png" /></p>
+
+<p>#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a MQ client (see <a href="#reading-content-from-kuzzle">Reading scenarios</a>)</p>
+
+<p>#2. The router handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code></p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"write"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"create"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Write Controller</code></p>
+
+<p>#4. The <code class="prettyprint">Write Controller</code> triggers the <code class="prettyprint">Plugins Manager</code> with a &ldquo;data:create&rdquo; event.<br/>
+The <code class="prettyprint">Plugins Manager</code> calls all pipes and hooks configured by the active plugins (see <a href="#plugins">Plugin&rsquo;s documentation</a>), and finally triggers the &ldquo;add&rdquo; event of the <code class="prettyprint">Write Hook</code>.<br/>
+The <code class="prettyprint">Write Hook</code> sends the request to the <code class="prettyprint">Internal Broker</code>. (see <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/hooks/README.md">Hooks Readme</a> for more details about hooks).</p>
+
+<p>#5. The <code class="prettyprint">Write Controller</code> asks the <code class="prettyprint">Worker Listener</code> to listen to the <code class="prettyprint">Internal Broker</code>&rsquo;s feedback message.</p>
+
+<p>That way Kuzzle parallelizes the processing of writing contents.</p>
+
+<h5 id="2nd-step-save-content-into-the-storage-engine">2nd step: Save content into the storage engine</h5>
+
+<p>Involved components overview:</p>
+
+<p><img alt="persistence_overview2" src="images/request-scenarios/persistence/overview2.png" /></p>
+
+<p>Detailed workflow:</p>
+
+<p><img alt="persistence_scenario_details2" src="images/request-scenarios/persistence/details2.png" /></p>
+
+<p>#6. A <code class="prettyprint">Write Worker</code> is notified by the internal broker about a new write request.</p>
+
+<p>#7. The worker calls the <code class="prettyprint">Write Engine</code> service.</p>
+
+<p>#8. The <code class="prettyprint">Write Engine</code> service performs a request to send the data to the data storage.</p>
+
+<p>#9. Promises functions are resolved to forward the response message back to the <code class="prettyprint">Write Worker</code></p>
+
+<p>#10. The worker sends the feedback message from ElasticSearch to the worker <em>response</em> queue (see #5).</p>
+
+<h5 id="3rd-step-send-feedback">3rd step: Send feedback</h5>
+
+<p>Involved components overview:</p>
+
+<p><img alt="persistence_overview3" src="images/request-scenarios/persistence/overview3.png" /></p>
+
+<p>Detailed workflow:</p>
+
+<p><img alt="persistence_scenario_details3" src="images/request-scenarios/persistence/details3.png" /></p>
+
+<p>#11. The <code class="prettyprint">Worker Listener</code> that the <code class="prettyprint">Write Controller</code> registered in step #5. receive a notification from the <code class="prettyprint">Internal Broker</code>&hellip;</p>
+
+<p>#12. &hellip; and forwards it to the <code class="prettyprint">Write Controller</code>, who then forwards it to the <code class="prettyprint">Funnel Controller</code>, who in turn forwards it to <code class="prettyprint">Router Controller</code>&hellip;</p>
+
+<p>#13. &hellip; which sends a feedback to the client.</p>
+
+<h4 id="subscribe-and-notification-scenario">Subscribe and Notification scenario</h4>
+
+<p>This subsection describes the process for <strong>non persistent</strong> data, as well as real-time notification about persisted data, using the <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Publish/Subscribe pattern</a>.</p>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by pub/sub actions:
+<img alt="pubsub_overview" src="images/request-scenarios/pubsub/overview.png" /></p>
+
+<h5 id="1st-step-subscription">1st step : subscription</h5>
+
+<p>The following diagram shows how two different clients, a Websocket and a MQ one, subscribe to data.</p>
+
+<p><img alt="pubsub_scenario_details1" src="images/request-scenarios/pubsub/details1.png" /></p>
+
+<p>#1. The client application opens a Websocket or a MQ connection and emits a &ldquo;subscribe&rdquo; event with some filters.
+(see <a href="http://kuzzle.io/api-reference/#on">API Documentation</a>)</p>
+
+<p>For instance, to be notified about all contents posted to the collection &ldquo;users&rdquo;, containing a field &ldquo;hobby&rdquo; equals to &ldquo;computer&rdquo;:
+<code class="prettyprint">json
+{
+  &quot;requestId&quot;: &quot;ed4faaff-253a-464f-a6b3-387af9d8483d&quot;,
+  &quot;index&quot;: &quot;mainindex&quot;,
+  &quot;collection&quot;: &quot;users&quot;,
+  &quot;action&quot;: &quot;on&quot;,
+  &quot;body&quot;: {
+    &quot;term&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
+  },
+  &quot;state&quot;: &quot;all&quot;
+}
+</code></p>
+
+<p>(see <a href="#filtering-syntax">Filtering Syntax</a> for more details about filters)</p>
+
+<p>The client then listens to the <code class="prettyprint">&lt;requestId&gt;</code> event on the socket.
+Kuzzle will get back to him with a corresponding Room ID and a Room Channel using this event.</p>
+
+<p>Sample Javascript code, using Websocket:</p>
+<pre class="highlight javascript"><code>  <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="s2">"ed4faaff-253a-464f-a6b3-387af9d8483d"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>#2. The <code class="prettyprint">Router Controller</code> interprets the input request and transfer the subscription message to the <code class="prettyprint">Funnel Controller</code>.</p>
+
+<p>Sample message:
+<code class="prettyprint">json
+{
+  &quot;index&quot;: &quot;mainindex&quot;,
+  &quot;collection&quot;: &quot;users&quot;,
+  &quot;controller&quot;: &quot;subscribe&quot;,
+  &quot;action&quot;: &quot;on&quot;,
+  &quot;filter&quot;: {
+    &quot;term&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
+  }
+}
+</code></p>
+
+<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and transfer it to the <code class="prettyprint">Subscribe Controller</code>.</p>
+
+<p>#4. The <code class="prettyprint">Subscribe Controller</code> calls the <code class="prettyprint">HotelClerk</code> internal component to create the subscription.</p>
+
+<p>#5. The <code class="prettyprint">HotelClerk</code> calls the <code class="prettyprint">DSL</code> component to get a formated filter related to the subscription (see <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/api/dsl/README.md">DSL Readme</a> for more details).</p>
+
+<p>#6. The <code class="prettyprint">HotelClerk</code> creates a channel related to the filters and give it back to the <code class="prettyprint">Subscribe Controller</code>.</p>
+
+<p>#7. The channel is sent back to the Websocket (or MQ) Router through the internal components.</p>
+
+<p>#8. The Websocket (or MQ) Router emits a <code class="prettyprint">&lt;requestId&gt;</code> event to the client, containing the subscribed channel ID.</p>
+
+<p>Sample response content:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"subscribe"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"on"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"requestId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ed4faaff-253a-464f-a6b3-387af9d8483d"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"roomId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"78c5b0ba-fead-4535-945c-8d64a7927459"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"channel"</span><span class="p">:</span><span class="w"> </span><span class="s2">"c5cd8bdc-06a4-4d6e-bae3-61f1a8ac2982"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#9. The client now listens to this <code class="prettyprint">channel</code> events to be notified about new messages corresponding to his subscription filters.</p>
+
+<h5 id="2nd-step-notify-about-real-time-actions">2nd step : notify about real-time actions</h5>
+
+<p>The following diagram shows how Kuzzle handles a new message and how subscribed clients are notified:</p>
+
+<p><img alt="pubsub_scenario_details2" src="images/request-scenarios/pubsub/details2.png" /></p>
+
+<p>#1. A new content is published to the <code class="prettyprint">Notifier</code> component.</p>
+
+<p>The &ldquo;<em>publish</em>&rdquo; method can be triggered:
+* either direclty by the <code class="prettyprint">Write Controller</code> for non persistent data (using the <a href="http://kuzzle.io/api-reference/#publish">publish</a> action).
+* or by the <code class="prettyprint">Plugins Manager</code> when a &#39;data:create&rsquo; event is triggered, to notify users in real-time before the data are sent to the storage Engine.</p>
+
+<p>#2. The <code class="prettyprint">Notifier</code> calls the <code class="prettyprint">DSL</code> component to test registered filters that match the content, and get related rooms.</p>
+
+<p>#3. The <code class="prettyprint">Notifier</code> uses the <code class="prettyprint">Notification Cache</code> engine to store the mapping content/rooms into cache.</p>
+
+<p>#4. The <code class="prettyprint">Notifier</code> calls the <code class="prettyprint">HotelClerk</code> to get the channels related to the rooms.</p>
+
+<p>#5. The <code class="prettyprint">Notifier</code> broadcasts the message to each related channel to the Websocket and MQ plugins.</p>
+
+<p>#6. Finally, the plugins send the message to the clients who subscribed to it.</p>
+
+<h5 id="3rd-step-notify-about-persisted-data">3rd step : notify about persisted data</h5>
+
+<p><img alt="pubsub_scenario_details2" src="images/request-scenarios/pubsub/details3.png" /></p>
+
+<p>#1. The <code class="prettyprint">Notifier</code> component is notified about a new action by the <code class="prettyprint">Write Controller</code> (see <a href="#writing-persistent-data">step #11. in write scenario</a>).</p>
+
+<p>#2. The <code class="prettyprint">Notifier</code> calls the <code class="prettyprint">Notification Cache</code> to get the rooms related to the content.</p>
+
+<p>#3. The <code class="prettyprint">Notifier</code> calls the <code class="prettyprint">HotelClerk</code> to get the channels related to the rooms.</p>
+
+<p>#4. The <code class="prettyprint">Notifier</code> broadcasts the message to each related channel to the Websocket and MQ plugins.</p>
+
+<p>#5. Finally, the plugins send the message to the clients who subscribed to it.</p>
+
             <h2 id="plugins">Plugins</h2>
 
 <p>Plugins are external components allowing to execute functions on specific event triggering.<br>

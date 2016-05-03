@@ -39,9 +39,12 @@ Options:
 $
 ```
 
+<aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
+
 ### Plugin installation
 
-Plugins can be installed from NPM, a GIT repository, or a plain directory accessible to Kuzzle instances. The corresponding installation options are: `--npmVersion`, `--gitUrl` and `--path`.
+Plugins can be installed from the NPM public registry, from a GIT repository, or from a plain directory accessible to Kuzzle instances.  
+The corresponding installation options are: `--npmVersion`, `--gitUrl` and `--path`.
 
 With no plugin `name` argument, the CLI will re-install (if needed) and refresh plugins configuration of all currently registered plugins.
 
@@ -555,7 +558,7 @@ __The controller code, implementing your actions:__
 module.exports = function MyController (pluginContext) {
 
   this.pluginContext = pluginContext;
-  
+
   this.myAction = function (requestObject, context)
     var
       responseBody = {},
@@ -579,7 +582,7 @@ module.exports = function () {
   this.controllers = require('./config/controllers.js');
   this.routes = require('./config/routes.js');
   this.pluginContext = null;
-  
+
   this.init = function (config, pluginContext, isDummy) {
     this.pluginContext = pluginContext;
     // do something

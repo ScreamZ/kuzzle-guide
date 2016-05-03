@@ -77,8 +77,11 @@ The module must have a `package.json` file with a `pluginInfo` entry. The option
 ```
 
 The `loadedBy` option tells Kuzzle to install and load the plugin only by corresponding instance types.  
+
 The accepted values are: `all`, `server` and `worker`. Default value: `all`.
+
 The `threads` option tells Kuzzle to load the plugin into different process and scale up to two process.
+
 Check [Worker communication](#worker-plugins) for more information.
 
 ####  Events triggered
@@ -283,6 +286,7 @@ Expected arguments:
 ``function (config, context, isDummy)``
 
 Where:
+
 * ``config``: JSON object containing the plugin configuration (the content of the ``defaultConfig`` or the ``customConfig`` configuration)
 * ``context``: the plugin context (see above)
 * ``isDummy``: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)
@@ -418,8 +422,11 @@ __The controller code, implementing your actions:__
 
 ```javascript
 // Controller implementation
-module.exports = function MyController (context) {
-  this.myAction = function (requestObject)
+module.exports = function MyController (pluginContext) {
+
+  this.pluginContext = pluginContext;
+  
+  this.myAction = function (requestObject, context)
     var
       responseBody = {},
       response;
@@ -427,7 +434,7 @@ module.exports = function MyController (context) {
     // implement here the result of this controller action
 
     // Sample response object creation with the context variable:
-    response = new context.ResponseObject(requestObject, responseBody);
+    response = new this.pluginContext.ResponseObject(requestObject, responseBody);
 
     // the function must return a Promise:
     return Promise.resolve(response);
@@ -441,15 +448,16 @@ module.exports = function () {
 
   this.controllers = require('./config/controllers.js');
   this.routes = require('./config/routes.js');
-  this.context = null;
-  this.init = function (config, context, isDummy) {
-    this.context = context;
+  this.pluginContext = null;
+  
+  this.init = function (config, pluginContext, isDummy) {
+    this.pluginContext = pluginContext;
     // do something
   };
 
   this.MyController = function () {
-    MyController = require('./controllers/myController'),
-    return new MyController(this.context);
+    var Controller = require('./controllers/myController'),
+    return new Controller(this.pluginContext);
   };
 };
 ```

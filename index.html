@@ -2856,36 +2856,148 @@ There are several types of plugins:</p>
 <li><strong>Controllers</strong>: add a specific controller to Kuzzle.</li>
 </ul>
 
-<h3 id="plugins-configuration">Plugins Configuration</h3>
+<h3 id="plugins-management">Plugins Management</h3>
 
-<p>Some plugins can be configured. To customize these plugins, all you have to do is to create a file <code class="prettyprint">config/customPlugins.json</code>, and to put it in the <code class="prettyprint">config/</code> Kuzzle directory.  </p>
+<p>Kuzzle is shipped with a few plugins installed by default. These plugins are listed in the <code class="prettyprint">.kuzzlerc</code> configuration file, under the <code class="prettyprint">pluginsManager.defaultPlugins</code> section.</p>
 
-<p>If your Kuzzle is running inside a docker image, you&rsquo;ll have to inject this file in the image.<br>
-In <code class="prettyprint">docker-compose.yml</code> file, you can have something like:</p>
-<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle</span>
-  <span class="s">volumes</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">host/path/to/customPlugins.json:/var/app/config/customPlugins.json"</span>
-  <span class="s">ports</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
-  <span class="s">links</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">elasticsearch</span>
-    <span class="pi">-</span> <span class="s">redis</span>
+<p>Plugins can be managed using the Kuzzle command-line interface:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --help
+
+Usage: plugins <span class="o">[</span>options] <span class="o">[</span>name]
+
+Manage plugins
+
+Options:
+
+  -h, --help                  output usage information
+  --install                   <span class="k">*</span>If plugin <span class="o">[</span>name] is provided, installs it using --npmVersion, --gitUrl or --path. Otherwise, <span class="o">(</span>re-<span class="o">)</span>installs all listed plugins
+  --get                       <span class="k">*</span>Gets the plugin <span class="o">[</span>name] current stored configuration
+  --set &lt;JSONObject&gt;          <span class="k">*</span>Updates the plugin configuration with new properties
+  --replace &lt;JSONObject&gt;      <span class="k">*</span>Replaces a plugin configuration with a new one
+  --unset &lt;property&gt;          <span class="k">*</span>Deletes the property <span class="o">[</span>property] from the plugin configuration
+  --remove                    <span class="k">*</span>Removes the supplied plugin <span class="o">[</span>name] from Kuzzle
+  --activate                  <span class="k">*</span>Marks the plugin as <span class="s2">"activated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
+  --deactivate                <span class="k">*</span>Marks the plugin as <span class="s2">"deactivated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
+  -v, --npmVersion &lt;version&gt;  Installs plugin &lt;version&gt; from NPM <span class="o">(</span>work only with --install<span class="o">)</span>
+  -u, --gitUrl &lt;url&gt;          Installs plugin from a GIT repo &lt;url&gt; <span class="o">(</span>work only with --install<span class="o">)</span>
+  -p, --path &lt;path&gt;           Installs a plugin from directory &lt;path&gt; <span class="o">(</span>work only with --install<span class="o">)</span>
+
+<span class="err">$</span>
 </code></pre>
 
-<p>Plugins configuration have the following default attributes:</p>
+<aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
+
+<h3 id="plugin-installation">Plugin installation</h3>
+
+<p>Plugins can be installed from the NPM public registry, from a GIT repository, or from a plain directory accessible to Kuzzle instances.<br>
+The corresponding installation options are: <code class="prettyprint">--npmVersion</code>, <code class="prettyprint">--gitUrl</code> and <code class="prettyprint">--path</code>.</p>
+
+<p>With no plugin <code class="prettyprint">name</code> argument, the CLI will re-install (if needed) and refresh plugins configuration of all currently registered plugins.</p>
+
+<p>Here are a few examples to install and register plugins to Kuzzle:</p>
+
+<p><strong>Using NPM:</strong></p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --install --npmVersion x.y.z plugin_name
+</code></pre>
+
+<p><strong>Using a GIT repository:</strong></p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --install --gitUrl https://git.repository.url/project/pluginsRepository plugin_name
+</code></pre>
+
+<p><strong>Using a local directory:</strong></p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --install --path /directory/absolute/path plugin_name
+</code></pre>
+
+<h3 id="viewing-a-plugin-configuration">Viewing a plugin configuration</h3>
+
+<p>To view a plugin&rsquo;s current configuration, use the <code class="prettyprint">--get</code> option.</p>
+
+<p>Example:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
+
+<h3 id="modifying-a-plugin-configuration">Modifying a plugin configuration</h3>
+
+<p>A plugin configuration is stored in the <code class="prettyprint">config</code> part of a plugin properties.
+There are two ways of changing a plugin configuration.</p>
+
+<p>You can either:</p>
 
 <ul>
-<li><code class="prettyprint">path</code>: The local path where the plugin is hosted on the server.</li>
-<li><code class="prettyprint">url</code>: a git URL where the plugin can be found and cloned.</li>
-<li><code class="prettyprint">version</code>: the NPM package version to download</li>
-<li><code class="prettyprint">customConfig</code>: config for the plugin. Each plugin has a different configuration (required or optional), check the corresponding plugin documentation for more information.</li>
-<li><code class="prettyprint">defaultConfig</code>: Don&rsquo;t edit this attribute. The defaultConfig is provided by the plugin itself. If you need to change the configuration, edit the <code class="prettyprint">customConfig</code> attribute</li>
+<li>perform a partial update, using the <code class="prettyprint">--set</code> action. This allows adding or updating parts of the configuration</li>
+<li>replace the entire plugin configuration with a new one, with the <code class="prettyprint">--replace</code> action.</li>
 </ul>
 
-<p><strong>Note:</strong>
-* A <code class="prettyprint">path</code>, a <code class="prettyprint">url</code>, or a <code class="prettyprint">version</code> parameter is required. Priority is <code class="prettyprint">path</code>, <code class="prettyprint">url</code>, <code class="prettyprint">version</code>; if more than one paramater is set, highest priority parameter is used and others will be ignored.</p>
+<p>Updating a plugin configuration:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+
+<span class="gp">$ </span>kuzzle plugins --set <span class="s1">'{"room": "foobar", "foo": "bar"}'</span> kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> room: <span class="s1">'foobar'</span>, port: <span class="s1">'7512'</span>, loadedBy: <span class="s1">'server'</span>, foo: <span class="s1">'bar'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
+
+<p>Replacing a plugin configuration:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+
+<span class="gp">$ </span>kuzzle plugins --replace <span class="s1">'{"foo": "bar"}'</span> kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> foo: <span class="s1">'bar'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
+
+<h3 id="removing-a-plugin-configuration-property">Removing a plugin configuration property</h3>
+
+<p>You can remove a plugin configuration property by using the <code class="prettyprint">--unset</code> action:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+
+<span class="gp">$ </span>kuzzle plugins --unset room kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: <span class="s1">'7512'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
+
+<h3 id="uninstalling-a-plugin">Uninstalling a plugin</h3>
+
+<p>Plugins can be uninstalled using the <code class="prettyprint">--remove</code> option. If the plugin has been installed from NPM or from a GIT repository, the plugin installation directory will also be deleted.</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --remove kuzzle-plugin-socketio
+███ kuzzle-plugin: Loading Kuzzle configuration...
+███ kuzzle-plugin: Removing plugin kuzzle-plugin-socketio...
+███ kuzzle-plugin: Plugin configuration deleted
+███ kuzzle-plugin: Plugin directory deleted
+</code></pre>
+
+<h3 id="activating-deactivating-a-plugin">Activating/Deactivating a plugin</h3>
+
+<p>By default, a plugin is activated when installed, meaning it will be loaded and used by Kuzzle on the next restart.</p>
+
+<p>You may want to activate or deactivate a plugin, without uninstalling it.</p>
+
+<p>To deactivate a plugin:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --deactivate kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">false</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
+
+<p>To activate a plugin:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --activate kuzzle-plugin-socketio
+<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
+  activated: <span class="nb">true</span>,
+  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+</code></pre>
 
 <h3 id="default-plugins">Default plugins</h3>
 
@@ -2903,7 +3015,7 @@ In <code class="prettyprint">docker-compose.yml</code> file, you can have someth
 
 <p>By default, the protocol plugin <a href="https://github.com/kuzzleio/kuzzle-plugin-socketio">socket.io</a> is installed, allowing to access Kuzzle using Socket.io clients.</p>
 
-<p>The default plugin configuration opens the port <code class="prettyprint">7512</code>. This can be changed by injecting a custom plugin configuration file.</p>
+<p>The default plugin configuration opens the port <code class="prettyprint">7512</code>. This can be changed using the <code class="prettyprint">kuzzle plugins</code> command-line interface.</p>
 
 <h3 id="how-to-create-a-plugin">How to create a plugin</h3>
 
@@ -2911,7 +3023,7 @@ In <code class="prettyprint">docker-compose.yml</code> file, you can have someth
 
 <h4 id="configuration">Configuration</h4>
 
-<p>The module must have a <code class="prettyprint">package.json</code> file with a <code class="prettyprint">pluginInfo</code> entry. The optional <code class="prettyprint">defaultConfig</code> will be copied in files <code class="prettyprint">config/defaultPlugins.json</code> and <code class="prettyprint">config/customPlugins.json</code> in Kuzzle.</p>
+<p>The module must have a <code class="prettyprint">package.json</code> file with a <code class="prettyprint">pluginInfo</code> entry. The optional <code class="prettyprint">defaultConfig</code> will be used by Kuzzle to initialize the plugin configuration on a fresh install.</p>
 <pre class="highlight json"><code><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -4144,13 +4256,10 @@ In <code class="prettyprint">docker-compose.yml</code> file, you can have someth
 <p>Expected arguments:
 <code class="prettyprint">function (config, context, isDummy)</code></p>
 
-<p>Where:</p>
-
-<ul>
-<li><code class="prettyprint">config</code>: JSON object containing the plugin configuration (the content of the <code class="prettyprint">defaultConfig</code> or the <code class="prettyprint">customConfig</code> configuration)</li>
-<li><code class="prettyprint">context</code>: the plugin context (see above)</li>
-<li><code class="prettyprint">isDummy</code>: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)</li>
-</ul>
+<p>Where:
+* <code class="prettyprint">config</code>: JSON object containing the current plugin configuration
+* <code class="prettyprint">context</code>: the plugin context (see above)
+* <code class="prettyprint">isDummy</code>: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)</p>
 
 <h3 id="gt-listener-plugins">&gt; Listener plugins</h3>
 

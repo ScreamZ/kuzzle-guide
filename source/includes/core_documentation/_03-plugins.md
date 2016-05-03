@@ -8,36 +8,170 @@ There are several types of plugins:
 * **Pipe events**: perform an action and return something. Kuzzle is waiting that all pipe events are performed before continuing.
 * **Controllers**: add a specific controller to Kuzzle.
 
-### Plugins Configuration
+### Plugins Management
 
-Some plugins can be configured. To customize these plugins, all you have to do is to create a file `config/customPlugins.json`, and to put it in the `config/` Kuzzle directory.  
+Kuzzle is shipped with a few plugins installed by default. These plugins are listed in the `.kuzzlerc` configuration file, under the `pluginsManager.defaultPlugins` section.
 
-If your Kuzzle is running inside a docker image, you'll have to inject this file in the image.  
-In `docker-compose.yml` file, you can have something like:
+Plugins can be managed using the Kuzzle command-line interface:
 
-```yaml
-kuzzle:
-  image: kuzzleio/kuzzle
-  volumes:
-    - "host/path/to/customPlugins.json:/var/app/config/customPlugins.json"
-  ports:
-    - "7511:7511"
-    - "7512:7512"
-  links:
-    - elasticsearch
-    - redis
+```sh
+$ kuzzle plugins --help
+
+Usage: plugins [options] [name]
+
+Manage plugins
+
+Options:
+
+  -h, --help                  output usage information
+  --install                   *If plugin [name] is provided, installs it using --npmVersion, --gitUrl or --path. Otherwise, (re-)installs all listed plugins
+  --get                       *Gets the plugin [name] current stored configuration
+  --set <JSONObject>          *Updates the plugin configuration with new properties
+  --replace <JSONObject>      *Replaces a plugin configuration with a new one
+  --unset <property>          *Deletes the property [property] from the plugin configuration
+  --remove                    *Removes the supplied plugin [name] from Kuzzle
+  --activate                  *Marks the plugin as "activated" (Kuzzle ignores deactivated plugins)
+  --deactivate                *Marks the plugin as "deactivated" (Kuzzle ignores deactivated plugins)
+  -v, --npmVersion <version>  Installs plugin <version> from NPM (work only with --install)
+  -u, --gitUrl <url>          Installs plugin from a GIT repo <url> (work only with --install)
+  -p, --path <path>           Installs a plugin from directory <path> (work only with --install)
+
+$
 ```
 
-Plugins configuration have the following default attributes:
+<aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
 
-* `path`: The local path where the plugin is hosted on the server.
-* `url`: a git URL where the plugin can be found and cloned.
-* `version`: the NPM package version to download
-* `customConfig`: config for the plugin. Each plugin has a different configuration (required or optional), check the corresponding plugin documentation for more information.
-* `defaultConfig`: Don't edit this attribute. The defaultConfig is provided by the plugin itself. If you need to change the configuration, edit the `customConfig` attribute
+### Plugin installation
 
-**Note:**
-* A `path`, a `url`, or a `version` parameter is required. Priority is `path`, `url`, `version`; if more than one paramater is set, highest priority parameter is used and others will be ignored.
+Plugins can be installed from the NPM public registry, from a GIT repository, or from a plain directory accessible to Kuzzle instances.  
+The corresponding installation options are: `--npmVersion`, `--gitUrl` and `--path`.
+
+With no plugin `name` argument, the CLI will re-install (if needed) and refresh plugins configuration of all currently registered plugins.
+
+Here are a few examples to install and register plugins to Kuzzle:
+
+**Using NPM:**
+
+```sh
+$ kuzzle plugins --install --npmVersion x.y.z plugin_name
+```
+
+**Using a GIT repository:**
+
+```sh
+$ kuzzle plugins --install --gitUrl https://git.repository.url/project/pluginsRepository plugin_name
+```
+
+**Using a local directory:**
+
+```sh
+$ kuzzle plugins --install --path /directory/absolute/path plugin_name
+```
+
+### Viewing a plugin configuration
+
+To view a plugin's current configuration, use the `--get` option.
+
+
+Example:
+
+```sh
+$ kuzzle plugins --get kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+```
+
+### Modifying a plugin configuration
+
+A plugin configuration is stored in the `config` part of a plugin properties.
+There are two ways of changing a plugin configuration.
+
+You can either:
+
+- perform a partial update, using the ``--set`` action. This allows adding or updating parts of the configuration
+- replace the entire plugin configuration with a new one, with the ``--replace`` action.
+
+Updating a plugin configuration:
+
+```sh
+$ kuzzle plugins --get kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+
+$ kuzzle plugins --set '{"room": "foobar", "foo": "bar"}' kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { room: 'foobar', port: '7512', loadedBy: 'server', foo: 'bar' } }
+```
+
+Replacing a plugin configuration:
+
+```sh
+$ kuzzle plugins --get kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+
+$ kuzzle plugins --replace '{"foo": "bar"}' kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { foo: 'bar' } }
+```
+
+### Removing a plugin configuration property
+
+You can remove a plugin configuration property by using the ``--unset`` action:
+
+```sh
+$ kuzzle plugins --get kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+
+$ kuzzle plugins --unset room kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: '7512', loadedBy: 'server' } }
+```
+
+### Uninstalling a plugin
+
+Plugins can be uninstalled using the ``--remove`` option. If the plugin has been installed from NPM or from a GIT repository, the plugin installation directory will also be deleted.
+
+```sh
+$ kuzzle plugins --remove kuzzle-plugin-socketio
+███ kuzzle-plugin: Loading Kuzzle configuration...
+███ kuzzle-plugin: Removing plugin kuzzle-plugin-socketio...
+███ kuzzle-plugin: Plugin configuration deleted
+███ kuzzle-plugin: Plugin directory deleted
+```
+
+
+### Activating/Deactivating a plugin
+
+By default, a plugin is activated when installed, meaning it will be loaded and used by Kuzzle on the next restart.
+
+You may want to activate or deactivate a plugin, without uninstalling it.
+
+To deactivate a plugin:
+
+```sh
+$ kuzzle plugins --deactivate kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: false,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+```
+
+To activate a plugin:
+
+```sh
+$ kuzzle plugins --activate kuzzle-plugin-socketio
+{ npmVersion: '1.0.7',
+  activated: true,
+  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+```
 
 ### Default plugins
 
@@ -55,7 +189,7 @@ See also the [global authentication mechanism documentation](#authentication).
 
 By default, the protocol plugin [socket.io](https://github.com/kuzzleio/kuzzle-plugin-socketio) is installed, allowing to access Kuzzle using Socket.io clients.
 
-The default plugin configuration opens the port `7512`. This can be changed by injecting a custom plugin configuration file.
+The default plugin configuration opens the port `7512`. This can be changed using the `kuzzle plugins` command-line interface.
 
 ### How to create a plugin
 
@@ -63,7 +197,7 @@ A plugin is a Javascript module that can be installed with NPM or via a public G
 
 #### Configuration
 
-The module must have a `package.json` file with a `pluginInfo` entry. The optional `defaultConfig` will be copied in files `config/defaultPlugins.json` and `config/customPlugins.json` in Kuzzle.
+The module must have a `package.json` file with a `pluginInfo` entry. The optional `defaultConfig` will be used by Kuzzle to initialize the plugin configuration on a fresh install.
 
 ```json
 "pluginInfo": {
@@ -286,8 +420,7 @@ Expected arguments:
 ``function (config, context, isDummy)``
 
 Where:
-
-* ``config``: JSON object containing the plugin configuration (the content of the ``defaultConfig`` or the ``customConfig`` configuration)
+* ``config``: JSON object containing the current plugin configuration
 * ``context``: the plugin context (see above)
 * ``isDummy``: boolean. True: asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)
 
@@ -425,7 +558,7 @@ __The controller code, implementing your actions:__
 module.exports = function MyController (pluginContext) {
 
   this.pluginContext = pluginContext;
-  
+
   this.myAction = function (requestObject, context)
     var
       responseBody = {},
@@ -449,7 +582,7 @@ module.exports = function () {
   this.controllers = require('./config/controllers.js');
   this.routes = require('./config/routes.js');
   this.pluginContext = null;
-  
+
   this.init = function (config, pluginContext, isDummy) {
     this.pluginContext = pluginContext;
     // do something

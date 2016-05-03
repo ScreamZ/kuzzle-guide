@@ -20,7 +20,8 @@ includes:
   - user_guide/06-security
   - core_documentation/index
   - core_documentation/01-architecture
-  - core_documentation/02-plugins
+  - core_documentation/02-request-scenarios
+  - core_documentation/03-plugins
 
 search: true
 ---

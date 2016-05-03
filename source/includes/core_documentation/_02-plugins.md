@@ -24,17 +24,17 @@ Manage plugins
 Options:
 
   -h, --help                  output usage information
-  --install                   *If plugin [name] is provided, install it using --npmVersion, --gitUrl or --path. Otherwise, (re-)install all listed plugins
+  --install                   *If plugin [name] is provided, installs it using --npmVersion, --gitUrl or --path. Otherwise, (re-)installs all listed plugins
   --get                       *Gets the plugin [name] current stored configuration
   --set <JSONObject>          *Updates the plugin configuration with new properties
   --replace <JSONObject>      *Replaces a plugin configuration with a new one
   --unset <property>          *Deletes the property [property] from the plugin configuration
-  --remove                    *Remove the supplied plugin [name] from Kuzzle
-  --activate                  *Mark the plugin as "activated" (Kuzzle ignores deactivated plugins)
-  --deactivate                *Mark the plugin as "deactivated" (Kuzzle ignores deactivated plugins)
-  -v, --npmVersion <version>  Install plugin <version> from NPM (work only with --install)
-  -u, --gitUrl <url>          Install plugin from a GIT repo <url> (work only with --install)
-  -p, --path <path>           Install a plugin from directory <path> (work only with --install)
+  --remove                    *Removes the supplied plugin [name] from Kuzzle
+  --activate                  *Marks the plugin as "activated" (Kuzzle ignores deactivated plugins)
+  --deactivate                *Marks the plugin as "deactivated" (Kuzzle ignores deactivated plugins)
+  -v, --npmVersion <version>  Installs plugin <version> from NPM (work only with --install)
+  -u, --gitUrl <url>          Installs plugin from a GIT repo <url> (work only with --install)
+  -p, --path <path>           Installs a plugin from directory <path> (work only with --install)
 
 $
 ```

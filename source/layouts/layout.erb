@@ -157,5 +157,14 @@ under the License.
       };
     </script>
     <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script type="text/javascript" src="http://kuzzle.io/wp-content/themes/kuzzleio/js/kuzzle.min.js"></script>
+    <script type="text/javascript">
+      (function setupKuzzleSandbox() {
+        var kuzzle = new Kuzzle('http://sandbox.kuzzle.io:7512/', function () {
+          window.kuzzle = kuzzle;
+        });
+      })();
+    </script>
   </body>
 </html>

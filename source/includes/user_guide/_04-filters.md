@@ -535,8 +535,8 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
 ```javascript
 var filter = {
-  term: {
-    firstName: ['Grace', 'Ada']
+  ids: {
+    values: ['a']
   }
 };
 

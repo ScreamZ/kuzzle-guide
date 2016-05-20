@@ -1800,6 +1800,8 @@ It is used to inform the client about the real status of his request (if an erro
 
 <h4 id="how-it-works">How it works</h4>
 
+<p><img alt="Authentication overview" src="images/request-scenarios/auth/overview.png" /></p>
+
 <p>Kuzzle provides a <strong>auth</strong> controller which delegates the authentication strategy to passportjs.</p>
 
 <p>If the passportjs <em>authenticate</em> method resolves an existing user, Kuzzle generates a <a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a> that should be used in subsequent requests.</p>
@@ -1807,7 +1809,6 @@ It is used to inform the client about the real status of his request (if an erro
 <p>See more details:</p>
 
 <ul>
-<li><a href="../request_scenarios/auth.md">Authentication scenarios</a></li>
 <li><a href="/api-reference/#auth-controller">Kuzzle API Documentation about Auth Controller</a> and <a href="/api-reference/#authorization-header">JWT token usage</a> in Kuzzle requests.</li>
 </ul>
 
@@ -1824,7 +1825,7 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 
 <p>A <code class="prettyprint">profile</code> is a set of <code class="prettyprint">role</code>. Each <code class="prettyprint">role</code> defines a set of permissions.</p>
 
-<p><img alt="Users, profiles and roles" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_security_readme_profiles-roles.png?raw=true" /></p>
+<p><img alt="Users, profiles and roles" src="images/images/request-scenarios/auth/kuzzle_security_readme_profiles-roles.png?raw=true" /></p>
 
 <p>In the simple example above, the <em>editor</em> profile is a superset of the <em>contributor</em> one, which, in turn, extends the <em>default</em> profile.</p>
 
@@ -2206,7 +2207,7 @@ A typical context object will look like:</p>
 
 <ul>
 <li><strong>Router Controller</strong>: implements the 3 API routers, normalizes the input message and sends them to the Funnel Controller</li>
-<li><strong>Funnel Controller</strong>: analyses the input message and calls the appropriate controller (see <a href="api-specifications.md">API specification</a>)</li>
+<li><strong>Funnel Controller</strong>: analyses the input message and calls the appropriate controller</li>
 <li><strong>Admin Controller</strong>, <strong>Auth Controller</strong>, <strong>Bulk Controller</strong>, <strong>Write Controller</strong>, <strong>Subscribe Controller</strong>, <strong>Read Controller</strong>: handles the input message (see <a href="/api-reference">API reference</a>)</li>
 <li><strong>Internal Components</strong>: Any component used internally by controllers and any other internal component to interact with services</li>
 </ul>
@@ -3046,6 +3047,8 @@ There are two ways of changing a plugin configuration.</p>
 
 <p>On each of following events, you can attach a function to execute in your plugin. In this function you <strong>HAVE</strong> to return an object similar to the input, because Kuzzle need it for internal purpose.</p>
 
+<h3 id="gt-event-data">&gt; event: data</h3>
+
 <table><thead>
 <tr>
 <th>Event</th>
@@ -3055,13 +3058,6 @@ There are two ways of changing a plugin configuration.</p>
 <th>Input</th>
 </tr>
 </thead><tbody>
-<tr>
-<td><strong>data</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
 <tr>
 <td><code class="prettyprint">data:beforeUpdateMapping</code></td>
 <td><code class="prettyprint">admin</code></td>
@@ -3440,13 +3436,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered after controller <code class="prettyprint">write</code> and action <code class="prettyprint">createCollection</code>.</td>
 <td>Type: Response object</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-memorystorage">&gt; event: memoryStorage</h3>
+
+<table><thead>
 <tr>
-<td><strong>memoryStorage</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">memoryStorage:before&lt;Action&gt;</code></td>
 <td><code class="prettyprint">memoryStorage</code></td>
@@ -3461,13 +3463,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>All actions in <code class="prettyprint">memoryStorage</code> controller have a trigger after</td>
 <td>Type: Response object</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-subscription">&gt; event: subscription</h3>
+
+<table><thead>
 <tr>
-<td><strong>subscription</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">subscription:beforeRemoveRooms</code></td>
 <td><code class="prettyprint">admin</code></td>
@@ -3482,13 +3490,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered after controller <code class="prettyprint">admin</code> and action <code class="prettyprint">removeRooms</code>. When the remove is done</td>
 <td>Type: Response object</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-security">&gt; event: security</h3>
+
+<table><thead>
 <tr>
-<td><strong>security</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">security:formatUserForSerialization</code></td>
 <td>/</td>
@@ -3776,13 +3790,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered after controller <code class="prettyprint">security</code> and action <code class="prettyprint">createOrReplaceUser</code>.</td>
 <td>Type: Response object</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-subscription">&gt; event: subscription</h3>
+
+<table><thead>
 <tr>
-<td><strong>subscription</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">subscription:beforeOn</code></td>
 <td><code class="prettyprint">subscribe</code></td>
@@ -3853,13 +3873,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered after controller <code class="prettyprint">subscribe</code> and action <code class="prettyprint">list</code>.</td>
 <td>Type: Response object</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-auth">&gt; event: auth</h3>
+
+<table><thead>
 <tr>
-<td><strong>auth</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">auth:beforeLogout</code></td>
 <td><code class="prettyprint">auth</code></td>
@@ -3930,13 +3956,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered during authentication. This event allows to load the corresponding strategy. Take a look at the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github">Github Plugin</a></td>
 <td>Type: Passport</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-passport">&gt; event: passport</h3>
+
+<table><thead>
 <tr>
-<td><strong>passport</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">passport:loadScope</code></td>
 <td>/</td>
@@ -3944,13 +3976,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered during authentication. This event allow plugins to modify the scope with rights. Take a look at the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github#configuration">Github Plugin</a></td>
 <td>Type: Object.<br> <code class="prettyprint">{scope}</code></td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-room">&gt; event: room</h3>
+
+<table><thead>
 <tr>
-<td><strong>room</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">room:new</code></td>
 <td>/</td>
@@ -3965,13 +4003,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered after a room is removed from the list. You can&rsquo;t modify the input on this event.</td>
 <td>Type: String.<br> The room id</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-protocol">&gt; event: protocol</h3>
+
+<table><thead>
 <tr>
-<td><strong>protocol</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">protocol:leaveChannel</code></td>
 <td>/</td>
@@ -4000,13 +4044,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered before broadcast. You can&rsquo;t modify the input on this event.</td>
 <td>Type: Object.<br>  <code class="prettyprint">{payload, channel}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channel</code> is the channel name.</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-cleandb">&gt; event: cleanDb</h3>
+
+<table><thead>
 <tr>
-<td><strong>cleanDb</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">cleanDb:deleteIndexes</code></td>
 <td>/</td>
@@ -4028,13 +4078,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered when an error occurred on clean db</td>
 <td>Type: Error</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-preparedb">&gt; event: prepareDb</h3>
+
+<table><thead>
 <tr>
-<td><strong>prepareDb</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">prepareDb:createInternalIndex</code></td>
 <td>/</td>
@@ -4091,13 +4147,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered when an error occurred during database preparation</td>
 <td>Type: Error</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-server">&gt; event: server</h3>
+
+<table><thead>
 <tr>
-<td><strong>server</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">server:httpStarted</code></td>
 <td>/</td>
@@ -4119,13 +4181,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered when the server overload</td>
 <td>Type: String.<br> Contains the overload percentage with &rsquo;%&rsquo; character</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-internalbroker">&gt; event: internalBroker</h3>
+
+<table><thead>
 <tr>
-<td><strong>internalBroker</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">internalBroker:started</code></td>
 <td>/</td>
@@ -4161,13 +4229,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered when the socket is closed</td>
 <td>Type: String</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-workergroup">&gt; event: workerGroup</h3>
+
+<table><thead>
 <tr>
-<td><strong>workerGroup</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">workerGroup:loaded</code></td>
 <td>/</td>
@@ -4175,13 +4249,19 @@ There are two ways of changing a plugin configuration.</p>
 <td>Triggered when workers are loaded</td>
 <td>Type: String.<br> Worker group name</td>
 </tr>
+</tbody></table>
+
+<h3 id="gt-event-rabbit">&gt; event: rabbit</h3>
+
+<table><thead>
 <tr>
-<td><strong>rabbit</strong></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<th>Event</th>
+<th>Controller</th>
+<th>Action</th>
+<th>Description</th>
+<th>Input</th>
 </tr>
+</thead><tbody>
 <tr>
 <td><code class="prettyprint">rabbit:started</code></td>
 <td>/</td>

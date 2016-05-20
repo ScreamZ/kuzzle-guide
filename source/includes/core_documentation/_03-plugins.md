@@ -222,9 +222,9 @@ Check [Worker communication](#worker-plugins) for more information.
 
 On each of following events, you can attach a function to execute in your plugin. In this function you **HAVE** to return an object similar to the input, because Kuzzle need it for internal purpose.
 
+### > event: data
 | Event | Controller| Action | Description | Input |
 |-------|-----------|--------|-------------|-------|
-|**data**|||
 |`data:beforeUpdateMapping`     | `admin` | `updateMapping` |Triggered before controller `admin` and action `updateMapping`|Type: Request object|
 |`data:afterUpdateMapping`      | `admin` | `updateMapping` |Triggered after controller `admin` and action `updateMapping`|Type: Response object|
 |`data:beforeGetMapping`        | `admin` | `getMapping` |Triggered before controller `admin` and action `getMapping`|Type: Request object|
@@ -279,13 +279,22 @@ On each of following events, you can attach a function to execute in your plugin
 |`data:afterDeleteByQuery`      | `write` | `deleteByQuery` |Triggered after controller `write` and action `deleteByQuery`.|Type: Response object|
 |`data:beforeCreateCollection`  | `write` | `createCollection` |Triggered before controller `write` and action `createCollection`.|Type: Request object|
 |`data:afterCreateCollection`   | `write` | `createCollection` |Triggered after controller `write` and action `createCollection`.|Type: Response object|
-|**memoryStorage**|||
+
+### > event: memoryStorage
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`memoryStorage:before<Action>`	| `memoryStorage` | / |All actions in `memoryStorage` controller have a trigger before |Type: Request object|
 |`memoryStorage:after<Action>`	| `memoryStorage` | / |All actions in `memoryStorage` controller have a trigger after |Type: Response object|
-|**subscription**|||
+
+### > event: subscription
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`subscription:beforeRemoveRooms`	| `admin` | `removeRooms` |Triggered before controller `admin` and action `removeRooms`. This action remove all rooms for a given collection|Type: Request object|
 |`subscription:afterRemoveRooms`	| `admin` | `removeRooms` |Triggered after controller `admin` and action `removeRooms`. When the remove is done|Type: Response object|
-|**security**|||
+
+### > event: security
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`security:formatUserForSerialization`	| / | / |Triggered before serialize a user. Useful to clean a user like attribute `password`|Type: User|
 |`security:beforeGetRole`				| `security` | `getRole` |Triggered before controller `security` and action `getRole`.|Type: Request object|
 |`security:afterGetRole`				| `security` | `getRole` |Triggered after controller `security` and action `getRole`.|Type: Response object|
@@ -327,7 +336,10 @@ On each of following events, you can attach a function to execute in your plugin
 |`security:afterUpdateRole`				| `security` | `updateRole` |Triggered after controller `security` and action `updateRole`.|Type: Response object|
 |`security:beforeCreateOrReplaceUser`	| `security` | `createOrReplaceUser` |Triggered before controller `security` and action `createOrReplaceUser`.|Type: Request object|
 |`security:afterCreateOrReplaceUser`	| `security` | `createOrReplaceUser` |Triggered after controller `security` and action `createOrReplaceUser`.|Type: Response object|
-|**subscription**|||
+
+### > event: subscription
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`subscription:beforeOn`	| `subscribe` | `on` |Triggered before controller `subscribe` and action `on`.|Type: Request object|
 |`subscription:afterOn`		| `subscribe` | `on` |Triggered after controller `subscribe` and action `on`.|Type: Response object|
 |`subscription:beforeJoin`	| `subscribe` | `join` |Triggered before controller `subscribe` and action `join`.|Type: Request object|
@@ -338,7 +350,10 @@ On each of following events, you can attach a function to execute in your plugin
 |`subscription:afterCount`	| `subscribe` | `count` |Triggered after controller `subscribe` and action `count`.|Type: Response object|
 |`subscription:beforeList`	| `subscribe` | `list` |Triggered before controller `subscribe` and action `list`.|Type: Request object|
 |`subscription:afterList`	| `subscribe` | `list` |Triggered after controller `subscribe` and action `list`.|Type: Response object|
-|**auth**|||
+
+### > event: auth
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`auth:beforeLogout`	| `auth` | `logout` |Triggered before controller `auth` and action `logout`.|Type: Context user.<br> `{profile, role, user, token}`|
 |`auth:afterLogout`		| `auth` | `logout` |Triggered after controller `auth` and action `logout`.|Type: Response object|
 |`auth:beforeLogin`		| `auth` | `login` |Triggered before controller `auth` and action `login`.|Type: Object.<br> `{context, requestObject}`|
@@ -349,21 +364,36 @@ On each of following events, you can attach a function to execute in your plugin
 |`auth:beforeUpdateSelf`| `auth` | `updateSelf` |Triggered before controller `auth` and action `updateSelf`.|Type: Request object|
 |`auth:afterUpdateSelf`	| `auth` | `updateSelf` |Triggered after controller `auth` and action `updateSelf`.|Type: Response object|
 |`auth:loadStrategies`	| /      |    /         |Triggered during authentication. This event allows to load the corresponding strategy. Take a look at the [Github Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github) |Type: Passport|
-|**passport**|||
+
+### > event: passport
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`passport:loadScope`		| / | / |Triggered during authentication. This event allow plugins to modify the scope with rights. Take a look at the [Github Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-github#configuration) |Type: Object.<br> `{scope}`|
-|**room**|||
+
+### > event: room
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`room:new`					| / | / |Triggered when a new room is added in the rooms list. You can't modify the input on this event.|Type: Object. <br> `{roomId, index, collection, formattedFilters}`|
 |`room:remove`				| / | / |Triggered after a room is removed from the list. You can't modify the input on this event.|Type: String.<br> The room id|
-|**protocol**|||
+
+### > event: protocol
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`protocol:leaveChannel`	| / | / |Triggered before a room is removed for the user. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
 |`protocol:joinChannel`		| / | / |Triggered after attach a user to a room. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
 |`protocol:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channel, id}` <br>`payload` is the notification content. <br>`channel` is the channel name.<br> `id` is the connection id|
 |`protocol:broadcast`		| / | / |Triggered before broadcast. You can't modify the input on this event.|Type: Object.<br>  `{payload, channel}` <br>`payload` is the notification content. <br>`channel` is the channel name.|
-|**cleanDb**|||
+
+### > event: cleanDb
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`cleanDb:deleteIndexes`| / | / |Triggered during `cleanDb` process just before indexes deletion. |Type: Request object.<br> Contains all indexes to delete in `requestObject.data.body.indexes`|
 |`cleanDb:done`			| / | / |Triggered after indexes deletion.| / |
 |`cleanDb:error`		| / | / |Triggered when an error occurred on clean db|Type: Error|
-|**prepareDb**|||
+
+### > event: prepareDb
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`prepareDb:createInternalIndex`	| / | / |Triggered on Kuzzle start for creating the internal index `%kuzzle`|Type: Request object.<br> Contains the internal index in `requestObject.index`|
 |`prepareDb:updateMappingRoles`		| / | / |Triggered on Kuzzle start for creating the internal mapping for Roles collection|Type: Request object.<br> Contains the default mapping in `requestObject.data.body`|
 |`prepareDb:updateMappingProfiles`	| / | / |Triggered on Kuzzle start for creating the internal mapping for Profiles collection|Type: Request object.<br> Contains the default mapping in `requestObject.data.body`|
@@ -372,19 +402,31 @@ On each of following events, you can attach a function to execute in your plugin
 |`prepareDb:importMapping`			| / | / |Triggered during database preparation. Called for each mapping to import|Type: Request object.<br> Contains the index in `requestObject.index` and mapping in `requestObject.data.body`|
 |`prepareDb:importFixtures`			| / | / |Triggered during database preparation. Called for each fixtures to import|Type: Request object.<br> Contains the index in `requestObject.index` and bulk in `requestObject.data.body`|
 |`prepareDb:error`					| / | / |Triggered when an error occurred during database preparation|Type: Error|
-|**server**|||
+
+### > event: server
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`server:httpStarted`		| / | / |Triggered when the http server is started.|Type: String|
 |`server:mqStarted`			| / | / |Triggered when the MQ server is started.|Type: String|
 |`server:overload`			| / | / |Triggered when the server overload|Type: String.<br> Contains the overload percentage with '%' character|
-|**internalBroker**|||
+
+### > event: internalBroker
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`internalBroker:started`		| / | / |Triggered when the internal broker is started|Type: String.<br> `'Internal broker server started'`|
 |`internalBroker:connected`		| / | / |Triggered when the internal broker is connected|Type: String.<br> `'Connected to Kuzzle server'`|
 |`internalBroker:reregistering`	| / | / |Triggered when the internal broker is reregistered|Type: String.<br> `'Re-registering room: ' + room`|
 |`internalBroker:error`			| / | / |Triggered when an error occured in internal broker|Type: Object.<br> {host, port, message, retry}|
 |`internalBroker:socketClosed`	| / | / |Triggered when the socket is closed|Type: String|
-|**workerGroup**|||
+
+### > event: workerGroup
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`workerGroup:loaded`	| / | / |Triggered when workers are loaded|Type: String.<br> Worker group name|
-|**rabbit**|||
+
+### > event: rabbit
+| Event | Controller| Action | Description | Input |
+|-------|-----------|--------|-------------|-------|
 |`rabbit:started`		| / | / |Triggered when rabbit MQ service is started|Type: String.<br> `'RabbitMQ Service started'`|
 |`rabbit:error`			| / | / |Triggered when an error occured on rabbit connection|Type: Error|
 |`rabbit:stopped`		| / | / |Triggered when the rabbit MQ service is stopped|Type: String.<br> `'RabbitMQ Service stopped'`|

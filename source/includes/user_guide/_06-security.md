@@ -26,13 +26,14 @@ You can also use Kuzzle's [Github authentication plugin](https://github.com/kuzz
 
 #### How it works
 
+![Authentication overview](./images/request-scenarios/auth/overview.png)
+
 Kuzzle provides a **auth** controller which delegates the authentication strategy to passportjs.
 
 If the passportjs _authenticate_ method resolves an existing user, Kuzzle generates a [JSON Web Token](https://tools.ietf.org/html/rfc7519) that should be used in subsequent requests.
 
 See more details:
 
-- [Authentication scenarios](../request_scenarios/auth.md)
 - [Kuzzle API Documentation about Auth Controller](/api-reference/#auth-controller) and [JWT token usage](/api-reference/#authorization-header) in Kuzzle requests.
 
 
@@ -49,7 +50,7 @@ Because some sets of permissions can be shared between several `profiles`, Kuzzl
 
 A `profile` is a set of `role`. Each `role` defines a set of permissions.
 
-![Users, profiles and roles](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_security_readme_profiles-roles.png?raw=true)
+![Users, profiles and roles](./images/request-scenarios/auth/kuzzle_security_readme_profiles-roles.png?raw=true)
 
 In the simple example above, the *editor* profile is a superset of the *contributor* one, which, in turn, extends the *default* profile.
 

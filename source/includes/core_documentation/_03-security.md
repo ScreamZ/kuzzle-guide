@@ -217,9 +217,9 @@ var role = {
         update: {
           args: {
             document: {
+              index: "$requestObject.index",
+              collection: "$requestObject.collection",
               action: {
-                index: "$requestObject.index",
-                collection: "$requestObject.collection",
                 get: "$currentId"
               }
             }
@@ -240,6 +240,8 @@ Where:
 
 ##### The permission function
 
+The permission function is executed in a sandbox with a limited scope. Its body is the evaluation of the _test_ parameter given in the role's definition and must return a boolean value.
+
 The permission function has the following signature:
 
 ```js
@@ -252,15 +254,15 @@ The permission function has the following signature:
  * @return {Boolean}
  */
 function ($requestObject, context, $currentUserId, args) {
-  // the function body is built from the "test" parameter
+  // the function body is built from the "test" parameter.
+  // Example, with the sample role above:
+  return args.document.content.user.id === $currentUserId;
 };
 ```
 
-The permission function is executed in a sandbox with a limited scope. Its body is the evaluation of the _test_ parameter given in the role's definition.
+###### Parameters
 
-##### Parameters
-
-###### $requestObject
+###### > $requestObject
 
 The request object is the request that is currently being evaluated.  
 A typical request object will look like:
@@ -288,7 +290,7 @@ var requestObject = {
 };
 ```
 
-###### context
+###### > context
 
 The context object stores some information about the current connection.  
 A typical context object will look like:
@@ -314,22 +316,34 @@ var context = {
 };
 ```
 
-###### $currentUserId
+###### > $currentUserId
 
-The _$currentUserId_ variable contains the current user id. It is an alias for `context.token.user._id`.
+The _$currentUserId_ variable contains the current user's ID. It is an alias for `context.token.user._id`.
 
-###### args
+###### > args
 
-The _args_ object contains the result of the evaluation of the fetch definition (see below).
+The main purpose of the "closures" behavior is to define a role policy based on conditions about stored documents.
+That means that we need to fetch documents from the storage engine in order to use them within the permission function.
+
+The _args_ object contains these documents, as a result of the evaluation of the [fetch definition](#the-fetch-definition).
+Each _args_ item will look like:
+```js
+{
+  content: <the document itself>,
+  id: <the document id>
+}
+```
+
+With the sample role above (`return args.document.content.user.id === $currentUserId`), the `update` action is allowed only if the fetched document contains an attribute `user.id` which value is the current user's ID.
 
 
 #### The fetch definition
 
 The optional _args_ parameter given to the permission function is the result of the evaluation of some fetch definition given in the args section of the role definition.
 
-Using this ability, you can pass some documents fetches from Kuzzle's database layer to your permission function.
+Using this ability, you can pass some documents fetched from Kuzzle's database layer to your permission function.
 
-In our example above, we fetch a _document_ variable which contains the document that was requested for update, and we use it in the permission function to test if it is owned by the current user.
+In our sample role above, we fetch a _document_ variable which contains the document that was requested for update, and we use it in the permission function to test if it is owned by the current user.
 
 ##### args element structure
 
@@ -339,7 +353,7 @@ The _args_ element has the following structure:
 var args = {
   <some variable>: {
     index: <index from which to fetch the document(s)>,
-    collection: <collection in which the document(s)  are fetched>,
+    collection: <collection from which to fetch the document(s)>,
     action: {
       <action type (get|mget|search)>: <action type specific parameters>
     }
@@ -353,25 +367,49 @@ var args = {
 
 You can define one or more _variables_ inside the args element and, for each of them, the action to use to populate them.
 
-The _variable_ will then be availalbe from your permission function under args._<variable>_.
+Each _variable_ will then be availalbe in [your permission function](#the-permission-function) under `args.<variable>`.
 
-###### _get_ action type
+###### embedded variables
+
+Some variables are exposed by Kuzzle and can be used within your fetch function definition:
+
+- `$requestObject`: The complete request object being evaluated.
+- `$currentId`: The current request's document ID. It is an alias for `$requestObject.data._id`.
+
+###### action types
+
+###### > _get_ action type
 
 The `get` action type performs a read/get call. It takes a document id for entry and returns the matching document.
 
+Example:
 ```js
 var args = {
-  myDocument: {
+  currentDocument: {
+    index: "$requestObject.index",
+    collection: "$requestObject.collection",
+    action: {
+      get: "$currentId"
+    }
+  },
+  anotherDocument: {
     index: "myIndex",
     collection: "myCollection",
     action: {
-      get: "$currentId"
+      get: "document_id"
     }
   }
 };
 ```
 
-###### _mget_ action type
+The _args_ variable passed to the permission function contains:
+- `args.currentDocument`: the document that is being updated. Indeed, we fetch:
+  - the document which ID is the current document's ID (`{action: {get: "currentId"}}`)
+  - in the current collection (`collection: "$requestObject.collection"`)
+  - of the current index (`index: "$requestObject.index"`).
+- `args.anotherDocument`: the document with ID `document_id`, from index `myIndex` and collection `myCollection`.
+
+###### > _mget_ action type
 
 The `mget` action type takes a list of document ids for entry and returns the list of matching documents.
 
@@ -391,10 +429,21 @@ var args = {
 };
 ```
 
-###### _search_ action type
+The _args_ variable passed to the permission function contains an array of documents fetched from `myIndex`/`myCollection`, like:
+```js
+args.myDocuments = [
+  { id: "id_1", content: {name: "Document 1", description: "Cum sociis natoque penatibus et magnis dis parturient montes"},
+  { id: "id_2", content: {name: "Document 2", description: "nascetur ridiculus mus. Nulla nunc velit"},
+  ...
+]
+```
+
+
+###### > _search_ action type
 
 The `search` action type makes a search in Kuzzle's database layer and returns the related documents.
 
+Example:
 ```js
 var args = {
   myDocuments: {
@@ -413,13 +462,17 @@ var args = {
 };
 ```
 
-The action.search value is sent to Kuzzle's database layer directly, being Elasticsearch 2.2.
+The _args_ variable passed to the permission function contains an array of documents fetched from `myIndex`/`myCollection`, for which the `name` attribute matches the `name` attribute of the request:
+```js
+args.myDocuments = [
+  { id: "id_1", content: {name: "foo", description: "Cum sociis natoque penatibus et magnis dis parturient montes"},
+  { id: "id_2", content: {name: "foo bar", description: "nascetur ridiculus mus. Nulla nunc velit"},
+  ...
+]
+```
+
+
+The _action.search_ value is sent to Kuzzle's database layer directly, being Elasticsearch 2.2.
 
 Please refer to [Elasticsearch search API documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html) for additional information on how to build your query.
 
-###### available variables
-
-Some variables are exposed by Kuzzle and can be used within your fetch function definition:
-
-- `$requestObject`: The complete request object being evaluated.
-- `$currentId`: The current request document id. Shortcut to $requestObject.data.&#95;id.

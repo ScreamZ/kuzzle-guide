@@ -90,12 +90,14 @@ In this example, the role denies every action to the user, except the `login`, `
 
 #### Profile definition
 
-A `profile` definition is a hierarchical JSON object that contains an array of roles, identified by their IDs.
+A `profile` definition is a hierarchical JSON object that contains an array of roles, identified by their IDs:
 
 ```js
 var myProfileDefinition = {
   roles: [
-    {_id: < role Id > (, restrictedTo: < role restrictions > ) }
+    {_id: < role Id > (, restrictedTo: < role restrictions > ) },
+    <another role>,
+    ...
   ]
 };
 ```
@@ -179,9 +181,9 @@ var role = {
         delete: {
           args: {
             document: {
+              index: "$requestObject.index",
+              collection: "$requestObject.collection",
               action: {
-                index: "$requestObject.index",
-                collection: "$requestObject.collection",
                 get: "$currentId"
               }
             }

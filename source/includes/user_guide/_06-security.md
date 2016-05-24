@@ -168,7 +168,7 @@ Now, let's say we have a chat application and want the users to be allowed to ed
 
 This type of rules depends on the context and cannot be expressed as a simple boolean.
 
-Kuzzle lets you define some more complex permissions using a custom function, which can dynamically decide wether the user is allowed to proceed or not depending on the context.
+Kuzzle let you define some more complex permissions using a custom function, which can dynamically decide wether the user is allowed to proceed or not depending on the context.
 
 In our chat example, the rule can be expressed as:
 

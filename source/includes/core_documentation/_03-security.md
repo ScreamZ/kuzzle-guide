@@ -18,13 +18,13 @@ Remember the [Architecture overview](#core-architecture) and focus on the compon
 
 Kuzzle uses these internal components during the authentication process:
 * The Auth Controller
-* The "Passport Wrapper", who makes an interface between Kuzzle controllers and the Passport library
+* The "Passport Wrapper", which makes an interface between Kuzzle controllers and the Passport library
 * The User and Token [Repositories](https://github.com/kuzzleio/kuzzle/tree/master/lib/api/core/models/repositories), to retrieve users' data.
 * The Authentication strategy, implemented within a dedicated plugin.
 
 ##### Sample scenario with the Local Plugin
 
-The "Local" strategy authenticates a user locally with its username/password, implemented by the [Passport Local Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local).
+The "Local" strategy authenticates a user locally with it's username/password, implemented by the [Passport Local Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local).
 
 Detailed workflow:
 
@@ -207,7 +207,7 @@ The `action permission` value can be set either to:
 - a boolean. When set to `true`, the user is allowed to perform the action.
 - an object that describes a function (we call it "closure").
 
-A closure enables to set a role's policy according to some execution context.
+A closure enable to set a role's policy according to some execution context.
 For example, if we need to allow users to update only their own document, it can be done with this sample role:
 ```js
 var role = {

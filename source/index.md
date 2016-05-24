@@ -21,7 +21,8 @@ includes:
   - core_documentation/index
   - core_documentation/01-architecture
   - core_documentation/02-request-scenarios
-  - core_documentation/03-plugins
+  - core_documentation/03-security
+  - core_documentation/04-plugins
 
 search: true
 ---

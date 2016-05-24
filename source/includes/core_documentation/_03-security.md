@@ -24,7 +24,7 @@ Kuzzle uses these internal components during the authentication process:
 
 ##### Sample scenario with the Local Plugin
 
-The "Local" strategy authenticates a user locally with it's username/password, implemented by the [Passport Local Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local).
+The "Local" strategy authenticates a user locally with his username/password, implemented by the [Passport Local Plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local).
 
 Detailed workflow:
 

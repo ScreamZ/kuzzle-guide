@@ -208,7 +208,7 @@ The `action permission` value can be set either to:
 - an object that describes a function (we call it "closure").
 
 A closure enable to set a role's policy according to some execution context.
-For example, if we need to allow users to update only their own document, it can be done with this sample role:
+For example, if we need to allow users to update only their own documents, it can be done with this sample role:
 ```js
 var role = {
   controllers: {
@@ -318,7 +318,7 @@ var context = {
 
 ###### > $currentUserId
 
-The _$currentUserId_ variable contains the current user's ID. It is an alias for `context.token.user._id`.
+The _$currentUserId_ variable contains the current user ID. It is an alias for `context.token.user._id`.
 
 ###### > args
 
@@ -334,7 +334,7 @@ Each _args_ item will look like:
 }
 ```
 
-With the sample role above (`return args.document.content.user.id === $currentUserId`), the `update` action is allowed only if the fetched document contains an attribute `user.id` which value is the current user's ID.
+With the sample role above (`return args.document.content.user.id === $currentUserId`), the `update` action is allowed only if the fetched document contains an attribute `user.id` which value is the current user ID.
 
 
 #### The fetch definition

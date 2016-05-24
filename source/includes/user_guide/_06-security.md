@@ -102,7 +102,7 @@ var myProfileDefinition = {
 };
 ```
 
-For each role associated to a profile, we can add some restrictions on which indexes and collections the role is applied.
+A role can be applied globally on the profile, or it can be restricted to a list of indexes or index/collections pairs.
 
 For example, if we have a "publisher" role which allows to request any action of the `write` controller:
 ```js
@@ -146,29 +146,31 @@ var profile3 = {
 ```
 
 With this sample profiles:
-* users with `profile1` are allowed to use any `write` controller's actions on any indexes and collections.
-* users with `profile2` are only allowed to use any `write` controller's actions on any collections of `index1`.
-* users with `profile3` are only allowed to use any `write` controller's actions on any collections of `index2`, as well as collections `foo` and `bar` of `index1`.
+* users with `profile1` are allowed to use all `write` controller actions on all indexes and collections.
+* users with `profile2` are only allowed to use `write` controller actions on collections stored in index `index1`.
+* users with `profile3` are only allowed to use `write` controller actions on:
+  * all collections stored in index `index2`
+  * collections `foo` and `bar` stored in index `index1`.
 
 ##### Composition rules
 
-In Kuzzle, the permission's strategy follow a whitelist policy:
+In Kuzzle, permissions follow the [Whitelist](https://en.wikipedia.org/wiki/Whitelist) strategy:
 
-An action must be **explicitly** allowed by at least one role of the user's profile (including restrictions).
+An action must be **explicitly** allowed by at least one role of the user profile (including restrictions).
 
 That means:
 * If a role allows it, the action is authorized, even if another role denies it.
-* If no role explicitly allows it, the action if denied, even if no role explicitly denies it as weel.
+* If no role explicitly allows it, the action if denied, even if no role explicitly denies it as well.
 
 #### Actions permissions functions
 
-So far, we've seen how to set permissions based on the users profiles only.
+So far, we've seen how to set permissions based on the user profile only.
 
 Now, let's say we have a chat application and want the users to be allowed to edit & delete their own messages only.
 
 This type of rules depends on the context and cannot be expressed as a simple boolean.
 
-Kuzzle let you define some more complex permissions using a custom function, which can dynamically decide wether the user is allowed to proceed or not depending on the context.
+Kuzzle lets you define more complex permissions using custom functions, allowing dynamic decision about whether the user is allowed to proceed or not, depending on the context.
 
 In our chat example, the rule can be expressed as:
 

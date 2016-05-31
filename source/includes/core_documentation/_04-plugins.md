@@ -804,7 +804,7 @@ module.exports = function () {
 
 ### > Authentication plugin
 
-Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see [plugins documentation](#plugins)).
+Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin.
 
 Take example on [Passport Local plugin](https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local), an authentication plugin must provide following steps:
 

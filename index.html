@@ -1779,38 +1779,20 @@ It is used to inform the client about the real status of his request (if an erro
 
 <p>When installing Kuzzle for the very first time, no default user is created and the Anonymous user is allowed to perform any action on the data. The only restriction is on the internal data storage used by Kuzzle to store its configuration.</p>
 
-<p>Once a first admin user is created, either by accessing <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a> for the first time or by using the <a href="https://github.com/kuzzleio/kuzzle/tree/master/bin">CLI</a>, the Anonymous permissions are dropped.</p>
+<p>Once a first admin user is created, either by accessing <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a> for the first time or by using the <a href="#command-line-interface">CLI</a>, the Anonymous permissions are dropped.</p>
 
 <p>You can then use the Back Office to administrate your user rights.</p>
 
 <h3 id="authentication">Authentication</h3>
 
-<p>The first step to secure your data is to be able to identify your users. Kuzzle ships by default with a local login/password strategy.</p>
+<p>The first step to secure your data is to be able to identify your users.
+Kuzzle ships by default with a local login/password strategy.</p>
 
-<p>Kuzzle uses <a href="http://passportjs.org/">passportjs</a> to enable authentication with a potentially large amount of providers, for example:</p>
+<p>You can also use Kuzzle&rsquo;s <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-oauth">Oauth authentication plugin</a>, or develop your own (see <a href="#authentication-process">Core documentation</a> for more details).</p>
 
-<ul>
-<li>local username/password authentication (enabled by default)</li>
-<li>oauth2 providers like github or google</li>
-<li>SAML providers</li>
-<li>etc.</li>
-</ul>
+<p>If the authentication request resolves an existing user, Kuzzle generates a <a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a> that should be used in subsequent requests.</p>
 
-<p>You can also use Kuzzle&rsquo;s <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-github">Github authentication plugin</a> or develop your own.</p>
-
-<h4 id="how-it-works">How it works</h4>
-
-<p><img alt="Authentication overview" src="images/request-scenarios/auth/overview.png" /></p>
-
-<p>Kuzzle provides a <strong>auth</strong> controller which delegates the authentication strategy to passportjs.</p>
-
-<p>If the passportjs <em>authenticate</em> method resolves an existing user, Kuzzle generates a <a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a> that should be used in subsequent requests.</p>
-
-<p>See more details:</p>
-
-<ul>
-<li><a href="/api-reference/#auth-controller">Kuzzle API Documentation about Auth Controller</a> and <a href="/api-reference/#authorization-header">JWT token usage</a> in Kuzzle requests.</li>
-</ul>
+<p>(see also Kuzzle API documentation about <a href="/api-reference/#login">Auth Controller</a> and <a href="/api-reference/#authorization-header">JWT token usage</a> in Kuzzle requests)</p>
 
 <h3 id="permissions">Permissions</h3>
 
@@ -1823,43 +1805,33 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 
 <p>Because some sets of permissions can be shared between several <code class="prettyprint">profiles</code>, Kuzzle includes an additional level of abstraction below the <code class="prettyprint">profile</code>: the <code class="prettyprint">roles</code>.</p>
 
-<p>A <code class="prettyprint">profile</code> is a set of <code class="prettyprint">role</code>. Each <code class="prettyprint">role</code> defines a set of permissions.</p>
+<p>A <code class="prettyprint">profile</code> is a set of <code class="prettyprint">roles</code>. Each <code class="prettyprint">role</code> defines a set of permissions.</p>
 
-<p><img alt="Users, profiles and roles" src="images/images/request-scenarios/auth/kuzzle_security_readme_profiles-roles.png?raw=true" /></p>
+<p><img alt="Users, profiles and roles" src="images/permissions/profiles-roles.png" /></p>
 
 <p>In the simple example above, the <em>editor</em> profile is a superset of the <em>contributor</em> one, which, in turn, extends the <em>default</em> profile.</p>
 
-<h3 id="roles-definition">Roles definition</h3>
+<p><code class="prettyprint">roles</code> and <code class="prettyprint">profiles</code> can be edited in <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a>.</p>
 
-<p><code class="prettyprint">roles</code> can be edited in <a href="https://github.com/kuzzleio/kuzzle-bo">Kuzzle Back Office</a>. A <code class="prettyprint">role</code> definition is a hierarchical JSON object in which permissions can be defined at each data level, from the <code class="prettyprint">index</code> down to the <code class="prettyprint">action</code>.</p>
+<h4 id="role-definition">Role definition</h4>
 
-<p>The <code class="prettyprint">role</code> definition is represented as a hierarchical object for one or more <code class="prettyprint">indexes</code>.</p>
+<p>A <code class="prettyprint">role</code> definition is a hierarchical JSON object in which permissions can be defined at <code class="prettyprint">controller</code> and <code class="prettyprint">action</code> level.</p>
+
+<p>The <code class="prettyprint">role</code> definition is represented as a hierarchical object for one or more <code class="prettyprint">controllers</code>.</p>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">myRoleDefinition</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
-    <span class="o">&lt;</span> <span class="nx">index</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
-      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
-        <span class="o">&lt;</span> <span class="nx">collection</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">true</span><span class="o">|</span><span class="kc">false</span><span class="p">,</span>
-          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
-            <span class="o">&lt;</span> <span class="nx">controller</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
-                <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
-                <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
-                <span class="p">...</span>
-              <span class="p">}</span>
-            <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="o">&lt;</span> <span class="nx">controller</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
+        <span class="o">&lt;</span> <span class="nx">action</span><span class="o">|*</span> <span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">action</span> <span class="nx">permission</span><span class="o">*</span> <span class="o">&gt;</span><span class="p">,</span>
+        <span class="p">...</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre>
 
-<p>Each entry of the <code class="prettyprint">indexes</code>, <code class="prettyprint">collections</code>, <code class="prettyprint">controllers</code>, <code class="prettyprint">actions</code> tree can be set to either an explicit value or the &ldquo;&#42;&rdquo; wildcard.</p>
+<p>Each entry of the <code class="prettyprint">controllers</code>, <code class="prettyprint">actions</code> tree can be set to either an explicit value or the &ldquo;&#42;&rdquo; wildcard.</p>
 
 <p>The <code class="prettyprint">action permission</code> value can be set either to:</p>
 
@@ -1870,24 +1842,12 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 
 <p>example:</p>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">anonymousRole</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-        <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nl">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">auth</span><span class="p">:</span> <span class="p">{</span>
-              <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
-                <span class="na">login</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="na">checkToken</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="na">getCurrentUser</span><span class="p">:</span> <span class="kc">true</span>
-              <span class="p">}</span>
-            <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
+    <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">auth</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">login</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="na">checkToken</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="na">getCurrentUser</span><span class="p">:</span> <span class="kc">true</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -1898,105 +1858,105 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 
 <p>In this example, the role denies every action to the user, except the <code class="prettyprint">login</code>, <code class="prettyprint">checkToken</code> and <code class="prettyprint">getCurrentUser</code> actions of the <code class="prettyprint">auth</code> controller.</p>
 
-<h4 id="95-candelete-and-95-cancreate">&#95;canDelete and &#95;canCreate</h4>
+<h4 id="profile-definition">Profile definition</h4>
 
-<p>Some permissions are not related to an index or a collection like for instance creating or deleting an index or a collection.</p>
-
-<p>To handle such cases, the role definition accepts the <code class="prettyprint">_canDelete</code> and <code class="prettyprint">_canCreate</code> parameters.</p>
-
-<ul>
-<li><code class="prettyprint">_canCreate</code> needs to be defined <em>at the level above</em> of the target.</li>
-<li><code class="prettyprint">_canDelete</code> needs to be defined at the first sub-level of the target.</li>
-</ul>
-
-<p>Example:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">_canCreate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">_canDelete</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="p">...</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+<p>A <code class="prettyprint">profile</code> definition is a hierarchical JSON object that contains an array of roles, identified by their IDs:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">myProfileDefinition</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">roles</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span><span class="na">_id</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">role</span> <span class="nx">Id</span> <span class="o">&gt;</span> <span class="p">(,</span> <span class="na">restrictedTo</span><span class="p">:</span> <span class="o">&lt;</span> <span class="nx">role</span> <span class="nx">restrictions</span> <span class="o">&gt;</span> <span class="p">)</span> <span class="p">},</span>
+    <span class="o">&lt;</span><span class="nx">another</span> <span class="nx">role</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="p">...</span>
+  <span class="p">]</span>
 <span class="p">};</span>
 </code></pre>
 
-<p>The above example allows the user to create any index and forbids to delete the <em>myIndex</em> index.</p>
+<p>A role can be applied globally on the profile, or it can be restricted to a list of indexes or index/collections pairs.</p>
 
-<h4 id="composition-rules">Composition rules</h4>
+<p>For example, if we have a &ldquo;publisher&rdquo; role which allows to request any action of the <code class="prettyprint">write</code> controller:
+<code class="prettyprint">js
+var publisherRole = {
+    controllers: {
+    write: {
+      actions: {
+        &#39;*&#39;: true
+      }
+    }
+  }
+};
+</code></p>
 
-<p>The composition rule is:</p>
+<p>Then we declare 3 profiles using this role:
+&ldquo;`js
+var profile1 = {
+  roles: [ {_id: &lsquo;publisherRole&rsquo; } ]
+};</p>
 
-<aside class="success">
-The more specific overrides the less specific.
-</aside>
+<p>var profile2 = {
+  roles: [
+    {
+      _id: &#39;publisherRole&rsquo;,
+      restrictedTo: [{index: &#39;index1&rsquo;}]
+    }
+  ]
+};</p>
 
-<p>Example:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nl">controllers</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">"*"</span><span class="p">:</span> <span class="kc">true</span>
-              <span class="p">}</span>
-            <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="na">forbiddenCollection</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"*"</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nl">actions</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">"*"</span><span class="p">:</span> <span class="kc">false</span>
-              <span class="p">}</span>
-            <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
+<p>var profile3 = {
+  roles: [
+    {
+      _id: &#39;publisherRole&rsquo;,
+      restrictedTo: [
+        {index: &#39;index1&rsquo;, collections: [&#39;foo&rsquo;, &#39;bar&rsquo;]},
+        {index: &#39;index2&rsquo;}
+      ]
+    }
+  ]
+};
+&rdquo;`</p>
 
-<p>In the example above, the user is granted any action on any collection of <em>myIndex</em> <strong>except</strong> for the <em>forbiddenCollection</em>, for which he is denied any action.</p>
+<p>With this sample profiles:
+* users with <code class="prettyprint">profile1</code> are allowed to use all <code class="prettyprint">write</code> controller actions on all indexes and collections.
+* users with <code class="prettyprint">profile2</code> are only allowed to use <code class="prettyprint">write</code> controller actions on collections stored in index <code class="prettyprint">index1</code>.
+* users with <code class="prettyprint">profile3</code> are only allowed to use <code class="prettyprint">write</code> controller actions on:
+  * all collections stored in index <code class="prettyprint">index2</code>
+  * collections <code class="prettyprint">foo</code> and <code class="prettyprint">bar</code> stored in index <code class="prettyprint">index1</code>.</p>
+
+<h5 id="composition-rules">Composition rules</h5>
+
+<p>In Kuzzle, permissions follow the <a href="https://en.wikipedia.org/wiki/Whitelist">Whitelist</a> strategy:</p>
+
+<p>An action must be <strong>explicitly</strong> allowed by at least one role of the user profile (including restrictions).</p>
+
+<p>That means:
+* If a role allows it, the action is authorized, even if another role denies it.
+* If no role explicitly allows it, the action if denied, even if no role explicitly denies it as well.</p>
 
 <h4 id="actions-permissions-functions">Actions permissions functions</h4>
 
-<p>So far, we&rsquo;ve seen how to set permissions based on the users profiles only.</p>
+<p>So far, we&rsquo;ve seen how to set permissions based on the user profile only.</p>
 
 <p>Now, let&rsquo;s say we have a chat application and want the users to be allowed to edit &amp; delete their own messages only.</p>
 
 <p>This type of rules depends on the context and cannot be expressed as a simple boolean.</p>
 
-<p>Kuzzle lets you define some more complex permissions using a custom function, which can dynamically decide wether the user is allowed to proceed or not depending on the context.</p>
+<p>Kuzzle lets you define more complex permissions using custom functions, allowing dynamic decision about whether the user is allowed to proceed or not, depending on the context.</p>
 
 <p>In our chat example, the rule can be expressed as:</p>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">indexes</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">myIndex</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">collections</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">chatMessages</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">write</span><span class="p">:</span> <span class="p">{</span>
-              <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
-                <span class="na">create</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="na">delete</span><span class="p">:</span> <span class="p">{</span>
-                  <span class="na">args</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="na">document</span><span class="p">:</span> <span class="p">{</span>
-                      <span class="na">collection</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
-                      <span class="na">index</span><span class="p">:</span> <span class="s2">"chatMessages"</span><span class="p">,</span>
-                      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
-                      <span class="p">}</span>
-                    <span class="p">}</span>
-                  <span class="p">},</span>
-                  <span class="na">test</span><span class="p">:</span> <span class="s2">"return args.document.content.user.id === $currentUserId"</span>
-                <span class="p">}</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">write</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">create</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="na">delete</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">args</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">document</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">index</span><span class="p">:</span> <span class="s2">"$requestObject.index"</span><span class="p">,</span>
+              <span class="na">collection</span><span class="p">:</span> <span class="s2">"$requestObject.collection"</span><span class="p">,</span>
+              <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
               <span class="p">}</span>
             <span class="p">}</span>
-          <span class="p">}</span>
+          <span class="p">},</span>
+          <span class="na">test</span><span class="p">:</span> <span class="s2">"return args.document.content.user.id === $currentUserId"</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -2004,177 +1964,7 @@ The more specific overrides the less specific.
 <span class="p">};</span>
 </code></pre>
 
-<h4 id="the-permission-function">The permission function</h4>
-
-<p>The permission function has the following signature:</p>
-<pre class="highlight javascript"><code><span class="cm">/**
- * @param {RequestObject} $requestObject  The current action request.
- * @param {Object} context                The current connection context. Contains the connection type and the current user.
- * @param {string} $currentUserId         The current user Id. Shortcut to context.token.user._id
- * @param {Object} args                   The result of the evaluated args definition.
- *
- * @return {Boolean}
- */</span>
-<span class="kd">function</span> <span class="p">(</span><span class="nx">$requestObject</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">$currentUserId</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// the function body is built from the "test" parameter</span>
-<span class="p">};</span>
-</code></pre>
-
-<p>The permission function is executed in a sandbox with a limited scope. Its body is the evaluation of the <em>test</em> parameter given in the definition.</p>
-
-<h5 id="parameters">Parameters</h5>
-
-<h6 id="requestobject">$requestObject</h6>
-
-<p>The request object is the request that is currently being evaluated.<br>
-A typical request object will look like:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">requestObject</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
-  <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
-  <span class="na">controller</span><span class="p">:</span> <span class="s2">"write"</span><span class="p">,</span>
-  <span class="na">action</span><span class="p">:</span> <span class="s2">"update"</span><span class="p">,</span>
-  <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">_id</span><span class="p">:</span> <span class="s2">"id_1"</span><span class="p">,</span>
-    <span class="na">body</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">foo</span><span class="p">:</span> <span class="s2">"bar"</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">someHeader</span><span class="p">:</span> <span class="s2">"some header value"</span><span class="p">,</span>
-  <span class="p">},</span>
-  <span class="na">metadata</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">someMetadata</span><span class="p">:</span> <span class="s2">"some metadata value"</span>
-  <span class="p">},</span>
-  <span class="na">requestId</span><span class="p">:</span> <span class="s2">"66978665-1ac5-4770-890c-59cc88f89098"</span><span class="p">,</span>
-  <span class="na">timestamp</span><span class="p">:</span> <span class="mi">14582100322345</span>
-<span class="p">};</span>
-</code></pre>
-
-<h6 id="context">context</h6>
-
-<p>The context object stores some information about the current connection.<br>
-A typical context object will look like:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">id</span><span class="p">:</span> <span class="s2">"/#O3u2-yCDXsYyqLr5AAAA"</span><span class="p">,</span>
-    <span class="na">type</span><span class="p">:</span> <span class="s2">"socketio"</span>
-  <span class="p">},</span>
-  <span class="na">token</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">_id</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
-    <span class="na">expiresAt</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-    <span class="na">ttl</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-    <span class="na">user</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">_id</span><span class="p">:</span> <span class="s2">"login"</span><span class="p">,</span>
-      <span class="na">name</span><span class="p">:</span> <span class="s2">"Username"</span><span class="p">,</span>
-      <span class="na">profile</span><span class="p">:</span> <span class="p">{</span>
-        <span class="c1">// user profile object.</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
-
-<h6 id="currentuserid">$currentUserId</h6>
-
-<p>The <em>$currentUserId</em> variable contains the current user id. It is an alias for <code class="prettyprint">context.token.user._id</code>.</p>
-
-<h6 id="args">args</h6>
-
-<p>The <em>args</em> object contains the result of the evaluation of the fetch definition (cf below).</p>
-
-<h4 id="the-fetch-definition">The fetch definition</h4>
-
-<p>The optional <em>args</em> parameter given to the permission function is the result of the evaluation of some fetch definition given in the args section of the role definition.</p>
-
-<p>Using this ability, you can pass some documents fetches from Kuzzle&rsquo;s database layer to your permission function.</p>
-
-<p>In our chat example above, we fetch a <em>document</em> variable which contains the document that was requested for deletion and that we use in the permission function to test if it is owned by the current user.</p>
-
-<h5 id="args-element-structure">args element structure</h5>
-
-<p>The <em>args</em> element has the following structure:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="o">&lt;</span><span class="nx">some</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nl">index</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">from</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">fetch</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span>
-      <span class="na">collection</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">collection</span> <span class="k">in</span> <span class="nx">which</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>  <span class="nx">are</span> <span class="nx">fetched</span><span class="o">&gt;</span><span class="p">,</span>
-      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
-        <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="p">(</span><span class="nx">get</span><span class="o">|</span><span class="nx">mget</span><span class="o">|</span><span class="nx">search</span><span class="p">)</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="nx">specific</span> <span class="nx">parameters</span><span class="o">&gt;</span>
-      <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="o">&lt;</span><span class="nx">another</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="p">...</span>
-    <span class="p">},</span>
-    <span class="p">...</span>
-<span class="p">};</span>
-</code></pre>
-
-<p>You can define one or more <em>variables</em> inside the args element and, for each of them, the action to use to populate them.</p>
-
-<p>The <em>variable</em> will then be availalbe from your permission function under args.<em><variable></em>.</p>
-
-<h6 id="get-action-type"><em>get</em> action type</h6>
-
-<p>The <code class="prettyprint">get</code> action type performs a read/get call. It takes a document id for entry and returns the matching document.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">myDocument</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
-      <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
-      <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
-
-<h6 id="mget-action-type"><em>mget</em> action type</h6>
-
-<p>The <code class="prettyprint">mget</code> action type takes a list of document ids for entry and returns the list of matching documents.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
-    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
-    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">mget</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s2">"id_1"</span><span class="p">,</span>
-        <span class="s2">"id_2"</span><span class="p">,</span>
-        <span class="p">...</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
-
-<h6 id="search-action-type"><em>search</em> action type</h6>
-
-<p>The <code class="prettyprint">search</code> action type makes a search in Kuzzle&rsquo;s database layer and returns the related documents.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
-    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">search</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">filter</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">match</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">name</span><span class="p">:</span> <span class="s2">"$requestObject.data.body.name"</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
-
-<p>The action.search value is sent to Kuzzle&rsquo;s database layer directly, being Elasticsearch 2.2.</p>
-
-<p>Please refer to <a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html">Elasticsearch search API documentation</a> for additional information on how to build your query.</p>
-
-<h6 id="available-variables">available variables</h6>
-
-<p>Some variables are exposed by Kuzzle and can be used within your fetch function definition:</p>
-
-<ul>
-<li><code class="prettyprint">$currentId</code>: The current request document id. Shortcut to $requestObject.data.&#95;id.</li>
-<li><code class="prettyprint">$requestObject</code>: The complete request object being evaluated.</li>
-</ul>
+<p>See more details at <a href="#permission-closures">Core documentation section</a></p>
 
             <h1 id="core-documentation">Core documentation</h1>
 
@@ -2844,6 +2634,464 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
 <p>#4. The <code class="prettyprint">Notifier</code> broadcasts the message to each related channel to the Websocket and MQ plugins.</p>
 
 <p>#5. Finally, the plugins send the message to the clients who subscribed to it.</p>
+
+            <h2 id="security">Security</h2>
+
+<h3 id="authentication-process">Authentication Process</h3>
+
+<h4 id="overview">Overview</h4>
+
+<p>Kuzzle uses <a href="http://passportjs.org/">passportjs</a> to enable authentication with a potentially large amount of providers, for example:</p>
+
+<ul>
+<li>local username/password authentication (enabled by default)</li>
+<li>oauth2 providers like github or google (using (Oauth plugin)[https://github.com/kuzzleio/kuzzle-plugin-auth-passport-oauth])</li>
+<li>SAML providers</li>
+<li>etc.</li>
+</ul>
+
+<h4 id="how-it-works">How it works</h4>
+
+<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by reading actions:
+<img alt="read_scenario_http_overview" src="images/request-scenarios/auth/overview.png" /></p>
+
+<p>Kuzzle uses these internal components during the authentication process:
+* The Auth Controller
+* The &ldquo;Passport Wrapper&rdquo;, which makes an interface between Kuzzle controllers and the Passport library
+* The User and Token <a href="https://github.com/kuzzleio/kuzzle/tree/master/lib/api/core/models/repositories">Repositories</a>, to retrieve users&rsquo; data.
+* The Authentication strategy, implemented within a dedicated plugin.</p>
+
+<h5 id="sample-scenario-with-the-local-plugin">Sample scenario with the Local Plugin</h5>
+
+<p>The &ldquo;Local&rdquo; strategy authenticates a user locally with his username/password, implemented by the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local">Passport Local Plugin</a>.</p>
+
+<p>Detailed workflow:</p>
+
+<p><img alt="auth_scenario_details_local" src="images/images/request-scenarios/auth/details_local.png" /></p>
+
+<p>#1. The user calls the <em>login</em> action of the <code class="prettyprint">Auth Controller</code>:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"login"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"local"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;my_username&gt;"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;my_password&gt;"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#2. The <code class="prettyprint">Auth Controller</code> calls the <em>authenticate()</em> method of the <code class="prettyprint">Passport Wrapper</code> which format and sends the related request to the <code class="prettyprint">Passport local strategy</code>.</p>
+
+<p>#3. The <code class="prettyprint">Passport local strategy</code> calls the <em>verify()</em> callback method declared by the <code class="prettyprint">Local Authentication Plugin</code> to check credentials.</p>
+
+<p>#4. The plugin calls the <code class="prettyprint">User Repository</code> and check if credentials are good and resolve to an existing user.</p>
+
+<p>#5. If a user is found, he is resolved and sent back to the <code class="prettyprint">Auth Controller</code> through the internal components.</p>
+
+<p>#6. The <code class="prettyprint">Auth Controller</code> calls the <em>generateToken()</em> method to get a <a href="https://jwt.io/">JWT Token</a> related to the user.</p>
+
+<p>#7. The JWT Token is sent back to the client, who will use it in next requests to be authenticated:</p>
+
+<p>Sample response:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"login"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"done"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"requestId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ed4faaff-253a-464f-a6b3-387af9d8483d"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_username"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"jwt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJteV91c2VybmFtZSIsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.BefoyfAKzwXuGhbYe0iPeG0v9F4HmikvahqwqzQr3pE"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h5 id="oauth2-scenario-with-the-oauth-plugin">OAuth2 scenario with the Oauth Plugin</h5>
+
+<p>The &ldquo;Oauth&rdquo; strategy, implemented by the <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-oauth">Passport Oauth Plugin</a>, authenticates a user locally with his account on Github, Google+, Facebook, Twitter, or any identity provider using OAUth2 protocol with &ldquo;Authorization Code&rdquo; grant type.</p>
+
+<p>For more details about OAuth2 protocol, see <a href="https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2#grant-type-authorization-code">here</a>.</p>
+
+<p>Detailed workflow:</p>
+
+<p><img alt="auth_scenario_details_oauth2" src="images/images/request-scenarios/auth/details_oauth2.png" /></p>
+
+<p>The authentication flow is a 2-step flow:</p>
+
+<h6 id="1st-step-get-the-oauth2-provider-39-s-url">1st step: get the OAuth2 Provider&rsquo;s URL</h6>
+
+<p>#1. The user calls the <em>login</em> action of the <code class="prettyprint">Auth Controller</code>:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"login"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"github"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#2. The <code class="prettyprint">Auth Controller</code> calls the <em>authenticate()</em> method of the <code class="prettyprint">Passport Wrapper</code> which format and sends the related request to the <code class="prettyprint">Passport oauth2 strategy</code>.</p>
+
+<p>#3. While no Authorization code is provided, the strategy calls a redirection to the <code class="prettyprint">OAuth2 Provider</code></p>
+
+<p>#4. The <code class="prettyprint">Passport Wrapper</code> intercepts the redirection request and format a Kuzzle Response for the client:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"headers"</span><span class="p">:</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"Content-Length"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"Location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/login/oauth/authorize?response_type=code&amp;redirect_uri=http%3A%2F%2Fkuzzle%2Fapi%2F1.0%2F_login%2Fgithub&amp;client_id=MY_CLIENT_ID"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"statusCode"</span><span class="p">:</span><span class="w"> </span><span class="mi">302</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#5. The <code class="prettyprint">Auth Controller</code> sends the response to the client, with the redirection URL to the <code class="prettyprint">OAUth2 Provider</code>:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"login"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+  </span><span class="nt">"requestId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fd4246f9-717c-4503-b50b-3a5bf0f142b5"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"Content-Length"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Location"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/login/oauth/authorize?response_type=code&amp;redirect_uri=http%3A%2F%2Fkuzzle%2Fapi%2F1.0%2F_login%2Fgithub&amp;client_id=MY_CLIENT_ID"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"statusCode"</span><span class="p">:</span><span class="w"> </span><span class="mi">302</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"done"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h6 id="2nd-step-authenticate-the-user-with-the-oauth2-code">2nd step: authenticate the user with the OAuth2 code.</h6>
+
+<p>#6. The Client sends an HTTP request to the <code class="prettyprint">OAuth2 Provider</code> (<strong>it has to be implemented within the client&rsquo;s application code</strong>).</p>
+
+<p>#7. The user authenticates himself to the <code class="prettyprint">Oauth2 Provider</code> and allow Kuzzle Application to use his credentials (that is the standard OAuth2 flow, managed at the provider&rsquo;s side).</p>
+
+<p>#8. The <code class="prettyprint">OAuth2 Provider</code> sends a HTTP redirect response to the client, containing the oauth2 authorization code:</p>
+<pre class="highlight plaintext"><code>HTTP/1.1 302 Found
+Location: http://&lt;kuzzle&gt;/api/1.0/_login/github?code=OAUTH2_CODE
+</code></pre>
+
+<p>#9. The client calls again the <em>login</em> action of the <code class="prettyprint">Auth Controller</code>, now with the oauth2 authorization code:</p>
+
+<ul>
+<li>either in REST, simply following the HTTP Redirection:</li>
+</ul>
+<pre class="highlight plaintext"><code>curl http://&lt;kuzzle&gt;/api/1.0/_login/github?code=OAUTH2_CODE
+</code></pre>
+
+<ul>
+<li>or, with another protocol (for example WebSocket), after having parsed the URL to get the authorization code:</li>
+</ul>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"login"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"github"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"OAUTH2_CODE"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>#10. The <code class="prettyprint">Auth Controller</code> calls the <em>authenticate()</em> method of the <code class="prettyprint">Passport Wrapper</code> which format and sends the related request to the <code class="prettyprint">Passport oauth2 strategy</code>.</p>
+
+<p>#11. The <code class="prettyprint">Passport oauth2 strategy</code> transmits the oauth2 authorization code to the <code class="prettyprint">OAuth2 Provider</code> in order to retrieve the OAuth2 Token.</p>
+
+<p>#12. The <code class="prettyprint">Passport oauth2 strategy</code> calls the <em>verify()</em> callback method declared by the <code class="prettyprint">Oauth2 Authentication Plugin</code></p>
+
+<p>#13. The plugin calls the <code class="prettyprint">User Repository</code> to check for an existing user with the given github ID.</p>
+
+<p><em>(Note: If no related user is found in kuzzle, the plugin can either deny the authentication, or create automatically the user, depending on its settings).</em></p>
+
+<p>#14. The user is resolved and sent back to the <code class="prettyprint">Auth Controller</code> through the internal components.</p>
+
+<p>#15. The <code class="prettyprint">Auth Controller</code> calls the <em>generateToken()</em> method to get a <a href="https://jwt.io/">JWT Token</a> related to the user.</p>
+
+<p>#16. The JWT Token is sent back to the client, who will use it in next requests to be authenticated:</p>
+
+<h4 id="how-to-provide-your-own-strategy">How to provide your own strategy</h4>
+
+<p>Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see <a href="#gt-authentication-plugin">plugins documentation</a>).</p>
+
+<h3 id="roles-definition-reference">Roles definition reference</h3>
+
+<h4 id="role-and-profile-definition">Role and profile definition</h4>
+
+<p>see <a href="#permissions">User Guide</a>.</p>
+
+<h4 id="permission-closures">Permission closures</h4>
+
+<p>The <code class="prettyprint">action permission</code> value can be set either to:</p>
+
+<ul>
+<li>a boolean. When set to <code class="prettyprint">true</code>, the user is allowed to perform the action.</li>
+<li>an object that describes a function (we call it &ldquo;closure&rdquo;).</li>
+</ul>
+
+<p>A closure enable to set a role&rsquo;s policy according to some execution context.
+For example, if we need to allow users to update only their own documents, it can be done with this sample role:
+<code class="prettyprint">js
+var role = {
+  controllers: {
+    write: {
+      actions: {
+        update: {
+          args: {
+            document: {
+              index: &quot;$requestObject.index&quot;,
+              collection: &quot;$requestObject.collection&quot;,
+              action: {
+                get: &quot;$currentId&quot;
+              }
+            }
+          },
+          test: &quot;return args.document.content.user.id === $currentUserId&quot;
+        }
+      }
+    }
+  }
+};
+</code></p>
+
+<p>Where:
+- <code class="prettyprint">test</code> is the body of <a href="#the-permission-function">the permission function</a>
+- <code class="prettyprint">args</code> is the parameter given to <a href="#the-fetch-definition">the fetch definition function</a></p>
+
+<p>(see below)</p>
+
+<h5 id="the-permission-function">The permission function</h5>
+
+<p>The permission function is executed in a sandbox with a limited scope. Its body is the evaluation of the <em>test</em> parameter given in the role&rsquo;s definition and must return a boolean value.</p>
+
+<p>The permission function has the following signature:</p>
+<pre class="highlight javascript"><code><span class="cm">/**
+ * @param {RequestObject} $requestObject  The current action request.
+ * @param {Object} context                The current connection context. Contains the connection type and the current user.
+ * @param {string} $currentUserId         The current user Id. Shortcut to context.token.user._id
+ * @param {Object} args                   The result of the evaluated args definition.
+ *
+ * @return {Boolean}
+ */</span>
+<span class="kd">function</span> <span class="p">(</span><span class="nx">$requestObject</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">$currentUserId</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// the function body is built from the "test" parameter.</span>
+  <span class="c1">// Example, with the sample role above:</span>
+  <span class="k">return</span> <span class="nx">args</span><span class="p">.</span><span class="nb">document</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="o">===</span> <span class="nx">$currentUserId</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="parameters">Parameters</h6>
+
+<h6 id="gt-requestobject">&gt; $requestObject</h6>
+
+<p>The request object is the request that is currently being evaluated.<br>
+A typical request object will look like:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">requestObject</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+  <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+  <span class="na">controller</span><span class="p">:</span> <span class="s2">"write"</span><span class="p">,</span>
+  <span class="na">action</span><span class="p">:</span> <span class="s2">"update"</span><span class="p">,</span>
+  <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_id</span><span class="p">:</span> <span class="s2">"id_1"</span><span class="p">,</span>
+    <span class="na">body</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">foo</span><span class="p">:</span> <span class="s2">"bar"</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">someHeader</span><span class="p">:</span> <span class="s2">"some header value"</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="na">metadata</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">someMetadata</span><span class="p">:</span> <span class="s2">"some metadata value"</span>
+  <span class="p">},</span>
+  <span class="na">requestId</span><span class="p">:</span> <span class="s2">"66978665-1ac5-4770-890c-59cc88f89098"</span><span class="p">,</span>
+  <span class="na">timestamp</span><span class="p">:</span> <span class="mi">14582100322345</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="gt-context">&gt; context</h6>
+
+<p>The context object stores some information about the current connection.<br>
+A typical context object will look like:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="s2">"/#O3u2-yCDXsYyqLr5AAAA"</span><span class="p">,</span>
+    <span class="na">type</span><span class="p">:</span> <span class="s2">"socketio"</span>
+  <span class="p">},</span>
+  <span class="na">token</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">_id</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+    <span class="na">expiresAt</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="na">ttl</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">_id</span><span class="p">:</span> <span class="s2">"login"</span><span class="p">,</span>
+      <span class="na">name</span><span class="p">:</span> <span class="s2">"Username"</span><span class="p">,</span>
+      <span class="na">profile</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// user profile object.</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<h6 id="gt-currentuserid">&gt; $currentUserId</h6>
+
+<p>The <em>$currentUserId</em> variable contains the current user ID. It is an alias for <code class="prettyprint">context.token.user._id</code>.</p>
+
+<h6 id="gt-args">&gt; args</h6>
+
+<p>The main purpose of the &ldquo;closures&rdquo; behavior is to define a role policy based on conditions about stored documents.
+That means that we need to fetch documents from the storage engine in order to use them within the permission function.</p>
+
+<p>The <em>args</em> object contains these documents, as a result of the evaluation of the <a href="#the-fetch-definition">fetch definition</a>.
+Each <em>args</em> item will look like:
+<code class="prettyprint">js
+{
+  content: &lt;the document itself&gt;,
+  id: &lt;the document id&gt;
+}
+</code></p>
+
+<p>With the sample role above (<code class="prettyprint">return args.document.content.user.id === $currentUserId</code>), the <code class="prettyprint">update</code> action is allowed only if the fetched document contains an attribute <code class="prettyprint">user.id</code> which value is the current user ID.</p>
+
+<h4 id="the-fetch-definition">The fetch definition</h4>
+
+<p>The optional <em>args</em> parameter given to the permission function is the result of the evaluation of some fetch definition given in the args section of the role definition.</p>
+
+<p>Using this ability, you can pass some documents fetched from Kuzzle&rsquo;s database layer to your permission function.</p>
+
+<p>In our sample role above, we fetch a <em>document</em> variable which contains the document that was requested for update, and we use it in the permission function to test if it is owned by the current user.</p>
+
+<h5 id="args-element-structure">args element structure</h5>
+
+<p>The <em>args</em> element has the following structure:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="o">&lt;</span><span class="nx">some</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">index</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">from</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">fetch</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">collection</span> <span class="nx">from</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">fetch</span> <span class="nx">the</span> <span class="nb">document</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="p">(</span><span class="nx">get</span><span class="o">|</span><span class="nx">mget</span><span class="o">|</span><span class="nx">search</span><span class="p">)</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">action</span> <span class="nx">type</span> <span class="nx">specific</span> <span class="nx">parameters</span><span class="o">&gt;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="o">&lt;</span><span class="nx">another</span> <span class="nx">variable</span><span class="o">&gt;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>You can define one or more <em>variables</em> inside the args element and, for each of them, the action to use to populate them.</p>
+
+<p>Each <em>variable</em> will then be availalbe in <a href="#the-permission-function">your permission function</a> under <code class="prettyprint">args.&lt;variable&gt;</code>.</p>
+
+<h6 id="embedded-variables">embedded variables</h6>
+
+<p>Some variables are exposed by Kuzzle and can be used within your fetch function definition:</p>
+
+<ul>
+<li><code class="prettyprint">$requestObject</code>: The complete request object being evaluated.</li>
+<li><code class="prettyprint">$currentId</code>: The current request&rsquo;s document ID. It is an alias for <code class="prettyprint">$requestObject.data._id</code>.</li>
+</ul>
+
+<h6 id="action-types">action types</h6>
+
+<h6 id="gt-get-action-type">&gt; <em>get</em> action type</h6>
+
+<p>The <code class="prettyprint">get</code> action type performs a read/get call. It takes a document id for entry and returns the matching document.</p>
+
+<p>Example:
+<code class="prettyprint">js
+var args = {
+  currentDocument: {
+    index: &quot;$requestObject.index&quot;,
+    collection: &quot;$requestObject.collection&quot;,
+    action: {
+      get: &quot;$currentId&quot;
+    }
+  },
+  anotherDocument: {
+    index: &quot;myIndex&quot;,
+    collection: &quot;myCollection&quot;,
+    action: {
+      get: &quot;document_id&quot;
+    }
+  }
+};
+</code></p>
+
+<p>The <em>args</em> variable passed to the permission function contains:
+- <code class="prettyprint">args.currentDocument</code>: the document that is being updated. Indeed, we fetch:
+  - the document which ID is the current document&rsquo;s ID (<code class="prettyprint">{action: {get: &quot;currentId&quot;}}</code>)
+  - in the current collection (<code class="prettyprint">collection: &quot;$requestObject.collection&quot;</code>)
+  - of the current index (<code class="prettyprint">index: &quot;$requestObject.index&quot;</code>).
+- <code class="prettyprint">args.anotherDocument</code>: the document with ID <code class="prettyprint">document_id</code>, from index <code class="prettyprint">myIndex</code> and collection <code class="prettyprint">myCollection</code>.</p>
+
+<h6 id="gt-mget-action-type">&gt; <em>mget</em> action type</h6>
+
+<p>The <code class="prettyprint">mget</code> action type takes a list of document ids for entry and returns the list of matching documents.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">mget</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">"id_1"</span><span class="p">,</span>
+        <span class="s2">"id_2"</span><span class="p">,</span>
+        <span class="p">...</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, like:
+<code class="prettyprint">js
+args.myDocuments = [
+  { id: &quot;id_1&quot;, content: {name: &quot;Document 1&quot;, description: &quot;Cum sociis natoque penatibus et magnis dis parturient montes&quot;},
+  { id: &quot;id_2&quot;, content: {name: &quot;Document 2&quot;, description: &quot;nascetur ridiculus mus. Nulla nunc velit&quot;},
+  ...
+]
+</code></p>
+
+<h6 id="gt-search-action-type">&gt; <em>search</em> action type</h6>
+
+<p>The <code class="prettyprint">search</code> action type makes a search in Kuzzle&rsquo;s database layer and returns the related documents.</p>
+
+<p>Example:
+<code class="prettyprint">js
+var args = {
+  myDocuments: {
+    index: &quot;myIndex&quot;,
+    collection: &quot;myCollection&quot;,
+    action: {
+      search: {
+        filter: {
+          match: {
+            name: &quot;$requestObject.data.body.name&quot;
+          }
+        }
+      }
+    }
+  }
+};
+</code></p>
+
+<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, for which the <code class="prettyprint">name</code> attribute matches the <code class="prettyprint">name</code> attribute of the request:
+<code class="prettyprint">js
+args.myDocuments = [
+  { id: &quot;id_1&quot;, content: {name: &quot;foo&quot;, description: &quot;Cum sociis natoque penatibus et magnis dis parturient montes&quot;},
+  { id: &quot;id_2&quot;, content: {name: &quot;foo bar&quot;, description: &quot;nascetur ridiculus mus. Nulla nunc velit&quot;},
+  ...
+]
+</code></p>
+
+<p>The <em>action.search</em> value is sent to Kuzzle&rsquo;s database layer directly, being Elasticsearch 2.2.</p>
+
+<p>Please refer to <a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html">Elasticsearch search API documentation</a> for additional information on how to build your query.</p>
 
             <h2 id="plugins">Plugins</h2>
 
@@ -4696,7 +4944,7 @@ To access these methods, simply call <code class="prettyprint">context.getRouter
 
 <h3 id="gt-authentication-plugin">&gt; Authentication plugin</h3>
 
-<p>Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin (see <a href="#plugins">plugins documentation</a>).</p>
+<p>Any strategy supported by passportjs can be implemented for Kuzzle with a dedicated plugin.</p>
 
 <p>Take example on <a href="https://github.com/kuzzleio/kuzzle-plugin-auth-passport-local">Passport Local plugin</a>, an authentication plugin must provide following steps:</p>
 

@@ -567,7 +567,7 @@ module.exports = function () {
 
 A `worker` plugin is simply a `listener` plugin running in different threads. This is especially useful to allow your plugin to perform cost-heavy operations without impeding Kuzzle performances.
 
-To convert a `listener` plugin to a `worker` one, just add a `threads: <number of threads>` to the plugin configuration.  
+To convert a `listener` plugin to a `worker` one, just add the following attribute to the plugin configuration: `threads: <number of threads>`
 If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.
 
 **Note:** `worker` plugins can only be launched by server instances of Kuzzle.
@@ -590,7 +590,7 @@ If the number of configured thread is greater than 1, Kuzzle will dispatch event
 
 But unlike `listener` plugins, `pipe` plugins can modify the provided data, and Kuzzle wait for these plugin to process it. `pipe` plugins can even invalidate data, resulting to an error returned to the original client.
 
-For this reason, Kuzzle enforce a timeout on data processing, rejecting the data altogether if a `pipe` plugin fails to respond in time, and forwarding an error to the original client.
+For this reason, Kuzzle enforce a timeout on data processing, rejecting the data altogether if a `pipe` plugin fails to respond in a timely fashion, and forwarding an error to the original client.
 
 `pipe` plugins functions must take a callback as their last parameter, and this callback must be called at the end of the processing with `callback(error, object)`:
 

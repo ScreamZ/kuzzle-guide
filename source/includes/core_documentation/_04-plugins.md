@@ -595,7 +595,7 @@ For this reason, Kuzzle enforce a timeout on data processing, rejecting the data
 `pipe` plugins functions must take a callback as their last parameter, and this callback must be called at the end of the processing with `callback(error, object)`:
 
 * error: if there is an error during the function, this parameter must be set with one of the available Error object provided by the plugin context. Otherwise, set it to `null`
-* object: the resulting data, given back for Kuzzle to process
+* object: the resulting data, given back to Kuzzle for processing
 
 `pipe` plugins are called in chain. When the `callback()` function is called, the next `pipe` plugin function attached on the event is triggered.   
 The order of plugin execution is not guaranteed.

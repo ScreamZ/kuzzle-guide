@@ -432,7 +432,7 @@ On each of following events, you can attach a function to execute in your plugin
 |`rabbit:stopped`		| / | / |Triggered when the rabbit MQ service is stopped|Type: String.<br> `'RabbitMQ Service stopped'`|
 
 
-#### The plugin context
+### The plugin context
 
 Plugins don't have access to the Kuzzle instance. Instead, Kuzzle provides a plugin ``context`` to the ``plugin.init()`` function.
 
@@ -440,6 +440,7 @@ Here is the list of shared objects contained in the provided ``context``:
 
 | Object | Purpose                      |
 |--------|------------------------------|
+| ``Dsl`` | Constructor allowing plugins to instantiate a Kuzzle DSL instance |
 | ``RequestObject`` | Constructor for standardized requests sent to Kuzzle |
 | ``ResponseObject`` | Constructor for the standardized Kuzzle non-realtime response objects |
 | ``RealTimeResponseObject`` | Constructor for the standardized Kuzzle realtime response objects |
@@ -447,12 +448,14 @@ Here is the list of shared objects contained in the provided ``context``:
 | ``repositories()`` | Getter function to the security roles, profiles and users repositories |
 | ``getRouter()`` | Getter function to the Kuzzle protocol communication system |
 
-#### Architecture
+
+
+### Architecture
 
 Your main javascript file in your plugin must have a function `init` and expose a `hooks` and/or a `pipes` and/or a `controllers` object. All functions defined in these files must be exposed as main object.
 
 
-#### The plugin init function
+### The plugin init function
 
 All plugins must expose a ``init`` function. Its purpose is to initialize the plugins according to its configuration.
 

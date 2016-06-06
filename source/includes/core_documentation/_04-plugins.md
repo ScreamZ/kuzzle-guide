@@ -448,16 +448,74 @@ Here is the list of shared objects contained in the provided ``context``:
 | ``repositories()`` | Getter function to the security roles, profiles and users repositories |
 | ``getRouter()`` | Getter function to the Kuzzle protocol communication system |
 
+### `Dsl` constructor
 
+The DSL constructor provided in the plugin context gives access to Kuzzle real-time filtering capabilities. It allows managing filters, and testing data to get a list of matching filters.
 
-### Architecture
+Each plugin can instantiate its own sandboxed DSL instance:
 
-Your main javascript file in your plugin must have a function `init` and expose a `hooks` and/or a `pipes` and/or a `controllers` object. All functions defined in these files must be exposed as main object.
+```js
+var dsl = new context.Dsl();
+```
+
+The DSL exposes the following methods:
+
+##### `createFilterId(index, collection, filters)`
+
+Creates a filter unique ID using the provided arguments.
+
+The calculation is predictable, meaning that the resulting filter ID will always be the same if invoked multiple times with the same arguments.
+
+**Returns:**
+
+A `string` containing the filter unique ID.
+
+##### `register(filterId, index, collection, filters)`
+
+Registers a filter to the DSL.
+
+The `filterId` argument can be handled by the caller, or it can be calculated using the `createFilterId` method.
+
+**Returns:**
+
+A `promise` resolving to the successfully added `filterId`.
+
+##### `remove(filterId)`
+
+Removes all references to a given filter from the DSL
+
+**Returns:**
+
+A `promise` resolved once the filter has been completely removed from the DSL
+
+##### `test(index, collection, data, [documentId])`
+
+Test data against filters in the filters tree, returning matching filter IDs, if any.
+
+**Returns:**
+
+A `promise` resolving to an array of `filterId` matching the provided data (and/or documentId, if any)
+
+##### `exists(index, collection)`
+
+Returns a boolean indicating if filters exist for an index-collection pair
+
+**Returns:**
+
+Returns `true` if at least one filter exists on the provided index-collection pair, returns `false` otherwise
+
+##### `getFilterIds(index, collection)`
+
+Retrieves filter IDs registered on an index-collection pair
+
+**Returns:**
+
+An `array` of `filterId` corresponding to filters registered on an index-collection pair.
 
 
 ### The plugin init function
 
-All plugins must expose a ``init`` function. Its purpose is to initialize the plugins according to its configuration.
+All plugins *must* expose a ``init`` function. Its purpose is to initialize the plugins according to its configuration.
 
 Kuzzle calls these ``init`` function at startup, during initialization.
 
@@ -471,7 +529,9 @@ Where:
 
 ### > Listener plugins
 
-Hook events are triggered and are non-blocking functions. Listener plugins are configured to be called on these hooks.
+`listener` plugins simply listen to events, and are supplied with these events data. These plugins cannot change the provided data, and Kuzzle does not wait for them to process the data either.
+
+To configure a plugin as a `listener` on some events, simply expose a `hooks` variable in the plugin context, listing events and the names of plugin functions to execute.
 
 ```javascript
 // Somewhere in Kuzzle
@@ -505,8 +565,12 @@ module.exports = function () {
 
 ### > Worker plugins
 
-Every Hook plugin can be used as a Worker plugin, but Worker plugins can only be launched by the Server. If you set your configuration as `"loadedBy": "worker"`, the plugin will be ignored.  
-You can convert a Hook plugin into a Worker plugin by adding a `threads` attribute to your plugin definition:
+A `worker` plugin is simply a `listener` plugin running in different threads. This is especially useful to allow your plugin to perform cost-heavy operations without impeding Kuzzle performances.
+
+To convert a `listener` plugin to a `worker` one, just add a `threads: <number of threads>` to the plugin configuration.  
+If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.
+
+**Note:** `worker` plugins can only be launched by server instances of Kuzzle.
 
 ```json
 {
@@ -519,42 +583,35 @@ You can convert a Hook plugin into a Worker plugin by adding a `threads` attribu
   }
 ```
 
-The `threads` value correspond to the number of processes that will be launched.
-
-
 
 ### > Pipe plugins
 
-When a pipe event is triggered, we are waiting for all plugins attached on this event. A plugin attached on a pipe event has access to the data and can even change them.
-A pipe plugin constructor must take in its last parameter a callback. This callback must be called at the end of the function with `callback(error, object)`:
+`pipe` plugins, like `listener` plugins, are attached to Kuzzle events, and they are supplied with these events data.  
 
-* error: if there is an error during the function, this parameter must be set with one of the available Error types. If everything is ok, you can call the function with null
-* object: the object to pass to the next function
+But unlike `listener` plugins, `pipe` plugins can modify the provided data, and Kuzzle wait for these plugin to process it. `pipe` plugins can even invalidate data, resulting to an error returned to the original client.
 
-Plugins are called in chain. When the `callback()` function is called, the next function attached on the event is triggered.  
-If the plugin fails to call the callback before timeout, Kuzzle will raise an error and forward it to the requesting clients.
+For this reason, Kuzzle enforce a timeout on data processing, rejecting the data altogether if a `pipe` plugin fails to respond in time, and forwarding an error to the original client.
 
-Pipe plugins are useful when you want to modify or validate an object.
+`pipe` plugins functions must take a callback as their last parameter, and this callback must be called at the end of the processing with `callback(error, object)`:
 
-```javascript
-// Somewhere in Kuzzle
-kuzzle.pluginsManager.trigger('event:pipeEvent', requestObject)
-  .then(function (modifiedRequestObject) {
-    // do something
-  });
-```
+* error: if there is an error during the function, this parameter must be set with one of the available Error object provided by the plugin context. Otherwise, set it to `null`
+* object: the resulting data, given back for Kuzzle to process
+
+`pipe` plugins are called in chain. When the `callback()` function is called, the next `pipe` plugin function attached on the event is triggered.   
+The order of plugin execution is not guaranteed.
+
+The following plugin example adds a `createdAt` attribute to all new documents:
 
 ```javascript
 // Plugin pipes configuration
 module.exports = {
-  'event:pipeEvent': 'addCreatedAt'
+  'data:beforeCreate': 'addCreatedAt'
 }
 ```
 
 ```javascript
-// In main plugin index file
+// In the main plugin index file
 module.exports = function () {
-
   this.pipes = require('./config/pipes.js');
   this.init = function (config, context, isDummy) {
     // do something
@@ -566,8 +623,6 @@ module.exports = function () {
   }
 }
 ```
-
-In this example, in Kuzzle, the `modifiedRequestObject` has now a `createdAt` attribute.
 
 ### > Controllers
 

@@ -6,7 +6,7 @@ For no-real-time, like search, get, etc, we directly pass information to Elastic
 
 You can also take a look at the internally used [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html) for Javascript
 
-### Geospatial
+### Geospatial filters
 
 Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).
 

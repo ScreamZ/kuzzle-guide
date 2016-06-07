@@ -6,9 +6,163 @@ For no-real-time, like search, get, etc, we directly pass information to Elastic
 
 You can also take a look at the internally used [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html) for Javascript
 
+### Geospatial
+
+Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).
+
+There are some inherent objects and concepts which are good to understand before going further. Most of them are taken from the ElasticSearch DSL format, some have been simplified.
+
+#### Geospatial objects and concepts
+
+  * [Point](#point)
+  * [Bounding Box](#bounding-box) aka BBox
+  * [Polygon](#polygon)
+  * [Distance](#distance)
+
+##### Point
+
+A point is a single longitude-latitude coordinate pair.
+
+The following notations are valid:
+
+```javascript
+{ lat: -74.1, lon: 40.73 }
+```
+
+```javascript
+{ latLon: { lat: 40.73, lon: -74.1 } }
+```
+
+<aside class="note">
+When coordinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+</aside>
+
+```javascript
+{ latLon: [ -74.1, 40.73 ] }
+```
+
+<aside class="note">
+As a string, the coordinates format is "lat, lon"
+</aside>
+
+```javascript
+{ latLon: "40.73, -74.1" }
+```
+
+Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
+
+```javascript
+{ latLon: "dr5r9ydj2" }
+```
+
+##### Bounding Box
+
+A bounding box (also known as BBox) is a 2D box that can be defined using:
+
+1. 2 points coordinates tuples, defining the top left and bottom right corners of the box
+2. 4 values defining the 4 BBox sides. ```top``` and ```bottom``` are latitudes and ```left``` and ```right``` are longitudes
+
+All of these representations are defining the same BBox:
+
+```javascript
+{
+  top: -74.1,
+  left: 40.73,
+  bottom: -71.12,
+  right: 40.01
+}
+```
+
+```javascript
+{
+  topLeft: { lat: 40.73, lon: -74.1 },
+  bottomRight: { lat: 40.01, lon: -71.12 }
+}
+```
+
+<aside class="note">
+When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+</aside>
+
+```javascript
+{
+  topLeft: [ -74.1, 40.73 ],
+  bottomRight: [ -71.12, 40.01 ]
+}
+```
+
+<aside class="note">
+As a string, the coordinates format is "lat, lon"
+</aside>
+
+```javascript
+{
+  topLeft: "40.73, -74.1",
+  bottomRight: "40.01, -71.12"
+}
+```
+
+Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
+
+```javascript
+{
+  topLeft: "dr5r9ydj2",
+  bottomRight: "drj7teegp"
+}
+```
+
+##### Polygon
+
+Unlike the GeoJSON representation, a polygon, here, must contain at least 3 [points](#point).  
+The last point do not have to be the same as the first one, but the points must be sorted in the right order. The polygon is automatically closed.
+
+For each polygon points, all the possible point notations are valid.
+
+Example of a valid polygon representation:
+
+```javascript
+{
+  points: [
+    [0,0],
+    {lon: 1, lat: 2},
+    '2,1',
+    's037ms06g'
+  ]
+}
+```
+
+##### Distance
+
+By default, when it is not specified, the distance unit is expressed in meters.  
+
+All formats supported by the [node-units](https://github.com/brettlangdon/node-units) library can be used:
+
+Units   | Notations
+--------|----------
+meters  | meter, m
+feet    | feet, ft
+inches  | inch, in
+yards   | yard, yd
+miles   | mile, mi
+
+All these notations are equivalent:
+
+```
+1000
+1000 m
+1km
+3280.839895013123 ft
+3280.839895013123FT
+39370.078740157485 inches
+39370.078740157485 inch
+39370.078740157485 in
+1 093,6132983377079 yd
+0.6213727366498067 miles
+```
+
 ### and
 
-The and filter allow to filter documents on two or more terms.
+The `and` filter allows filtering documents on two or more terms.
 
 Given the following documents:
 
@@ -27,7 +181,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```javascript
 {
@@ -74,7 +228,7 @@ var room =
 
 ### bool
 
-A filter that matches documents matching boolean combinations of other queries. 
+A filter matching documents matching boolean combinations of other queries.
 
 Given the following documents:
 
@@ -102,7 +256,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the second document: 
+The following filter validates the second document:
 
 ```javascript
 bool: {
@@ -195,7 +349,7 @@ var room =
 
 ### exists
 
-Returns documents that have at least one non-null value in the original field.
+The `exists` filter matches documents containing non-null fields.
 
 Given the following documents:
 
@@ -215,7 +369,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```javascript
 {
@@ -244,7 +398,7 @@ var room =
 
 ### missing
 
-Returns documents that have only null values or no value in the original field
+A filter matching documents with missing field.
 
 Given the following documents:
 
@@ -264,8 +418,8 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the second document:
- 
+The following filter validates the second document:
+
 ```javascript
 {
   missing: {
@@ -293,7 +447,7 @@ var room =
 
 ### not
 
-A filter that filters out matched documents.
+The `not` filter reverts a filter result.
 
 Given the following documents:
 
@@ -312,7 +466,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```
 {
@@ -345,7 +499,7 @@ var room =
 
 ### or
 
-A filter that matches documents using the OR boolean operator on other filters.
+The `or` filter allows combining multiple filters with a OR boolean operator.
 
 Given the following documents:
 
@@ -370,7 +524,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first and second documents: 
+The following filter validates the first two documents:
 
 ```javascript
 {
@@ -413,7 +567,7 @@ var room =
 
 ### term
 
-Filters documents that have fields that contain a term.
+The `term` filter matches documents using string equality.
 
 Given the following documents:
 
@@ -428,7 +582,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```javascript
 term: {
@@ -455,7 +609,7 @@ var room =
 
 ### terms
 
-Filters documents that have fields that match any of the provided terms.
+This filter allows testing a string field against multiple possibilities.
 
 Given the following documents:
 
@@ -474,7 +628,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the two first documents: 
+The following filter validates the first two documents:
 
 ```javascript
 terms: {
@@ -501,7 +655,7 @@ var room =
 
 ### ids
 
-Filters documents that only have the provided ids.
+This filter returns only documents having their unique document ID listed in the provided list.
 
 Given the following documents:
 
@@ -523,7 +677,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates first document:
 
 ```javascript
 ids: {
@@ -550,7 +704,7 @@ var room =
 
 ### range
 
-Filters documents with fields that have terms within a certain range.
+Filters documents with fields having number attributes within a certain range.
 
 The range filter accepts the following parameters:
 
@@ -588,7 +742,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the two last documents, not the first: 
+The following filter validates the last two documents:
 
 ```javascript
 range: {
@@ -619,178 +773,30 @@ var room =
     };
 ```
 
-### Geospacial
+### geoBoundingBox
 
-The geospacial filters allows you to find or discriminate documents containing a geolocalisation field (ie: a point).
+Filter documents having their location field within a [bounding box](#bounding-box).
 
-There are some inherent objects and concepts wich are good to understand before to go further. Most of them are following the ElasticSearch DSL format, some has been simplified.
+![Illustration of geoBoundingBox](./images/geolocation/geoBoundingBox.png)
 
-#### Geospacial objects and concepts
-
-  * [Point](#point)
-  * [Bounding Box](#bounding-box) aka BBox
-  * [Polygon](#polygon)
-  * [Distance](#distance)
-
-##### Point
-
-A point is... well you know, a point, defined by a longitude and a latitude.
-The following notations are valid: 
-
-```javascript
-{ lat: -74.1, lon: 40.73 }
-```
-
-```javascript
-{ latLon: { lat: 40.73, lon: -74.1 } }
-```
-
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
-</aside>
-
-```javascript
-{ latLon: [ -74.1, 40.73 ] }
-```
-
-<aside class="warning">
-As a string, the coordinates format is "lat, lon"
-</aside>
-
-```javascript
-{ latLon: "40.73, -74.1" }
-```
-
-Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
-
-```javascript
-{ latLon: "dr5r9ydj2" }
-```
-
-##### Bounding Box
-
-A bounding box (also known as BBox) is a 2D box that can be defined via:
-
-1. 2 points coordinates tuples, defining the top left and bottom right corners of the box
-2. 4 values defining the 4 BBox sides. ```top``` and ```bottom``` are latitudes and ```left``` and ```right``` are longitudes
-
-All of these representations are defining the same BBox: 
-
-```javascript
-{
-  top: -74.1,
-  left: 40.73,
-  bottom: -71.12,
-  right: 40.01
-}
-```
-
-```javascript
-{
-  topLeft: { lat: 40.73, lon: -74.1 },
-  bottomRight: { lat: 40.01, lon: -71.12 }
-}
-```
-
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
-</aside>
-
-```javascript
-{
-  topLeft: [ -74.1, 40.73 ], 
-  bottomRight: [ -71.12, 40.01 ]
-}
-```
-
-<aside class="warning">
-As a string, the coordinates format is "lat, lon"
-</aside>
-
-```javascript
-{
-  topLeft: "40.73, -74.1", 
-  bottomRight: "40.01, -71.12"
-}
-```
-
-Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
-
-```javascript
-{
-  topLeft: "dr5r9ydj2", 
-  bottomRight: "drj7teegp"
-}
-```
-
-##### Polygon
-
-Unlike the GeoJSON representation, a polygon, here, must contain at least, 3 [points](#point) ; the last point do not have to be the same as the first one, but the points must be in the right order. The polygon is automatically closed.
-
-For each polygon points, all the possible point notations are valid.
-
-Example of a valid polygon representation: 
-
-```javascript
-{
-  points: [
-    [0,0],
-    {lon: 1, lat: 2},
-    '2,1',
-    's037ms06g'
-  ]
-}
-```
-
-##### Distance
-
-By default, when it is not specified, the distance unit is meters.
-You can use other units accepted by the excellent [node-units](https://github.com/brettlangdon/node-units) library, so all units and prefix that library can handle are supported, such as the following, using a lower, upper or camelized notation:
-
-Units   | Notations
---------|----------
-meters  | meter, m
-feet    | feet, ft
-inches  | inch, in
-yards   | yard, yd
-miles   | mile, mi
-
-According to this, all these notations are equivalent: 
-
-```
-1000
-1000 m
-1km
-3280.839895013123 ft
-3280.839895013123FT
-39370.078740157485 inches
-39370.078740157485 inch
-39370.078740157485 in
-1 093,6132983377079 yd
-0.6213727366498067 miles
-```
-#### Geospacial filters
-
-##### geoBoundingBox
-
-Filter documents wich have a location field and are located into a [bounding box](#bounding-box).
-
-![Illustration of geoBoundingBox](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoBoundingBox.png?raw=true)
-
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -829,26 +835,30 @@ var room =
     };
 ```
 
-##### geoDistance
+### geoDistance
 
-Filter documents wich have a location field and are located into a given [distance](#distance) from a given point.
+Filter documents having their location field within a [distance](#distance) radius of a provided location [point](#point)
 
-![Illustration of geoDistance](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistance.png?raw=true)
+![Illustration of geoDistance](./images/geolocation/geoDistance.png)
 
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -885,27 +895,30 @@ var room =
     };
 ```
 
-##### geoDistanceRange
+### geoDistanceRange
 
-Filter documents wich have a location field and are located into a given [distances](#distance) range from a given point.
+Filter documents having their location field within a [distance](#distance) range from a given [point](#point)
 
-![Illustration of geoDistanceRange](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistanceRange.png?raw=true)
+![Illustration of geoDistanceRange](./images/geolocation/geoDistanceRange.png)
 
-
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -944,26 +957,30 @@ var room =
     };
 ```
 
-##### geoPolygon
+### geoPolygon
 
-Filter documents wich have a location field and are located into a given [polygon](#polygon).
+Filter documents having their location field located inside a given [polygon](#polygon).
 
-![Illustration of geoPolygon](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoPolygon.png?raw=true)
+![Illustration of geoPolygon](./images/geolocation/geoPolygon.png)
 
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 

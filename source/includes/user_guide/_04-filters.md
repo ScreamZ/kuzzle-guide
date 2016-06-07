@@ -895,6 +895,7 @@ var room =
     };
 ```
 
+
 ### geoDistanceRange
 
 Filter documents having their location field within a [distance](#distance) range from a given [point](#point)

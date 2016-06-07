@@ -34,7 +34,7 @@ The following notations are valid:
 ```
 
 <aside class="note">
-When coordinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+When coordinates are in array format, the format is [lon, lat] to comply with <a href="https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3">ElasticSearch DSL definition</a>
 </aside>
 
 ```javascript
@@ -81,7 +81,7 @@ All of these representations are defining the same BBox:
 ```
 
 <aside class="note">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+When cooddinates are in array format, the format is [lon, lat] to comply with <a href="https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3">ElasticSearch DSL definition</a>
 </aside>
 
 ```javascript

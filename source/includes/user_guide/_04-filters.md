@@ -1,14 +1,325 @@
 ## Filtering Syntax
 
-For real-time subscription we use a sub language of Elasticsearch DSL, only for [Filters](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-filters.html).
+This documentation section details the filtering syntax of **subscriptions**.  
+This is different from document searches, which are performed using [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/query-dsl.html)
 
-For no-real-time, like search, get, etc, we directly pass information to Elasticsearch. You can use the whole [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
+Kuzzle subscriptions use a subset of Elasticsearch Query DSL, called Kuzzle DSL.
 
-You can also take a look at the internally used [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html) for Javascript
+### Filter terms
 
-### and
+### > exists
 
-The and filter allow to filter documents on two or more terms.
+The `exists` filter matches documents containing non-null fields.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper',
+  city: 'NYC',
+  hobby: 'computer',
+  alive: false
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace',
+  city: 'London',
+  hobby: 'computer'
+}
+```
+
+The following filter validates the first document:
+
+```javascript
+{
+  exists: {
+    field: 'alive'
+  }
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```js
+var filter = {
+  exists: {
+    field: 'alive'
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > missing
+
+A filter matching documents with missing field.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper',
+  city: 'NYC',
+  hobby: 'computer',
+  alive: false
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace',
+  city: 'London',
+  hobby: 'computer',
+}
+```
+
+The following filter validates the second document:
+
+```javascript
+{
+  missing: {
+    field: 'alive'
+  }
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```js
+var filter = {
+  missing: {
+    field: 'alive'
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > term
+
+The `term` filter matches documents using string equality.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+}
+```
+
+The following filter validates the first document:
+
+```javascript
+term: {
+  firstName: 'Grace'
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  term: {
+    firstName: 'Grace'
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > terms
+
+This filter allows testing a string field against multiple possibilities.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+},
+{
+  firstName: 'Marie',
+  lastName: 'Curie'
+}
+```
+
+The following filter validates the first two documents:
+
+```javascript
+terms: {
+  firstName: ['Grace', 'Ada']
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  term: {
+    firstName: ['Grace', 'Ada']
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > ids
+
+This filter returns only documents having their unique document ID listed in the provided list.
+
+Given the following documents:
+
+```javascript
+{
+  _id: 'a',
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  _id: 'b',
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+},
+{
+  _id: 'c',
+  firstName: 'Marie',
+  lastName: 'Curie'
+}
+```
+
+The following filter validates first document:
+
+```javascript
+ids: {
+  values: ['a']
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  ids: {
+    values: ['a']
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > range
+
+Filters documents with fields having number attributes within a certain range.
+
+The range filter accepts the following parameters:
+
+```gte``` Greater-than or equal to
+
+```gt``` Greater-than
+
+```lte``` Less-than or equal to
+
+```lt``` Less-than
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper',
+  age: 85,
+  city: 'NYC',
+  hobby: 'computer'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace',
+  age: 36
+  city: 'London',
+  hobby: 'computer'
+},
+{
+  firstName: 'Marie',
+  lastName: 'Curie',
+  age: 55,
+  city: 'Paris',
+  hobby: 'radium'
+}
+```
+
+The following filter validates the last two documents:
+
+```javascript
+range: {
+  age: {
+    gte: 36,
+    lt: 85
+  }
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  range: {
+    age: {
+      gte: 36,
+      lt: 85
+    }
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### Filter controls
+
+Filter controls allow regrouping or inverting filters and/or geospatial filters.
+
+### > and
+
+The `and` filter allows filtering documents on two or more terms.
 
 Given the following documents:
 
@@ -27,7 +338,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```javascript
 {
@@ -72,9 +383,9 @@ var room =
     };
 ```
 
-### bool
+### > bool
 
-A filter that matches documents matching boolean combinations of other queries. 
+A filter matching documents matching boolean combinations of other queries.
 
 Given the following documents:
 
@@ -102,7 +413,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the second document: 
+The following filter validates the second document:
 
 ```javascript
 bool: {
@@ -193,107 +504,9 @@ var room =
     };
 ```
 
-### exists
+### > not
 
-Returns documents that have at least one non-null value in the original field.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper',
-  city: 'NYC',
-  hobby: 'computer',
-  alive: false
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace',
-  city: 'London',
-  hobby: 'computer'
-}
-```
-
-The following filter can be made, and will be validated on the first document: 
-
-```javascript
-{
-  exists: {
-    field: 'alive'
-  }
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```js
-var filter = {
-  exists: {
-    field: 'alive'
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### missing
-
-Returns documents that have only null values or no value in the original field
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper',
-  city: 'NYC',
-  hobby: 'computer',
-  alive: false
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace',
-  city: 'London',
-  hobby: 'computer',
-}
-```
-
-The following filter can be made, and will be validated on the second document:
- 
-```javascript
-{
-  missing: {
-    field: 'alive'
-  }
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```js
-var filter = {
-  missing: {
-    field: 'alive'
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### not
-
-A filter that filters out matched documents.
+The `not` filter reverts a filter result.
 
 Given the following documents:
 
@@ -312,7 +525,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first document: 
+The following filter validates the first document:
 
 ```
 {
@@ -343,9 +556,9 @@ var room =
     };
 ```
 
-### or
+### > or
 
-A filter that matches documents using the OR boolean operator on other filters.
+The `or` filter allows combining multiple filters with a OR boolean operator.
 
 Given the following documents:
 
@@ -370,7 +583,7 @@ Given the following documents:
 }
 ```
 
-The following filter can be made, and will be validated on the first and second documents: 
+The following filter validates the first two documents:
 
 ```javascript
 {
@@ -411,231 +624,24 @@ var room =
     };
 ```
 
-### term
+### Geospatial filters
 
-Filters documents that have fields that contain a term.
+Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).
 
-Given the following documents:
+There are some inherent objects and concepts which are good to understand before going further. Most of them are taken from the ElasticSearch DSL format, some have been simplified.
 
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-}
-```
+#### Geospatial objects and concepts
 
-The following filter can be made, and will be validated on the first document: 
-
-```javascript
-term: {
-  firstName: 'Grace'
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: 'Grace'
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### terms
-
-Filters documents that have fields that match any of the provided terms.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-},
-{
-  firstName: 'Marie',
-  lastName: 'Curie'
-}
-```
-
-The following filter can be made, and will be validated on the two first documents: 
-
-```javascript
-terms: {
-  firstName: ['Grace', 'Ada']
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: ['Grace', 'Ada']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### ids
-
-Filters documents that only have the provided ids.
-
-Given the following documents:
-
-```javascript
-{
-  _id: 'a',
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  _id: 'b',
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-},
-{
-  _id: 'c',
-  firstName: 'Marie',
-  lastName: 'Curie'
-}
-```
-
-The following filter can be made, and will be validated on the first document: 
-
-```javascript
-ids: {
-  values: ['a']
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  ids: {
-    values: ['a']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### range
-
-Filters documents with fields that have terms within a certain range.
-
-The range filter accepts the following parameters:
-
-```gte``` Greater-than or equal to
-
-```gt``` Greater-than
-
-```lte``` Less-than or equal to
-
-```lt``` Less-than
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper',
-  age: 85,
-  city: 'NYC',
-  hobby: 'computer'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace',
-  age: 36
-  city: 'London',
-  hobby: 'computer'
-},
-{
-  firstName: 'Marie',
-  lastName: 'Curie',
-  age: 55,
-  city: 'Paris',
-  hobby: 'radium'
-}
-```
-
-The following filter can be made, and will be validated on the two last documents, not the first: 
-
-```javascript
-range: {
-  age: {
-    gte: 36,
-    lt: 85
-  }
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  range: {
-    age: {
-      gte: 36,
-      lt: 85
-    }
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### Geospacial
-
-The geospacial filters allows you to find or discriminate documents containing a geolocalisation field (ie: a point).
-
-There are some inherent objects and concepts wich are good to understand before to go further. Most of them are following the ElasticSearch DSL format, some has been simplified.
-
-#### Geospacial objects and concepts
-
-  * [Point](#point)
-  * [Bounding Box](#bounding-box) aka BBox
-  * [Polygon](#polygon)
-  * [Distance](#distance)
+  * Point
+  * Bounding Box aka BBox
+  * Polygon
+  * Distance
 
 ##### Point
 
-A point is... well you know, a point, defined by a longitude and a latitude.
-The following notations are valid: 
+A point is a single longitude-latitude coordinate pair.
+
+The following notations are valid:
 
 ```javascript
 { lat: -74.1, lon: 40.73 }
@@ -645,15 +651,15 @@ The following notations are valid:
 { latLon: { lat: 40.73, lon: -74.1 } }
 ```
 
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+<aside class="note">
+When coordinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
 </aside>
 
 ```javascript
 { latLon: [ -74.1, 40.73 ] }
 ```
 
-<aside class="warning">
+<aside class="note">
 As a string, the coordinates format is "lat, lon"
 </aside>
 
@@ -669,12 +675,12 @@ Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
 ##### Bounding Box
 
-A bounding box (also known as BBox) is a 2D box that can be defined via:
+A bounding box (also known as BBox) is a 2D box that can be defined using:
 
 1. 2 points coordinates tuples, defining the top left and bottom right corners of the box
 2. 4 values defining the 4 BBox sides. ```top``` and ```bottom``` are latitudes and ```left``` and ```right``` are longitudes
 
-All of these representations are defining the same BBox: 
+All of these representations are defining the same BBox:
 
 ```javascript
 {
@@ -692,24 +698,24 @@ All of these representations are defining the same BBox:
 }
 ```
 
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+<aside class="note">
+When cooddinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
 </aside>
 
 ```javascript
 {
-  topLeft: [ -74.1, 40.73 ], 
+  topLeft: [ -74.1, 40.73 ],
   bottomRight: [ -71.12, 40.01 ]
 }
 ```
 
-<aside class="warning">
+<aside class="note">
 As a string, the coordinates format is "lat, lon"
 </aside>
 
 ```javascript
 {
-  topLeft: "40.73, -74.1", 
+  topLeft: "40.73, -74.1",
   bottomRight: "40.01, -71.12"
 }
 ```
@@ -718,18 +724,19 @@ Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
 ```javascript
 {
-  topLeft: "dr5r9ydj2", 
+  topLeft: "dr5r9ydj2",
   bottomRight: "drj7teegp"
 }
 ```
 
 ##### Polygon
 
-Unlike the GeoJSON representation, a polygon, here, must contain at least, 3 [points](#point) ; the last point do not have to be the same as the first one, but the points must be in the right order. The polygon is automatically closed.
+Unlike the GeoJSON representation, a polygon, here, must contain at least 3 [points](#point).  
+The last point do not have to be the same as the first one, but the points must be sorted in the right order. The polygon is automatically closed.
 
 For each polygon points, all the possible point notations are valid.
 
-Example of a valid polygon representation: 
+Example of a valid polygon representation:
 
 ```javascript
 {
@@ -744,8 +751,9 @@ Example of a valid polygon representation:
 
 ##### Distance
 
-By default, when it is not specified, the distance unit is meters.
-You can use other units accepted by the excellent [node-units](https://github.com/brettlangdon/node-units) library, so all units and prefix that library can handle are supported, such as the following, using a lower, upper or camelized notation:
+By default, when it is not specified, the distance unit is expressed in meters.  
+
+All formats supported by the [node-units](https://github.com/brettlangdon/node-units) library can be used:
 
 Units   | Notations
 --------|----------
@@ -755,7 +763,7 @@ inches  | inch, in
 yards   | yard, yd
 miles   | mile, mi
 
-According to this, all these notations are equivalent: 
+All these notations are equivalent:
 
 ```
 1000
@@ -769,28 +777,32 @@ According to this, all these notations are equivalent:
 1 093,6132983377079 yd
 0.6213727366498067 miles
 ```
-#### Geospacial filters
 
-##### geoBoundingBox
 
-Filter documents wich have a location field and are located into a [bounding box](#bounding-box).
+### > geoBoundingBox
 
-![Illustration of geoBoundingBox](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoBoundingBox.png?raw=true)
+Filter documents having their location field within a [bounding box](#geospatial-filters).
 
-Given the following documents: 
+![Illustration of geoBoundingBox](./images/geolocation/geoBoundingBox.png)
+
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -829,26 +841,30 @@ var room =
     };
 ```
 
-##### geoDistance
+### > geoDistance
 
-Filter documents wich have a location field and are located into a given [distance](#distance) from a given point.
+Filter documents having their location field within a [distance](#geospatial-filters) radius of a provided point of origin.
 
-![Illustration of geoDistance](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistance.png?raw=true)
+![Illustration of geoDistance](./images/geolocation/geoDistance.png)
 
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -885,27 +901,31 @@ var room =
     };
 ```
 
-##### geoDistanceRange
 
-Filter documents wich have a location field and are located into a given [distances](#distance) range from a given point.
+### > geoDistanceRange
 
-![Illustration of geoDistanceRange](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistanceRange.png?raw=true)
+Filter documents having their location field within a [distance](#geospatial-filters) range from a given point of origin
 
+![Illustration of geoDistanceRange](./images/geolocation/geoDistanceRange.png)
 
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 
@@ -944,26 +964,30 @@ var room =
     };
 ```
 
-##### geoPolygon
+### > geoPolygon
 
-Filter documents wich have a location field and are located into a given [polygon](#polygon).
+Filter documents having their location field located inside a given [polygon](#geospatial-filters).
 
-![Illustration of geoPolygon](https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoPolygon.png?raw=true)
+![Illustration of geoPolygon](./images/geolocation/geoPolygon.png)
 
-Given the following documents: 
+Given the following documents:
 
 ```javascript
 {
   firstName: 'Grace',
   lastName: 'Hopper',
-  'location.lat': 32.692742,
-  'location.lon': -97.114127
+  location: {
+    lat: 32.692742,
+    lon: -97.114127
+  }
 },
 {
   firstName: 'Ada',
   lastName: 'Lovelace',
-  'location.lat': 51.519291,
-  'location.lon': -0.149817
+  location: {
+    lat: 51.519291,
+    lon: -0.149817
+  }
 }
 ```
 

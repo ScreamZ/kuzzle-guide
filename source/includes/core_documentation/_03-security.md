@@ -209,6 +209,7 @@ The `action permission` value can be set either to:
 
 A closure enable to set a role's policy according to some execution context.
 For example, if we need to allow users to update only their own documents, it can be done with this sample role:
+
 ```js
 var role = {
   controllers: {
@@ -327,6 +328,7 @@ That means that we need to fetch documents from the storage engine in order to u
 
 The _args_ object contains these documents, as a result of the evaluation of the [fetch definition](#the-fetch-definition).
 Each _args_ item will look like:
+
 ```js
 {
   content: <the document itself>,
@@ -383,6 +385,7 @@ Some variables are exposed by Kuzzle and can be used within your fetch function 
 The `get` action type performs a read/get call. It takes a document id for entry and returns the matching document.
 
 Example:
+
 ```js
 var args = {
   currentDocument: {
@@ -430,6 +433,7 @@ var args = {
 ```
 
 The _args_ variable passed to the permission function contains an array of documents fetched from `myIndex`/`myCollection`, like:
+
 ```js
 args.myDocuments = [
   { id: "id_1", content: {name: "Document 1", description: "Cum sociis natoque penatibus et magnis dis parturient montes"},
@@ -444,6 +448,7 @@ args.myDocuments = [
 The `search` action type makes a search in Kuzzle's database layer and returns the related documents.
 
 Example:
+
 ```js
 var args = {
   myDocuments: {
@@ -463,6 +468,7 @@ var args = {
 ```
 
 The _args_ variable passed to the permission function contains an array of documents fetched from `myIndex`/`myCollection`, for which the `name` attribute matches the `name` attribute of the request:
+
 ```js
 args.myDocuments = [
   { id: "id_1", content: {name: "foo", description: "Cum sociis natoque penatibus et magnis dis parturient montes"},
@@ -475,4 +481,3 @@ args.myDocuments = [
 The _action.search_ value is sent to Kuzzle's database layer directly, being Elasticsearch 2.2.
 
 Please refer to [Elasticsearch search API documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-request-body.html) for additional information on how to build your query.
-

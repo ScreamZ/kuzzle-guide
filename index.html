@@ -2836,29 +2836,28 @@ Location: http://&lt;kuzzle&gt;/api/1.0/_login/github?code=OAUTH2_CODE
 </ul>
 
 <p>A closure enable to set a role&rsquo;s policy according to some execution context.
-For example, if we need to allow users to update only their own documents, it can be done with this sample role:
-<code class="prettyprint">js
-var role = {
-  controllers: {
-    write: {
-      actions: {
-        update: {
-          args: {
-            document: {
-              index: &quot;$requestObject.index&quot;,
-              collection: &quot;$requestObject.collection&quot;,
-              action: {
-                get: &quot;$currentId&quot;
-              }
-            }
-          },
-          test: &quot;return args.document.content.user.id === $currentUserId&quot;
-        }
-      }
-    }
-  }
-};
-</code></p>
+For example, if we need to allow users to update only their own documents, it can be done with this sample role:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">role</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">write</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">update</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">args</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">document</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">index</span><span class="p">:</span> <span class="s2">"$requestObject.index"</span><span class="p">,</span>
+              <span class="na">collection</span><span class="p">:</span> <span class="s2">"$requestObject.collection"</span><span class="p">,</span>
+              <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">},</span>
+          <span class="na">test</span><span class="p">:</span> <span class="s2">"return args.document.content.user.id === $currentUserId"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
 
 <p>Where:
 - <code class="prettyprint">test</code> is the body of <a href="#the-permission-function">the permission function</a>
@@ -2948,13 +2947,12 @@ A typical context object will look like:</p>
 That means that we need to fetch documents from the storage engine in order to use them within the permission function.</p>
 
 <p>The <em>args</em> object contains these documents, as a result of the evaluation of the <a href="#the-fetch-definition">fetch definition</a>.
-Each <em>args</em> item will look like:
-<code class="prettyprint">js
-{
-  content: &lt;the document itself&gt;,
-  id: &lt;the document id&gt;
-}
-</code></p>
+Each <em>args</em> item will look like:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">content</span><span class="p">:</span> <span class="o">&lt;</span><span class="nx">the</span> <span class="nb">document</span> <span class="nx">itself</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">id</span><span class="err">:</span> <span class="o">&lt;</span><span class="nx">the</span> <span class="nb">document</span> <span class="nx">id</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</code></pre>
 
 <p>With the sample role above (<code class="prettyprint">return args.document.content.user.id === $currentUserId</code>), the <code class="prettyprint">update</code> action is allowed only if the fetched document contains an attribute <code class="prettyprint">user.id</code> which value is the current user ID.</p>
 
@@ -3003,25 +3001,24 @@ Each <em>args</em> item will look like:
 
 <p>The <code class="prettyprint">get</code> action type performs a read/get call. It takes a document id for entry and returns the matching document.</p>
 
-<p>Example:
-<code class="prettyprint">js
-var args = {
-  currentDocument: {
-    index: &quot;$requestObject.index&quot;,
-    collection: &quot;$requestObject.collection&quot;,
-    action: {
-      get: &quot;$currentId&quot;
-    }
-  },
-  anotherDocument: {
-    index: &quot;myIndex&quot;,
-    collection: &quot;myCollection&quot;,
-    action: {
-      get: &quot;document_id&quot;
-    }
-  }
-};
-</code></p>
+<p>Example:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">currentDocument</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">index</span><span class="p">:</span> <span class="s2">"$requestObject.index"</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"$requestObject.collection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">get</span><span class="p">:</span> <span class="s2">"$currentId"</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">anotherDocument</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">get</span><span class="p">:</span> <span class="s2">"document_id"</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
 
 <p>The <em>args</em> variable passed to the permission function contains:
 - <code class="prettyprint">args.currentDocument</code>: the document that is being updated. Indeed, we fetch:
@@ -3048,46 +3045,43 @@ var args = {
 <span class="p">};</span>
 </code></pre>
 
-<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, like:
-<code class="prettyprint">js
-args.myDocuments = [
-  { id: &quot;id_1&quot;, content: {name: &quot;Document 1&quot;, description: &quot;Cum sociis natoque penatibus et magnis dis parturient montes&quot;},
-  { id: &quot;id_2&quot;, content: {name: &quot;Document 2&quot;, description: &quot;nascetur ridiculus mus. Nulla nunc velit&quot;},
-  ...
-]
-</code></p>
+<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, like:</p>
+<pre class="highlight javascript"><code><span class="nx">args</span><span class="p">.</span><span class="nx">myDocuments</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="s2">"id_1"</span><span class="p">,</span> <span class="na">content</span><span class="p">:</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"Document 1"</span><span class="p">,</span> <span class="na">description</span><span class="p">:</span> <span class="s2">"Cum sociis natoque penatibus et magnis dis parturient montes"</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="s2">"id_2"</span><span class="p">,</span> <span class="na">content</span><span class="p">:</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"Document 2"</span><span class="p">,</span> <span class="na">description</span><span class="p">:</span> <span class="s2">"nascetur ridiculus mus. Nulla nunc velit"</span><span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span>
+</code></pre>
 
 <h6 id="gt-search-action-type">&gt; <em>search</em> action type</h6>
 
 <p>The <code class="prettyprint">search</code> action type makes a search in Kuzzle&rsquo;s database layer and returns the related documents.</p>
 
-<p>Example:
-<code class="prettyprint">js
-var args = {
-  myDocuments: {
-    index: &quot;myIndex&quot;,
-    collection: &quot;myCollection&quot;,
-    action: {
-      search: {
-        filter: {
-          match: {
-            name: &quot;$requestObject.data.body.name&quot;
-          }
-        }
-      }
-    }
-  }
-};
-</code></p>
+<p>Example:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">myDocuments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">index</span><span class="p">:</span> <span class="s2">"myIndex"</span><span class="p">,</span>
+    <span class="na">collection</span><span class="p">:</span> <span class="s2">"myCollection"</span><span class="p">,</span>
+    <span class="na">action</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">search</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">filter</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">match</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">name</span><span class="p">:</span> <span class="s2">"$requestObject.data.body.name"</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
 
-<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, for which the <code class="prettyprint">name</code> attribute matches the <code class="prettyprint">name</code> attribute of the request:
-<code class="prettyprint">js
-args.myDocuments = [
-  { id: &quot;id_1&quot;, content: {name: &quot;foo&quot;, description: &quot;Cum sociis natoque penatibus et magnis dis parturient montes&quot;},
-  { id: &quot;id_2&quot;, content: {name: &quot;foo bar&quot;, description: &quot;nascetur ridiculus mus. Nulla nunc velit&quot;},
-  ...
-]
-</code></p>
+<p>The <em>args</em> variable passed to the permission function contains an array of documents fetched from <code class="prettyprint">myIndex</code>/<code class="prettyprint">myCollection</code>, for which the <code class="prettyprint">name</code> attribute matches the <code class="prettyprint">name</code> attribute of the request:</p>
+<pre class="highlight javascript"><code><span class="nx">args</span><span class="p">.</span><span class="nx">myDocuments</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="s2">"id_1"</span><span class="p">,</span> <span class="na">content</span><span class="p">:</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"foo"</span><span class="p">,</span> <span class="na">description</span><span class="p">:</span> <span class="s2">"Cum sociis natoque penatibus et magnis dis parturient montes"</span><span class="p">},</span>
+  <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="s2">"id_2"</span><span class="p">,</span> <span class="na">content</span><span class="p">:</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"foo bar"</span><span class="p">,</span> <span class="na">description</span><span class="p">:</span> <span class="s2">"nascetur ridiculus mus. Nulla nunc velit"</span><span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span>
+</code></pre>
 
 <p>The <em>action.search</em> value is sent to Kuzzle&rsquo;s database layer directly, being Elasticsearch 2.2.</p>
 

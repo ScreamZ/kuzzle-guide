@@ -105,6 +105,7 @@ var myProfileDefinition = {
 A role can be applied globally on the profile, or it can be restricted to a list of indexes or index/collections pairs.
 
 For example, if we have a "publisher" role which allows to request any action of the `write` controller:
+
 ```js
 var publisherRole = {
     controllers: {
@@ -118,6 +119,7 @@ var publisherRole = {
 ```
 
 Then we declare 3 profiles using this role:
+
 ```js
 var profile1 = {
   roles: [ {_id: 'publisherRole' } ]
@@ -146,6 +148,7 @@ var profile3 = {
 ```
 
 With this sample profiles:
+
 * users with `profile1` are allowed to use all `write` controller actions on all indexes and collections.
 * users with `profile2` are only allowed to use `write` controller actions on collections stored in index `index1`.
 * users with `profile3` are only allowed to use `write` controller actions on:

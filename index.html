@@ -1894,53 +1894,57 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 
 <p>A role can be applied globally on the profile, or it can be restricted to a list of indexes or index/collections pairs.</p>
 
-<p>For example, if we have a &ldquo;publisher&rdquo; role which allows to request any action of the <code class="prettyprint">write</code> controller:
-<code class="prettyprint">js
-var publisherRole = {
-    controllers: {
-    write: {
-      actions: {
-        &#39;*&#39;: true
-      }
-    }
-  }
-};
-</code></p>
+<p>For example, if we have a &ldquo;publisher&rdquo; role which allows to request any action of the <code class="prettyprint">write</code> controller:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">publisherRole</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">controllers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">write</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">actions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">'*'</span><span class="p">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
 
-<p>Then we declare 3 profiles using this role:
-&ldquo;`js
-var profile1 = {
-  roles: [ {_id: &lsquo;publisherRole&rsquo; } ]
-};</p>
+<p>Then we declare 3 profiles using this role:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">profile1</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">roles</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span><span class="na">_id</span><span class="p">:</span> <span class="s1">'publisherRole'</span> <span class="p">}</span> <span class="p">]</span>
+<span class="p">};</span>
 
-<p>var profile2 = {
-  roles: [
-    {
-      _id: &#39;publisherRole&rsquo;,
-      restrictedTo: [{index: &#39;index1&rsquo;}]
-    }
-  ]
-};</p>
+<span class="kd">var</span> <span class="nx">profile2</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">roles</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">_id</span><span class="p">:</span> <span class="s1">'publisherRole'</span><span class="p">,</span>
+      <span class="na">restrictedTo</span><span class="p">:</span> <span class="p">[{</span><span class="na">index</span><span class="p">:</span> <span class="s1">'index1'</span><span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">};</span>
 
-<p>var profile3 = {
-  roles: [
-    {
-      _id: &#39;publisherRole&rsquo;,
-      restrictedTo: [
-        {index: &#39;index1&rsquo;, collections: [&#39;foo&rsquo;, &#39;bar&rsquo;]},
-        {index: &#39;index2&rsquo;}
-      ]
-    }
-  ]
-};
-&rdquo;`</p>
+<span class="kd">var</span> <span class="nx">profile3</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">roles</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">_id</span><span class="p">:</span> <span class="s1">'publisherRole'</span><span class="p">,</span>
+      <span class="na">restrictedTo</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="na">index</span><span class="p">:</span> <span class="s1">'index1'</span><span class="p">,</span> <span class="na">collections</span><span class="p">:</span> <span class="p">[</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">]},</span>
+        <span class="p">{</span><span class="na">index</span><span class="p">:</span> <span class="s1">'index2'</span><span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">};</span>
+</code></pre>
 
-<p>With this sample profiles:
-* users with <code class="prettyprint">profile1</code> are allowed to use all <code class="prettyprint">write</code> controller actions on all indexes and collections.
-* users with <code class="prettyprint">profile2</code> are only allowed to use <code class="prettyprint">write</code> controller actions on collections stored in index <code class="prettyprint">index1</code>.
-* users with <code class="prettyprint">profile3</code> are only allowed to use <code class="prettyprint">write</code> controller actions on:
-  * all collections stored in index <code class="prettyprint">index2</code>
-  * collections <code class="prettyprint">foo</code> and <code class="prettyprint">bar</code> stored in index <code class="prettyprint">index1</code>.</p>
+<p>With this sample profiles:</p>
+
+<ul>
+<li>users with <code class="prettyprint">profile1</code> are allowed to use all <code class="prettyprint">write</code> controller actions on all indexes and collections.</li>
+<li>users with <code class="prettyprint">profile2</code> are only allowed to use <code class="prettyprint">write</code> controller actions on collections stored in index <code class="prettyprint">index1</code>.</li>
+<li>users with <code class="prettyprint">profile3</code> are only allowed to use <code class="prettyprint">write</code> controller actions on:
+
+<ul>
+<li>all collections stored in index <code class="prettyprint">index2</code></li>
+<li>collections <code class="prettyprint">foo</code> and <code class="prettyprint">bar</code> stored in index <code class="prettyprint">index1</code>.</li>
+</ul></li>
+</ul>
 
 <h5 id="composition-rules">Composition rules</h5>
 

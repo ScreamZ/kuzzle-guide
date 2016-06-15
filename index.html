@@ -765,15 +765,290 @@ This command is interactive and let you choose to reset the roles rights or not.
 
             <h2 id="filtering-syntax">Filtering Syntax</h2>
 
-<p>For real-time subscription we use a sub language of Elasticsearch DSL, only for <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-filters.html">Filters</a>.</p>
+<p>This documentation section details the filtering syntax of <strong>subscriptions</strong>.<br>
+This is different from document searches, which are performed using <a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.2/query-dsl.html">Elasticsearch Query DSL</a></p>
 
-<p>For no-real-time, like search, get, etc, we directly pass information to Elasticsearch. You can use the whole <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">Elasticsearch DSL</a></p>
+<p>Kuzzle subscriptions use a subset of Elasticsearch Query DSL, called Kuzzle DSL.</p>
 
-<p>You can also take a look at the internally used <a href="https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html">Elasticsearch API</a> for Javascript</p>
+<h3 id="filter-terms">Filter terms</h3>
 
-<h3 id="and">and</h3>
+<h3 id="gt-exists">&gt; exists</h3>
 
-<p>The and filter allow to filter documents on two or more terms.</p>
+<p>The <code class="prettyprint">exists</code> filter matches documents containing non-null fields.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the first document:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">exists</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">exists</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="gt-missing">&gt; missing</h3>
+
+<p>A filter matching documents with missing field.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the second document:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">missing</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">missing</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="gt-term">&gt; term</h3>
+
+<p>The <code class="prettyprint">term</code> filter matches documents using string equality.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the first document:</p>
+<pre class="highlight javascript"><code><span class="nx">term</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="gt-terms">&gt; terms</h3>
+
+<p>This filter allows testing a string field against multiple possibilities.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the first two documents:</p>
+<pre class="highlight javascript"><code><span class="nx">terms</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="gt-ids">&gt; ids</h3>
+
+<p>This filter returns only documents having their unique document ID listed in the provided list.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">_id</span><span class="p">:</span> <span class="s1">'a'</span><span class="p">,</span>
+  <span class="nx">firstName</span><span class="err">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">_id</span><span class="p">:</span> <span class="s1">'b'</span><span class="p">,</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">_id</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">,</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates first document:</p>
+<pre class="highlight javascript"><code><span class="nx">ids</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">values</span><span class="p">:</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">ids</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">values</span><span class="p">:</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="gt-range">&gt; range</h3>
+
+<p>Filters documents with fields having number attributes within a certain range.</p>
+
+<p>The range filter accepts the following parameters:</p>
+
+<p><code class="prettyprint">gte</code> Greater-than or equal to</p>
+
+<p><code class="prettyprint">gt</code> Greater-than</p>
+
+<p><code class="prettyprint">lte</code> Less-than or equal to</p>
+
+<p><code class="prettyprint">lt</code> Less-than</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
+  <span class="nx">age</span><span class="err">:</span> <span class="mi">85</span><span class="p">,</span>
+  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
+  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">36</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span><span class="p">,</span>
+  <span class="na">age</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
+  <span class="na">city</span><span class="p">:</span> <span class="s1">'Paris'</span><span class="p">,</span>
+  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'radium'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the last two documents:</p>
+<pre class="highlight javascript"><code><span class="nx">range</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+    <span class="nx">lt</span><span class="err">:</span> <span class="mi">85</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+      <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
+  <span class="nx">kuzzle</span>
+    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called each time a new notification on this filter is received</span>
+    <span class="p">};</span>
+</code></pre>
+
+<h3 id="filter-controls">Filter controls</h3>
+
+<p>Filter controls allow regrouping or inverting filters and/or geospatial filters.</p>
+
+<h3 id="gt-and">&gt; and</h3>
+
+<p>The <code class="prettyprint">and</code> filter allows filtering documents on two or more terms.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -790,7 +1065,7 @@ This command is interactive and let you choose to reset the roles rights or not.
 <span class="p">}</span>
 </code></pre>
 
-<p>The following filter can be made, and will be validated on the first document: </p>
+<p>The following filter validates the first document:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">and</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span>
@@ -831,9 +1106,9 @@ This command is interactive and let you choose to reset the roles rights or not.
     <span class="p">};</span>
 </code></pre>
 
-<h3 id="bool">bool</h3>
+<h3 id="gt-bool">&gt; bool</h3>
 
-<p>A filter that matches documents matching boolean combinations of other queries. </p>
+<p>A filter matching documents matching boolean combinations of other queries.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -859,7 +1134,7 @@ This command is interactive and let you choose to reset the roles rights or not.
 <span class="p">}</span>
 </code></pre>
 
-<p>The following filter can be made, and will be validated on the second document: </p>
+<p>The following filter validates the second document:</p>
 <pre class="highlight javascript"><code><span class="nx">bool</span><span class="err">:</span> <span class="p">{</span>
   <span class="nl">must</span> <span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span>
@@ -946,95 +1221,9 @@ This command is interactive and let you choose to reset the roles rights or not.
     <span class="p">};</span>
 </code></pre>
 
-<h3 id="exists">exists</h3>
+<h3 id="gt-not">&gt; not</h3>
 
-<p>Returns documents that have at least one non-null value in the original field.</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
-  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
-  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
-  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter can be made, and will be validated on the first document: </p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">exists</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">exists</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="missing">missing</h3>
-
-<p>Returns documents that have only null values or no value in the original field</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
-  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span><span class="p">,</span>
-  <span class="nx">alive</span><span class="err">:</span> <span class="kc">false</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
-  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span><span class="p">,</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter can be made, and will be validated on the second document:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">missing</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nl">field</span><span class="p">:</span> <span class="s1">'alive'</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">missing</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">field</span><span class="p">:</span> <span class="s1">'alive'</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="not">not</h3>
-
-<p>A filter that filters out matched documents.</p>
+<p>The <code class="prettyprint">not</code> filter reverts a filter result.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1051,7 +1240,7 @@ This command is interactive and let you choose to reset the roles rights or not.
 <span class="p">}</span>
 </code></pre>
 
-<p>The following filter can be made, and will be validated on the first document: </p>
+<p>The following filter validates the first document:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="err">not:</span><span class="w"> </span><span class="err">{</span><span class="w">
     </span><span class="err">term:</span><span class="w"> </span><span class="err">{</span><span class="w">
@@ -1078,9 +1267,9 @@ This command is interactive and let you choose to reset the roles rights or not.
     <span class="p">};</span>
 </code></pre>
 
-<h3 id="or">or</h3>
+<h3 id="gt-or">&gt; or</h3>
 
-<p>A filter that matches documents using the OR boolean operator on other filters.</p>
+<p>The <code class="prettyprint">or</code> filter allows combining multiple filters with a OR boolean operator.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1103,7 +1292,7 @@ This command is interactive and let you choose to reset the roles rights or not.
 <span class="p">}</span>
 </code></pre>
 
-<p>The following filter can be made, and will be validated on the first and second documents: </p>
+<p>The following filter validates the first two documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">or</span><span class="p">:</span> <span class="p">{</span>
     <span class="nl">term</span><span class="p">:</span> <span class="p">{</span>
@@ -1140,221 +1329,38 @@ This command is interactive and let you choose to reset the roles rights or not.
     <span class="p">};</span>
 </code></pre>
 
-<h3 id="term">term</h3>
+<h3 id="geospatial-filters">Geospatial filters</h3>
 
-<p>Filters documents that have fields that contain a term.</p>
+<p>Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).</p>
 
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
-<span class="p">}</span>
-</code></pre>
+<p>There are some inherent objects and concepts which are good to understand before going further. Most of them are taken from the ElasticSearch DSL format, some have been simplified.</p>
 
-<p>The following filter can be made, and will be validated on the first document: </p>
-<pre class="highlight javascript"><code><span class="nx">term</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="terms">terms</h3>
-
-<p>Filters documents that have fields that match any of the provided terms.</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter can be made, and will be validated on the two first documents: </p>
-<pre class="highlight javascript"><code><span class="nx">terms</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="ids">ids</h3>
-
-<p>Filters documents that only have the provided ids.</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">_id</span><span class="p">:</span> <span class="s1">'a'</span><span class="p">,</span>
-  <span class="nx">firstName</span><span class="err">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">_id</span><span class="p">:</span> <span class="s1">'b'</span><span class="p">,</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">_id</span><span class="p">:</span> <span class="s1">'c'</span><span class="p">,</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter can be made, and will be validated on the first document: </p>
-<pre class="highlight javascript"><code><span class="nx">ids</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">values</span><span class="p">:</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">ids</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">values</span><span class="p">:</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="range">range</h3>
-
-<p>Filters documents with fields that have terms within a certain range.</p>
-
-<p>The range filter accepts the following parameters:</p>
-
-<p><code class="prettyprint">gte</code> Greater-than or equal to</p>
-
-<p><code class="prettyprint">gt</code> Greater-than</p>
-
-<p><code class="prettyprint">lte</code> Less-than or equal to</p>
-
-<p><code class="prettyprint">lt</code> Less-than</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="nx">age</span><span class="err">:</span> <span class="mi">85</span><span class="p">,</span>
-  <span class="nx">city</span><span class="err">:</span> <span class="s1">'NYC'</span><span class="p">,</span>
-  <span class="nx">hobby</span><span class="err">:</span> <span class="s1">'computer'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="na">age</span><span class="p">:</span> <span class="mi">36</span>
-  <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span><span class="p">,</span>
-  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span><span class="p">,</span>
-  <span class="na">age</span><span class="p">:</span> <span class="mi">55</span><span class="p">,</span>
-  <span class="na">city</span><span class="p">:</span> <span class="s1">'Paris'</span><span class="p">,</span>
-  <span class="na">hobby</span><span class="p">:</span> <span class="s1">'radium'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter can be made, and will be validated on the two last documents, not the first: </p>
-<pre class="highlight javascript"><code><span class="nx">range</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">age</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nl">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
-    <span class="nx">lt</span><span class="err">:</span> <span class="mi">85</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
-      <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="geospacial">Geospacial</h3>
-
-<p>The geospacial filters allows you to find or discriminate documents containing a geolocalisation field (ie: a point).</p>
-
-<p>There are some inherent objects and concepts wich are good to understand before to go further. Most of them are following the ElasticSearch DSL format, some has been simplified.</p>
-
-<h4 id="geospacial-objects-and-concepts">Geospacial objects and concepts</h4>
+<h4 id="geospatial-objects-and-concepts">Geospatial objects and concepts</h4>
 
 <ul>
-<li><a href="#point">Point</a></li>
-<li><a href="#bounding-box">Bounding Box</a> aka BBox</li>
-<li><a href="#polygon">Polygon</a></li>
-<li><a href="#distance">Distance</a></li>
+<li>Point</li>
+<li>Bounding Box aka BBox</li>
+<li>Polygon</li>
+<li>Distance</li>
 </ul>
 
 <h5 id="point">Point</h5>
 
-<p>A point is&hellip; well you know, a point, defined by a longitude and a latitude.
-The following notations are valid: </p>
+<p>A point is a single longitude-latitude coordinate pair.</p>
+
+<p>The following notations are valid:</p>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="mf">40.73</span> <span class="p">}</span>
 </code></pre>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">}</span> <span class="p">}</span>
 </code></pre>
 
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+<aside class="note">
+When coordinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">]</span> <span class="p">}</span>
 </code></pre>
 
-<aside class="warning">
+<aside class="note">
 As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span> <span class="p">}</span>
@@ -1366,14 +1372,14 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 
 <h5 id="bounding-box">Bounding Box</h5>
 
-<p>A bounding box (also known as BBox) is a 2D box that can be defined via:</p>
+<p>A bounding box (also known as BBox) is a 2D box that can be defined using:</p>
 
 <ol>
 <li>2 points coordinates tuples, defining the top left and bottom right corners of the box</li>
 <li>4 values defining the 4 BBox sides. <code class="prettyprint">top</code> and <code class="prettyprint">bottom</code> are latitudes and <code class="prettyprint">left</code> and <code class="prettyprint">right</code> are longitudes</li>
 </ol>
 
-<p>All of these representations are defining the same BBox: </p>
+<p>All of these representations are defining the same BBox:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">top</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span>
   <span class="nx">left</span><span class="err">:</span> <span class="mf">40.73</span><span class="p">,</span>
@@ -1387,38 +1393,39 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 <span class="p">}</span>
 </code></pre>
 
-<aside class="warning">
-When cooddinates are in array format, the format is [lon, lat] to comply with [ElasticSearch DSL definition](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-geo-bounding-box-filter.html#_lat_lon_as_array_3)
+<aside class="note">
+When cooddinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">topLeft</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">],</span> 
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">],</span>
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">71.12</span><span class="p">,</span> <span class="mf">40.01</span> <span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
 
-<aside class="warning">
+<aside class="note">
 As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span><span class="p">,</span> 
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span><span class="p">,</span>
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"40.01, -71.12"</span>
 <span class="p">}</span>
 </code></pre>
 
 <p>Here is the <a href="https://en.wikipedia.org/wiki/Geohash">geoHash</a> representation</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span><span class="p">,</span> 
+  <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span><span class="p">,</span>
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"drj7teegp"</span>
 <span class="p">}</span>
 </code></pre>
 
 <h5 id="polygon">Polygon</h5>
 
-<p>Unlike the GeoJSON representation, a polygon, here, must contain at least, 3 <a href="#point">points</a> ; the last point do not have to be the same as the first one, but the points must be in the right order. The polygon is automatically closed.</p>
+<p>Unlike the GeoJSON representation, a polygon, here, must contain at least 3 <a href="#point">points</a>.<br>
+The last point do not have to be the same as the first one, but the points must be sorted in the right order. The polygon is automatically closed.</p>
 
 <p>For each polygon points, all the possible point notations are valid.</p>
 
-<p>Example of a valid polygon representation: </p>
+<p>Example of a valid polygon representation:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">points</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
@@ -1431,8 +1438,9 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 
 <h5 id="distance">Distance</h5>
 
-<p>By default, when it is not specified, the distance unit is meters.
-You can use other units accepted by the excellent <a href="https://github.com/brettlangdon/node-units">node-units</a> library, so all units and prefix that library can handle are supported, such as the following, using a lower, upper or camelized notation:</p>
+<p>By default, when it is not specified, the distance unit is expressed in meters.  </p>
+
+<p>All formats supported by the <a href="https://github.com/brettlangdon/node-units">node-units</a> library can be used:</p>
 
 <table><thead>
 <tr>
@@ -1462,7 +1470,7 @@ You can use other units accepted by the excellent <a href="https://github.com/br
 </tr>
 </tbody></table>
 
-<p>According to this, all these notations are equivalent: </p>
+<p>All these notations are equivalent:</p>
 <pre class="highlight plaintext"><code>1000
 1000 m
 1km
@@ -1475,26 +1483,28 @@ You can use other units accepted by the excellent <a href="https://github.com/br
 0.6213727366498067 miles
 </code></pre>
 
-<h4 id="geospacial-filters">Geospacial filters</h4>
+<h3 id="gt-geoboundingbox">&gt; geoBoundingBox</h3>
 
-<h5 id="geoboundingbox">geoBoundingBox</h5>
+<p>Filter documents having their location field within a <a href="#geospatial-filters">bounding box</a>.</p>
 
-<p>Filter documents wich have a location field and are located into a <a href="#bounding-box">bounding box</a>.</p>
+<p><img alt="Illustration of geoBoundingBox" src="images/geolocation/geoBoundingBox.png" /></p>
 
-<p><img alt="Illustration of geoBoundingBox" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoBoundingBox.png?raw=true" /></p>
-
-<p>Given the following documents: </p>
+<p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
   <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="nx">location</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="p">}</span>
 <span class="p">},</span>
 <span class="p">{</span>
   <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
   <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">lat</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+    <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1529,24 +1539,28 @@ You can use other units accepted by the excellent <a href="https://github.com/br
     <span class="p">};</span>
 </code></pre>
 
-<h5 id="geodistance">geoDistance</h5>
+<h3 id="gt-geodistance">&gt; geoDistance</h3>
 
-<p>Filter documents wich have a location field and are located into a given <a href="#distance">distance</a> from a given point.</p>
+<p>Filter documents having their location field within a <a href="#geospatial-filters">distance</a> radius of a provided point of origin.</p>
 
-<p><img alt="Illustration of geoDistance" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistance.png?raw=true" /></p>
+<p><img alt="Illustration of geoDistance" src="images/geolocation/geoDistance.png" /></p>
 
-<p>Given the following documents: </p>
+<p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
   <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="nx">location</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="p">}</span>
 <span class="p">},</span>
 <span class="p">{</span>
   <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
   <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">lat</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+    <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1579,24 +1593,28 @@ You can use other units accepted by the excellent <a href="https://github.com/br
     <span class="p">};</span>
 </code></pre>
 
-<h5 id="geodistancerange">geoDistanceRange</h5>
+<h3 id="gt-geodistancerange">&gt; geoDistanceRange</h3>
 
-<p>Filter documents wich have a location field and are located into a given <a href="#distance">distances</a> range from a given point.</p>
+<p>Filter documents having their location field within a <a href="#geospatial-filters">distance</a> range from a given point of origin</p>
 
-<p><img alt="Illustration of geoDistanceRange" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoDistanceRange.png?raw=true" /></p>
+<p><img alt="Illustration of geoDistanceRange" src="images/geolocation/geoDistanceRange.png" /></p>
 
-<p>Given the following documents: </p>
+<p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
   <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="nx">location</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="p">}</span>
 <span class="p">},</span>
 <span class="p">{</span>
   <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
   <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">lat</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+    <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1631,24 +1649,28 @@ You can use other units accepted by the excellent <a href="https://github.com/br
     <span class="p">};</span>
 </code></pre>
 
-<h5 id="geopolygon">geoPolygon</h5>
+<h3 id="gt-geopolygon">&gt; geoPolygon</h3>
 
-<p>Filter documents wich have a location field and are located into a given <a href="#polygon">polygon</a>.</p>
+<p>Filter documents having their location field located inside a given <a href="#geospatial-filters">polygon</a>.</p>
 
-<p><img alt="Illustration of geoPolygon" src="https://github.com/kuzzleio/kuzzle/blob/develop/docs/images/kuzzle_geoPolygon.png?raw=true" /></p>
+<p><img alt="Illustration of geoPolygon" src="images/geolocation/geoPolygon.png" /></p>
 
-<p>Given the following documents: </p>
+<p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
   <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="err">:</span> <span class="mf">32.692742</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="nx">location</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">lat</span><span class="p">:</span> <span class="mf">32.692742</span><span class="p">,</span>
+    <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">97.114127</span>
+  <span class="p">}</span>
 <span class="p">},</span>
 <span class="p">{</span>
   <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
   <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span><span class="p">,</span>
-  <span class="s1">'location.lat'</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
-  <span class="s1">'location.lon'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="na">location</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">lat</span><span class="p">:</span> <span class="mf">51.519291</span><span class="p">,</span>
+    <span class="na">lon</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.149817</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -4527,7 +4549,7 @@ There are two ways of changing a plugin configuration.</p>
 </tr>
 </tbody></table>
 
-<h4 id="the-plugin-context">The plugin context</h4>
+<h3 id="the-plugin-context">The plugin context</h3>
 
 <p>Plugins don&rsquo;t have access to the Kuzzle instance. Instead, Kuzzle provides a plugin <code class="prettyprint">context</code> to the <code class="prettyprint">plugin.init()</code> function.</p>
 
@@ -4539,6 +4561,10 @@ There are two ways of changing a plugin configuration.</p>
 <th>Purpose</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><code class="prettyprint">Dsl</code></td>
+<td>Constructor allowing plugins to instantiate a Kuzzle DSL instance</td>
+</tr>
 <tr>
 <td><code class="prettyprint">RequestObject</code></td>
 <td>Constructor for standardized requests sent to Kuzzle</td>
@@ -4565,13 +4591,71 @@ There are two ways of changing a plugin configuration.</p>
 </tr>
 </tbody></table>
 
-<h4 id="architecture">Architecture</h4>
+<h3 id="dsl-constructor"><code class="prettyprint">Dsl</code> constructor</h3>
 
-<p>Your main javascript file in your plugin must have a function <code class="prettyprint">init</code> and expose a <code class="prettyprint">hooks</code> and/or a <code class="prettyprint">pipes</code> and/or a <code class="prettyprint">controllers</code> object. All functions defined in these files must be exposed as main object.</p>
+<p>The DSL constructor provided in the plugin context gives access to Kuzzle real-time filtering capabilities. It allows managing filters, and testing data to get a list of matching filters.</p>
 
-<h4 id="the-plugin-init-function">The plugin init function</h4>
+<p>Each plugin can instantiate its own sandboxed DSL instance:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">dsl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Dsl</span><span class="p">();</span>
+</code></pre>
 
-<p>All plugins must expose a <code class="prettyprint">init</code> function. Its purpose is to initialize the plugins according to its configuration.</p>
+<p>The DSL exposes the following methods:</p>
+
+<h5 id="createfilterid-index-collection-filters"><code class="prettyprint">createFilterId(index, collection, filters)</code></h5>
+
+<p>Creates a filter unique ID using the provided arguments.</p>
+
+<p>The calculation is predictable, meaning that the resulting filter ID will always be the same if invoked multiple times with the same arguments.</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>A <code class="prettyprint">string</code> containing the filter unique ID.</p>
+
+<h5 id="register-filterid-index-collection-filters"><code class="prettyprint">register(filterId, index, collection, filters)</code></h5>
+
+<p>Registers a filter to the DSL.</p>
+
+<p>The <code class="prettyprint">filterId</code> argument can be handled by the caller, or it can be calculated using the <code class="prettyprint">createFilterId</code> method.</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>A <code class="prettyprint">promise</code> resolving to the successfully added <code class="prettyprint">filterId</code>.</p>
+
+<h5 id="remove-filterid"><code class="prettyprint">remove(filterId)</code></h5>
+
+<p>Removes all references to a given filter from the DSL</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>A <code class="prettyprint">promise</code> resolved once the filter has been completely removed from the DSL</p>
+
+<h5 id="test-index-collection-data-documentid"><code class="prettyprint">test(index, collection, data, [documentId])</code></h5>
+
+<p>Test data against filters in the filters tree, returning matching filter IDs, if any.</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>A <code class="prettyprint">promise</code> resolving to an array of <code class="prettyprint">filterId</code> matching the provided data (and/or documentId, if any)</p>
+
+<h5 id="exists-index-collection"><code class="prettyprint">exists(index, collection)</code></h5>
+
+<p>Returns a boolean indicating if filters exist for an index-collection pair</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>Returns <code class="prettyprint">true</code> if at least one filter exists on the provided index-collection pair, returns <code class="prettyprint">false</code> otherwise</p>
+
+<h5 id="getfilterids-index-collection"><code class="prettyprint">getFilterIds(index, collection)</code></h5>
+
+<p>Retrieves filter IDs registered on an index-collection pair</p>
+
+<p><strong>Returns:</strong></p>
+
+<p>An <code class="prettyprint">array</code> of <code class="prettyprint">filterId</code> corresponding to filters registered on an index-collection pair.</p>
+
+<h3 id="the-plugin-init-function">The plugin init function</h3>
+
+<p>All plugins <em>must</em> expose a <code class="prettyprint">init</code> function. Its purpose is to initialize the plugins according to its configuration.</p>
 
 <p>Kuzzle calls these <code class="prettyprint">init</code> function at startup, during initialization.</p>
 
@@ -4585,7 +4669,9 @@ There are two ways of changing a plugin configuration.</p>
 
 <h3 id="gt-listener-plugins">&gt; Listener plugins</h3>
 
-<p>Hook events are triggered and are non-blocking functions. Listener plugins are configured to be called on these hooks.</p>
+<p><code class="prettyprint">listener</code> plugins simply listen to events, and are supplied with these events data. These plugins cannot change the provided data, and Kuzzle does not wait for them to process the data either.</p>
+
+<p>To configure a plugin as a <code class="prettyprint">listener</code> on some events, simply expose a <code class="prettyprint">hooks</code> variable in the plugin context, listing events and the names of plugin functions to execute.</p>
 <pre class="highlight javascript"><code><span class="c1">// Somewhere in Kuzzle</span>
 <span class="nx">kuzzle</span><span class="p">.</span><span class="nx">pluginsManager</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">'event:hookEvent'</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
 </code></pre>
@@ -4613,8 +4699,12 @@ There are two ways of changing a plugin configuration.</p>
 
 <h3 id="gt-worker-plugins">&gt; Worker plugins</h3>
 
-<p>Every Hook plugin can be used as a Worker plugin, but Worker plugins can only be launched by the Server. If you set your configuration as <code class="prettyprint">&quot;loadedBy&quot;: &quot;worker&quot;</code>, the plugin will be ignored.<br>
-You can convert a Hook plugin into a Worker plugin by adding a <code class="prettyprint">threads</code> attribute to your plugin definition:</p>
+<p>A <code class="prettyprint">worker</code> plugin is simply a <code class="prettyprint">listener</code> plugin running in different threads. This is especially useful to allow your plugin to perform cost-heavy operations without impeding Kuzzle performances.</p>
+
+<p>To convert a <code class="prettyprint">listener</code> plugin to a <code class="prettyprint">worker</code> one, just add the following attribute to the plugin configuration: <code class="prettyprint">threads: &lt;number of threads&gt;</code>
+If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.</p>
+
+<p><strong>Note:</strong> <code class="prettyprint">worker</code> plugins can only be launched by server instances of Kuzzle.</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
     </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/var/kuzzle-plugin-very-useful"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -4625,36 +4715,32 @@ You can convert a Hook plugin into a Worker plugin by adding a <code class="pret
   </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>The <code class="prettyprint">threads</code> value correspond to the number of processes that will be launched.</p>
-
 <h3 id="gt-pipe-plugins">&gt; Pipe plugins</h3>
 
-<p>When a pipe event is triggered, we are waiting for all plugins attached on this event. A plugin attached on a pipe event has access to the data and can even change them.
-A pipe plugin constructor must take in its last parameter a callback. This callback must be called at the end of the function with <code class="prettyprint">callback(error, object)</code>:</p>
+<p><code class="prettyprint">pipe</code> plugins, like <code class="prettyprint">listener</code> plugins, are attached to Kuzzle events, and they are supplied with these events data.  </p>
+
+<p>But unlike <code class="prettyprint">listener</code> plugins, <code class="prettyprint">pipe</code> plugins can modify the provided data, and Kuzzle wait for these plugin to process it. <code class="prettyprint">pipe</code> plugins can even invalidate data, resulting to an error returned to the original client.</p>
+
+<p>For this reason, Kuzzle enforce a timeout on data processing, rejecting the data altogether if a <code class="prettyprint">pipe</code> plugin fails to respond in a timely fashion, and forwarding an error to the original client.</p>
+
+<p><code class="prettyprint">pipe</code> plugins functions must take a callback as their last parameter, and this callback must be called at the end of the processing with <code class="prettyprint">callback(error, object)</code>:</p>
 
 <ul>
-<li>error: if there is an error during the function, this parameter must be set with one of the available Error types. If everything is ok, you can call the function with null</li>
-<li>object: the object to pass to the next function</li>
+<li>error: if there is an error during the function, this parameter must be set with one of the available Error object provided by the plugin context. Otherwise, set it to <code class="prettyprint">null</code></li>
+<li>object: the resulting data, given back to Kuzzle for processing</li>
 </ul>
 
-<p>Plugins are called in chain. When the <code class="prettyprint">callback()</code> function is called, the next function attached on the event is triggered.<br>
-If the plugin fails to call the callback before timeout, Kuzzle will raise an error and forward it to the requesting clients.</p>
+<p><code class="prettyprint">pipe</code> plugins are called in chain. When the <code class="prettyprint">callback()</code> function is called, the next <code class="prettyprint">pipe</code> plugin function attached on the event is triggered.<br>
+The order of plugin execution is not guaranteed.</p>
 
-<p>Pipe plugins are useful when you want to modify or validate an object.</p>
-<pre class="highlight javascript"><code><span class="c1">// Somewhere in Kuzzle</span>
-<span class="nx">kuzzle</span><span class="p">.</span><span class="nx">pluginsManager</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">'event:pipeEvent'</span><span class="p">,</span> <span class="nx">requestObject</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">modifiedRequestObject</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// do something</span>
-  <span class="p">});</span>
-</code></pre>
+<p>The following plugin example adds a <code class="prettyprint">createdAt</code> attribute to all new documents:</p>
 <pre class="highlight javascript"><code><span class="c1">// Plugin pipes configuration</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s1">'event:pipeEvent'</span><span class="p">:</span> <span class="s1">'addCreatedAt'</span>
+  <span class="s1">'data:beforeCreate'</span><span class="p">:</span> <span class="s1">'addCreatedAt'</span>
 <span class="p">}</span>
 </code></pre>
-<pre class="highlight javascript"><code><span class="c1">// In main plugin index file</span>
+<pre class="highlight javascript"><code><span class="c1">// In the main plugin index file</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
   <span class="k">this</span><span class="p">.</span><span class="nx">pipes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config/pipes.js'</span><span class="p">);</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">isDummy</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// do something</span>
@@ -4666,8 +4752,6 @@ If the plugin fails to call the callback before timeout, Kuzzle will raise an er
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
-<p>In this example, in Kuzzle, the <code class="prettyprint">modifiedRequestObject</code> has now a <code class="prettyprint">createdAt</code> attribute.</p>
 
 <h3 id="gt-controllers">&gt; Controllers</h3>
 

@@ -14,7 +14,7 @@ If you are running Docker and just want to get your own Kuzzle running, you can 
 You don't have to clone kuzzle to use it.
 </aside>
 
-- Get our official [`docker-compose.yml` file](https://github.com/kuzzleio/kuzzle/blob/develop/docker-compose.yml):
+- Get our official [`docker-compose.yml` file](https://github.com/kuzzleio/kuzzle/blob/master/docker-compose.yml):
 
 ```shell
 wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml

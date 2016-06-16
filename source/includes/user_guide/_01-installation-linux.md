@@ -14,35 +14,19 @@ If you are running Docker and just want to get your own Kuzzle running, you can 
 You don't have to clone kuzzle to use it.
 </aside>
 
-- Create a `docker-compose.yml` with:
+- Get our official [`docker-compose.yml` file](https://github.com/kuzzleio/kuzzle/blob/develop/docker-compose.yml):
 
-```yml
-kuzzle:
-  image: kuzzleio/kuzzle:latest
-  ports:
-    - "7512:7512"
-    - "7511:7511"
-  links:
-    - elasticsearch
-    - redis
-
-redis:
-  image: redis:3.0
-
-elasticsearch:
-  image: elasticsearch:2.2
+```shell
+wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml
 ```
 
-<aside class="notice">
-You can also retrieve this file directly with curl/wget : <br />
-<code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
-</aside>
-
-- run: 
+- Run the following command:
 
 ```bash
 $ docker-compose up
 ```
+
+- Done!
 
 #### Reset Kuzzle and insert some fixtures with Docker
 
@@ -51,7 +35,7 @@ If you need to get a fresh start with all persistent data erased and populate it
 ```bash
 $ FIXTURES=path/to/the/fixtures/file.json docker-compose up
 ```
-    
+
 examples:
 
 ```javascript
@@ -122,10 +106,10 @@ $ FIXTURES=fixtures/file.json DEFAULT_MAPPING=mapping/file.json docker-compose u
 When you already have installed an old version of kuzzle, don't forget to update kuzzle's containers with:
 
 ```bash
-$ docker-compose -f <docker-compose-file.yml> pull 
+$ docker-compose -f <docker-compose-file.yml> pull
 ```
 
-##### Updating kuzzle's dependencies 
+##### Updating kuzzle's dependencies
 
 To ensure that Kuzzle's dependencies are up-to-date, run the command directly without log-in into the container:
 
@@ -154,7 +138,7 @@ $ vagrant up
 
 <aside class="notice">
 we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
-</aside> 
+</aside>
 
 #### Prerequisites
 

@@ -265,7 +265,7 @@ $ ./bin/kuzzle start --worker
 
 #### Run it again
 
-To run kuzzle again, you will need to redo following steps (prerequist are still need as well):
+To run kuzzle again, you will need to redo following steps (prerequist are still needed as well):
 
 ```bash
 # Proxy

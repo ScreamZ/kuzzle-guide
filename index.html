@@ -410,34 +410,20 @@ You don&rsquo;t have to clone kuzzle to use it.
 </aside>
 
 <ul>
-<li>Create a <code class="prettyprint">docker-compose.yml</code> with:</li>
+<li>Get our official <a href="https://github.com/kuzzleio/kuzzle/blob/develop/docker-compose.yml"><code class="prettyprint">docker-compose.yml</code> file</a>:</li>
 </ul>
-<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle:latest</span>
-  <span class="s">ports</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
-  <span class="s">links</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">elasticsearch</span>
-    <span class="pi">-</span> <span class="s">redis</span>
-
-<span class="s">redis</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">redis:3.0</span>
-
-<span class="s">elasticsearch</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">elasticsearch:2.2</span>
+<pre class="highlight shell"><code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml
 </code></pre>
 
-<aside class="notice">
-You can also retrieve this file directly with curl/wget : <br />
-<code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
-</aside>
-
 <ul>
-<li>run: </li>
+<li>Run the following command:</li>
 </ul>
 <pre class="highlight shell"><code><span class="gp">$ </span>docker-compose up
 </code></pre>
+
+<ul>
+<li>Done!</li>
+</ul>
 
 <h4 id="reset-kuzzle-and-insert-some-fixtures-with-docker">Reset Kuzzle and insert some fixtures with Docker</h4>
 
@@ -503,7 +489,7 @@ You can also retrieve this file directly with curl/wget : <br />
 <h5 id="updating-kuzzle-39-s-containers">Updating kuzzle&rsquo;s containers</h5>
 
 <p>When you already have installed an old version of kuzzle, don&rsquo;t forget to update kuzzle&rsquo;s containers with:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>docker-compose -f &lt;docker-compose-file.yml&gt; pull 
+<pre class="highlight shell"><code><span class="gp">$ </span>docker-compose -f &lt;docker-compose-file.yml&gt; pull
 </code></pre>
 
 <h5 id="updating-kuzzle-39-s-dependencies">Updating kuzzle&rsquo;s dependencies</h5>
@@ -532,7 +518,7 @@ You can also retrieve this file directly with curl/wget : <br />
 
 <aside class="notice">
 we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
-</aside> 
+</aside>
 
 <h4 id="prerequisites">Prerequisites</h4>
 

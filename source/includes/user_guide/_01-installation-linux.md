@@ -206,10 +206,10 @@ $ ./bin/kuzzle install
 
 #### Finally
 
-Start a server instance:
+Start a server instance (we override the default port to avoid a conflict with the proxy):
 
 ```bash
-$ ./bin/kuzzle start --server
+$ kuzzle_httpPort=17511 ./bin/kuzzle start --server
 ```
 
 And then start as many worker instances as you want. At least one worker is required:
@@ -243,7 +243,7 @@ $ export WRITE_ENGINE_HOST=localhost:9200
 $ export CACHE_HOST=localhost
 $ export CACHE_PORT=6379
 $ ./bin/kuzzle install
-$ ./bin/kuzzle start --server
+$ kuzzle_httpPort=17511 ./bin/kuzzle start --server
 $ ./bin/kuzzle start --worker
 ```
 
@@ -262,7 +262,7 @@ $ export READ_ENGINE_HOST=localhost:9200
 $ export WRITE_ENGINE_HOST=localhost:9200
 $ export CACHE_HOST=localhost
 $ export CACHE_PORT=6379
-$ ./bin/kuzzle start --server
+$ kuzzle_httpPort=17511 ./bin/kuzzle start --server
 $ ./bin/kuzzle start --worker
 ```
 

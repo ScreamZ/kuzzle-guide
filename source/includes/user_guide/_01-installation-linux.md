@@ -148,6 +148,30 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 #### Step one
 
+Retrieve the Kuzzle proxy source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle-proxy.git):
+
+```bash
+$ git clone https://github.com/kuzzleio/kuzzle-proxy.git
+$ cd kuzzle-proxy
+```
+
+then install the dependencies:
+
+```bash
+$ npm install
+$ npm run plugins
+```
+
+#### Step two
+
+Start a proxy instance:
+
+```bash
+$ npm start
+```
+
+#### Step three
+
 Retrieve the Kuzzle source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle.git):
 
 ```bash
@@ -161,7 +185,7 @@ then install the dependencies:
 $ npm install
 ```
 
-#### Step two
+#### Step four
 
 Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:
 
@@ -172,8 +196,7 @@ $ export CACHE_HOST=localhost
 $ export CACHE_PORT=6379
 ```
 
-
-#### Step three
+#### Step five
 
 Install the default plugins:
 
@@ -204,6 +227,14 @@ $ bin/kuzzle start --help
 #### All steps in one
 
 ```bash
+# Proxy
+$ git clone https://github.com/kuzzleio/kuzzle-proxy.git
+$ cd kuzzle-proxy
+$ npm install
+$ npm run plugins
+$ npm start
+
+# Kuzzle
 $ git clone https://github.com/kuzzleio/kuzzle.git
 $ cd kuzzle
 $ npm install
@@ -212,6 +243,25 @@ $ export WRITE_ENGINE_HOST=localhost:9200
 $ export CACHE_HOST=localhost
 $ export CACHE_PORT=6379
 $ ./bin/kuzzle install
+$ ./bin/kuzzle start --server
+$ ./bin/kuzzle start --worker
+```
+
+#### Run it again
+
+To run kuzzle again, you will need to redo following steps (prerequisites are still needed as well):
+
+```bash
+# Proxy
+$ cd kuzzle-proxy
+$ npm start
+
+# Kuzzle
+$ cd kuzzle
+$ export READ_ENGINE_HOST=localhost:9200
+$ export WRITE_ENGINE_HOST=localhost:9200
+$ export CACHE_HOST=localhost
+$ export CACHE_PORT=6379
 $ ./bin/kuzzle start --server
 $ ./bin/kuzzle start --worker
 ```

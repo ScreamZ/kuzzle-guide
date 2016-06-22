@@ -530,6 +530,24 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 <h4 id="step-one">Step one</h4>
 
+<p>Retrieve the Kuzzle proxy source code from the <a href="https://github.com/kuzzleio/kuzzle-proxy.git">GitHub repo</a>:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle-proxy.git
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
+</code></pre>
+
+<p>then install the dependencies:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>npm install
+<span class="gp">$ </span>npm run plugins
+</code></pre>
+
+<h4 id="step-two">Step two</h4>
+
+<p>Start a proxy instance:</p>
+<pre class="highlight shell"><code><span class="gp">$ </span>npm start
+</code></pre>
+
+<h4 id="step-three">Step three</h4>
+
 <p>Retrieve the Kuzzle source code from the <a href="https://github.com/kuzzleio/kuzzle.git">GitHub repo</a>:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
 <span class="gp">$ </span><span class="nb">cd </span>kuzzle
@@ -539,7 +557,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <pre class="highlight shell"><code><span class="gp">$ </span>npm install
 </code></pre>
 
-<h4 id="step-two">Step two</h4>
+<h4 id="step-four">Step four</h4>
 
 <p>Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
@@ -548,7 +566,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
 </code></pre>
 
-<h4 id="step-three">Step three</h4>
+<h4 id="step-five">Step five</h4>
 
 <p>Install the default plugins:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
@@ -569,7 +587,15 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 </code></pre>
 
 <h4 id="all-steps-in-one">All steps in one</h4>
-<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
+<pre class="highlight shell"><code><span class="c"># Proxy</span>
+<span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle-proxy.git
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
+<span class="gp">$ </span>npm install
+<span class="gp">$ </span>npm run plugins
+<span class="gp">$ </span>npm start
+
+<span class="c"># Kuzzle</span>
+<span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
 <span class="gp">$ </span><span class="nb">cd </span>kuzzle
 <span class="gp">$ </span>npm install
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
@@ -577,6 +603,23 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
 <span class="gp">$ </span>./bin/kuzzle install
+<span class="gp">$ </span>./bin/kuzzle start --server
+<span class="gp">$ </span>./bin/kuzzle start --worker
+</code></pre>
+
+<h4 id="run-it-again">Run it again</h4>
+
+<p>To run kuzzle again, you will need to redo following steps (prerequisites are still needed as well):</p>
+<pre class="highlight shell"><code><span class="c"># Proxy</span>
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
+<span class="gp">$ </span>npm start
+
+<span class="c"># Kuzzle</span>
+<span class="gp">$ </span><span class="nb">cd </span>kuzzle
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
 <span class="gp">$ </span>./bin/kuzzle start --server
 <span class="gp">$ </span>./bin/kuzzle start --worker
 </code></pre>

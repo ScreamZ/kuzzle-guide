@@ -574,8 +574,8 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 <h4 id="finally">Finally</h4>
 
-<p>Start a server instance:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle start --server
+<p>Start a server instance (we override the default port to avoid a conflict with the proxy):</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
 </code></pre>
 
 <p>And then start as many worker instances as you want. At least one worker is required:</p>
@@ -603,7 +603,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
 <span class="gp">$ </span>./bin/kuzzle install
-<span class="gp">$ </span>./bin/kuzzle start --server
+<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
 <span class="gp">$ </span>./bin/kuzzle start --worker
 </code></pre>
 
@@ -620,7 +620,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
-<span class="gp">$ </span>./bin/kuzzle start --server
+<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
 <span class="gp">$ </span>./bin/kuzzle start --worker
 </code></pre>
 

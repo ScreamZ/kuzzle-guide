@@ -24,6 +24,8 @@ includes:
   - core_documentation/03-security
   - plugins/index
   - plugins/01-managing-plugins-cli
+  - plugins/02-plugin-prerequisites
+  - plugins/03-plugin-context
 
 search: true
 ---
@@ -78,7 +80,7 @@ Welcome to the Kuzzle developer guide
     <a href="#plugins">
         <div class="panel-title"><i class="icon icon-puzzle"></i> Plugins</div>
         <div class="panel-content">
-            <span>Learn more about plugins</span>
+            <span>Learn how to create plugins</span>
             <button>Read the documentation</button>
         </div>
     </a>

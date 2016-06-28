@@ -1,6 +1,6 @@
 ## Creating plugins
 
-### Listener plugins
+### > Listener plugins
 
 `listener` plugins simply listen to events, and are supplied with these events data. These plugins cannot change the provided data, and Kuzzle does not wait for them to process the data either.
 
@@ -31,7 +31,7 @@ module.exports = function () {
 }
 ```
 
-### Worker plugins
+### > Worker plugins
 
 A `worker` plugin is simply a `listener` plugin running in separate threads. This is especially useful when you have to perform cost-heavy operations without impeding Kuzzle performances.
 
@@ -57,7 +57,7 @@ Plugin configuration example:
 ```
 
 
-### Pipe plugins
+### > Pipe plugins
 
 `pipe` plugins, like `listener` plugins, are attached to Kuzzle events, and they are supplied with these events data.  
 
@@ -69,6 +69,8 @@ For this reason, Kuzzle enforces a timeout on data processing, rejecting the dat
 
 * `error`: if there is an error during the function, this parameter must be set with one of the available Error object provided by the plugin context. Otherwise, set it to `null`
 * `object`: the resulting data, given back to Kuzzle for processing
+
+<aside class="warning">The resulting data <b>MUST BE</b> of the same type than the provided one. For instance, a "before..." event provides a pipe plugin with a "RequestObject" object, and the plugin <b>MUST</b> return a "RequestObject"</aside>
 
 `pipe` plugins are called in chain. When the `callback()` function is called, the next `pipe` plugin function attached on the event is triggered.   
 The order of plugin execution is not guaranteed.
@@ -97,7 +99,7 @@ module.exports = function () {
 }
 ```
 
-### Controllers
+### > Controllers
 
 `controller` plugins extend Kuzzle API by adding a new controller and its associated actions (see [API reference](http://kuzzle.io/api-reference/#common-attributes)).
 
@@ -215,7 +217,7 @@ module.exports = function () {
 ```
 
 
-### Protocol plugins
+### > Protocol plugins
 
 Kuzzle core only supports REST communications. All other supported protocols are implemented as `protocol` plugins.  
 By default, the Kuzzle official docker image is shipped with the [Socket.io](https://github.com/kuzzleio/kuzzle-plugin-socketio) `protocol` plugin.
@@ -334,7 +336,7 @@ module.exports = function () {
 ```
 
 
-### Authentication plugin
+### > Authentication plugin
 
 Kuzzle allows users to log in, and the supported authentication strategies can be extended using `authentication` plugins.
 

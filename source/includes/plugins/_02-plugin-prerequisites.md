@@ -1,6 +1,6 @@
 ## Plugin creation prerequisites
 
-### Plugin default configuration
+### > Plugin default configuration
 
 All plugins must have a `package.json` file on their root directory, containing a `pluginInfo` entry.
 
@@ -19,7 +19,7 @@ Default configuration example:
 }
 ```
 
-### Special plugin configurations
+### > Special plugin configurations
 
 Additionally to plugins' custom configuration, there are a few reserved words used by Kuzzle to configure how a plugin is loaded:
 
@@ -41,7 +41,7 @@ Where:
 |`threads`|`unsigned integer`|`0`| If > 0, the plugin will be treated as a worker plugin (see below) |
 |`privileged`|`boolean`|`false`| If `true`, the plugin is loaded with privileged access to the running Kuzzle instance (see Plugin Context below)<br/>Ignored if `threads` is greater than `0` |
 
-### Plugin init function
+### > Plugin init function
 
 Plugins must expose a ``init`` function. Its purpose is to initialize the plugin according to its configuration.
 

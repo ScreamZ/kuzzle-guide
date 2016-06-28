@@ -18,7 +18,7 @@ Here is the list of shared objects contained in the provided ``context``:
 | `context.constructors.ResponseObject` | Constructor for the standardized Kuzzle response objects |
 | `errors.<ErrorConstructor>` |Kuzzle error constructors, built dynamically from available Kuzzle error objects at runtime|
 
-### Accessor: `passport`
+### > Accessor: `passport`
 
 The `passport` accessor allow authentication plugins to register a new login strategy to Kuzzle.
 
@@ -54,7 +54,7 @@ function verify (username, password, done) {
 pluginContext.accessors.passport.use(new LocalStrategy(verify.bind(this)));
 ```
 
-### Accessor: `router`
+### > Accessor: `router`
 
 The `router` accessor allows protocol plugins to interface themselves with Kuzzle. This accessor exposes the following methods:
 
@@ -102,7 +102,7 @@ Not calling this method after a connection is dropped will result in a memory-le
 |`context`|`object`| Object identifying the connection context. Obtained by calling `newConnection()`|
 
 
-### Accessor: `users`
+### > Accessor: `users`
 
 The `users` accessor provides methods for handling users. This accessor is mainly used by authentication plugins.
 
@@ -136,7 +136,7 @@ Loads a user from Kuzzle
 
 A `promise` resolving to a `user` object containing the user information.
 
-### Constructor: `Dsl`
+### > Constructor: `Dsl`
 
 The DSL constructor provided in the plugin context gives access to [Kuzzle real-time filtering capabilities](http://kuzzle.io/guide/#filtering-syntax). It allows managing filters, and testing data to get a list of matching filters.
 
@@ -250,7 +250,7 @@ Retrieves filter IDs registered on an index-collection pair
 
 An `array` of `filterId` corresponding to filters registered on an index-collection pair.
 
-### Constructor: `RequestObject`
+### > Constructor: `RequestObject`
 
 This constructor is used to transform an [API request](http://kuzzle.io/api-reference/?websocket#common-attributes) into a standardized Kuzzle request.
 
@@ -296,7 +296,7 @@ var requestObject = new context.constructors.RequestObject({
 
 Please refer to our [API Reference](kuzzle.io/api-reference/?websocket) for a complete list of controllers-actions and their purposes.
 
-### Constructor: `ResponseObject`
+### > Constructor: `ResponseObject`
 
 This constructor creates a standardized Kuzzle Response object from a `RequestObject` and response data.
 
@@ -329,7 +329,7 @@ This constructor creates a standardized Kuzzle Response object from a `RequestOb
 
 Transforms the `ResponseObject` object into a plain-old JSON object following [Kuzzle standard response format](http://kuzzle.io/api-reference/?websocket#kuzzle-response)
 
-### Error: `BadRequestError`
+### > Error: `BadRequestError`
 
 **Status Code:** `400`
 
@@ -339,7 +339,7 @@ Used to notify about badly formed requests.
 var err = new context.errors.BadRequestError('error message');
 ```
 
-### Error: `ForbiddenError`
+### > Error: `ForbiddenError`
 
 **Status Code:** `403`
 
@@ -349,7 +349,7 @@ Used when a user tries to use resources beyond his access rights.
 var err = new context.errors.ForbiddenError('error message');
 ```
 
-### Error: `GatewayTimeoutError`
+### > Error: `GatewayTimeoutError`
 
 **Status Code:** `504`
 
@@ -359,7 +359,7 @@ Used when a plugin takes too long to perform a task.
 var err = new context.errors.GatewayTimeoutError('error message');
 ```
 
-### Error: `InternalError`
+### > Error: `InternalError`
 
 **Status Code:** `500`
 
@@ -369,7 +369,7 @@ Standard generic error. Used for uncatched exceptions.
 var err = new context.errors.InternalError('error message');
 ```
 
-### Error: `NotFoundError`
+### > Error: `NotFoundError`
 
 **Status Code:** `404`
 
@@ -379,7 +379,7 @@ Used when asked resources cannot be found.
 var err = new context.errors.NotFoundError('error message');
 ```
 
-### Error: `ParseError`
+### > Error: `ParseError`
 
 **Status Code:** `400`
 
@@ -389,7 +389,7 @@ Used when a provided resource cannot be interpreted.
 var err = new context.errors.ParseError('error message');
 ```
 
-### Error: `PartialError`
+### > Error: `PartialError`
 
 **Status Code:** `206`
 
@@ -402,7 +402,7 @@ var err = new context.errors.PartialError('error message', [{this: 'failed'}, {a
 ```
 
 
-### Error: `PluginImplementationError`
+### > Error: `PluginImplementationError`
 
 **Status Code:** `500`
 
@@ -412,7 +412,7 @@ Used when a plugin fails.
 var err = new context.errors.PluginImplementationError('error message');
 ```
 
-### Error: `ServiceUnavailableError`
+### > Error: `ServiceUnavailableError`
 
 **Status Code:** `503`
 
@@ -422,7 +422,7 @@ Used when a resource cannot respond because it is temporarily unavailable.
 var err = new context.errors.ServiceUnavailableError('error message');
 ```
 
-### Error: `UnauthorizedError`
+### > Error: `UnauthorizedError`
 
 **Status Code:** `401`
 

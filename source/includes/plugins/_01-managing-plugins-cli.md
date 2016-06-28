@@ -29,7 +29,7 @@ Options:
 
 <aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
 
-### List installed plugins
+### > List installed plugins
 
 You can get an overview of installed plugins and their activation status using the ``--list`` option:
 
@@ -40,7 +40,7 @@ kuzzle-plugin-logger (activated)
 kuzzle-plugin-auth-passport-oauth (disabled)
 ```
 
-### Install a plugin
+### > Install a plugin
 
 Kuzzle CLI is able to install a plugin from the NPM public registry, from a GIT repository, or from a plain directory accessible to Kuzzle instances.  
 The corresponding installation options are: `--npmVersion`, `--gitUrl` and `--path`.
@@ -67,7 +67,7 @@ $ kuzzle plugins --install --gitUrl https://git.repository.url/project/pluginsRe
 $ kuzzle plugins --install --path /directory/absolute/path plugin_name
 ```
 
-### View plugin configuration
+### > View plugin configuration
 
 To view a plugin configuration, use the `--get` option.
 
@@ -81,7 +81,7 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
   config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
 ```
 
-### Modify a plugin configuration
+### > Modify a plugin configuration
 
 Plugins configurations are stored in the `config` part of plugins properties.
 
@@ -141,7 +141,7 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
   config: { port: 7512, room: 'foobar', loadedBy: 'server', foo: 'bar' } }
 ```
 
-### Removing a plugin configuration property
+### > Removing a plugin configuration property
 
 You can remove a plugin configuration property by using the ``--unset`` action:
 
@@ -157,7 +157,7 @@ $ kuzzle plugins --unset room kuzzle-plugin-socketio
   config: { port: '7512', loadedBy: 'server' } }
 ```
 
-### Uninstalling a plugin
+### > Uninstalling a plugin
 
 Plugins can be uninstalled using the ``--remove`` option. If the plugin has been installed from NPM or from a GIT repository, the plugin installation directory will also be deleted.
 
@@ -169,7 +169,7 @@ $ kuzzle plugins --remove kuzzle-plugin-socketio
 ███ kuzzle-plugin: Plugin directory deleted
 ```
 
-### Activating/Deactivating a plugin
+### > Activating/Deactivating a plugin
 
 By default, a plugin is activated when installed, meaning it will be loaded and used by Kuzzle on the next restart.
 

@@ -27,6 +27,7 @@ includes:
   - plugins/02-plugin-prerequisites
   - plugins/03-plugin-context
   - plugins/04-creating-plugins
+  - plugins/05-kuzzle-events
 
 search: true
 ---

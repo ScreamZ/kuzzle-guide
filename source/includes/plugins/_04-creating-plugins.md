@@ -383,7 +383,7 @@ module.exports = function MyAuthenticationPlugin () {
 };
 ```
 
-#### Module strategy example, using the LocalStrategy strategy
+#### Authentication plugin example, using the LocalStrategy strategy
 
 <aside class="notice">Passport strategy constructors take a "verify" callback. As the following example demonstrates, if the provided callback uses "this.[attribute]" attributes, then it's necessary to bind the provided callback to the plugin's context</aside>
 
@@ -406,7 +406,7 @@ module.exports = function MyAuthenticationPlugin () {
       done(null, {some: "user information"});
     }
     else {
-      done(this.context.errors.ForbiddenError('Login failed'));
+      done(new this.context.errors.ForbiddenError('Login failed'));
     }
   };
 };

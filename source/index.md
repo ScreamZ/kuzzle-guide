@@ -26,6 +26,7 @@ includes:
   - plugins/01-managing-plugins-cli
   - plugins/02-plugin-prerequisites
   - plugins/03-plugin-context
+  - plugins/04-creating-plugins
 
 search: true
 ---

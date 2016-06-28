@@ -8,7 +8,8 @@ Each plugin receives its own plugin context instance.
 Here is the list of shared objects contained in the provided ``context``:
 
 | Attribute path | Purpose                      |
-|--------|------------------------------|
+|----------------|------------------------------|
+| `context.accessors.passport` | Access to Kuzzle [Passport](http://passportjs.org) instance |
 | `context.accessors.router` | Access to Kuzzle protocol communication system |
 | `context.accessors.users` | Access to users management, especially useful for authentication plugins |
 | `context.config` | Contains the entire Kuzzle instance configuration (most of it coming from `.kuzzlerc`) |
@@ -16,6 +17,42 @@ Here is the list of shared objects contained in the provided ``context``:
 | `context.constructors.RequestObject` | Constructor for standardized requests sent to Kuzzle |
 | `context.constructors.ResponseObject` | Constructor for the standardized Kuzzle response objects |
 | `errors.<ErrorConstructor>` |Kuzzle error constructors, built dynamically from available Kuzzle error objects at runtime|
+
+### Accessor: `passport`
+
+The `passport` accessor allow authentication plugins to register a new login strategy to Kuzzle.
+
+This accessor exposes the following method:
+
+##### `use(strategy)`
+
+Implements [Passport `use()` method](http://passportjs.org/docs/configure)
+
+**Arguments:**
+
+| Name | Type | Description                      |
+|------|------|----------------------------------|
+| `strategy` | `Strategy object` | A Passport instantiated strategy object |
+
+<aside class="notice">Passport strategy constructors take a "verify" callback. As the following example demonstrates, if the provided callback uses "this.[attribute]" attributes, then it's necessary to bind the provided callback to the plugin's context</aside>
+
+Example:
+
+```js
+var LocalStrategy = require('passport-local').Strategy;
+
+function verify (username, password, done) {
+  // verification code
+  if (userVerified) {
+    done(null, userInformation);
+  }
+  else {
+    done(error);
+  }
+}
+
+pluginContext.accessors.passport.use(new LocalStrategy(verify.bind(this)));
+```
 
 ### Accessor: `router`
 
@@ -361,7 +398,7 @@ Used when a request only partially succeeded.
 The constructor takes an additional `array` argument containing a list of failed parts.
 
 ```js
-var err = new context.errors.PartialError('error message', [{this: 'failed'}, {this: 'failed too'}]);
+var err = new context.errors.PartialError('error message', [{this: 'failed'}, {andThis: 'failed too'}]);
 ```
 
 
@@ -379,7 +416,7 @@ var err = new context.errors.PluginImplementationError('error message');
 
 **Status Code:** `503`
 
-Used when a resource couldn't respond because it is temporarily unavailable.
+Used when a resource cannot respond because it is temporarily unavailable.
 
 ```js
 var err = new context.errors.ServiceUnavailableError('error message');

@@ -20,7 +20,7 @@ Here is the list of shared objects contained in the provided ``context``:
 
 ### > Accessor: `passport`
 
-The `passport` accessor allow [authentication plugins](http://kuzzle.io/guide//#gt-authentication-plugin) to register a new login strategy to Kuzzle.
+The `passport` accessor allow [authentication plugins](/#gt-authentication-plugin) to register a new login strategy to Kuzzle.
 
 This accessor exposes the following method:
 
@@ -115,7 +115,7 @@ Creates a new user in Kuzzle. Will return an error if the user already exists.
 | Name | Type | Default Value | Description                      |
 |------|------|---------------|----------------------------------|
 |`loginName`|`string`| | Name of the user's login to create |
-|`userProfile`|`string`|`default`| [User profile](http://kuzzle.io/guide/#permissions) |
+|`userProfile`|`string`|`default`| [User profile](#permissions) |
 |`userInfo`|`object`| `{}` | Misc. information about the user |
 
 ##### Returns
@@ -138,7 +138,7 @@ A `promise` resolving to a `user` object containing the user information.
 
 ### > Constructor: `Dsl`
 
-The DSL constructor provided in the plugin context gives access to [Kuzzle real-time filtering capabilities](http://kuzzle.io/guide/#filtering-syntax). It allows managing filters, and testing data to get a list of matching filters.
+The DSL constructor provided in the plugin context gives access to [Kuzzle real-time filtering capabilities](#filtering-syntax). It allows managing filters, and testing data to get a list of matching filters.
 
 Each plugin can instantiate its own sandboxed DSL instance:
 
@@ -160,7 +160,7 @@ The calculation is predictable, meaning that the resulting filter ID will always
 |------|------|----------------------------------|
 |`index`|`string`| Data index name |
 |`collection`|`string`| Data collection name |
-|`filters`|`object`| Filters in [Kuzzle DSL](http://kuzzle.io/guide/#filtering-syntax) format |
+|`filters`|`object`| Filters in [Kuzzle DSL](#filtering-syntax) format |
 
 ##### Returns
 
@@ -177,7 +177,7 @@ Registers a filter to the DSL.
 |`filterId`|`string`| Filter unique ID. Can be generated with `createFilterId` |
 |`index`|`string`| Data index name |
 |`collection`|`string`| Data collection name |
-|`filters`|`object`| Filters in [Kuzzle DSL](http://kuzzle.io/guide/#filtering-syntax) format |
+|`filters`|`object`| Filters in [Kuzzle DSL](#filtering-syntax) format |
 
 ##### Returns
 

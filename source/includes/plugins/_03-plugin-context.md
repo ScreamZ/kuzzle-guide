@@ -306,7 +306,7 @@ var requestObject = new context.constructors.RequestObject({
 |`RequestObject.timestamp`|`integer`| Request timestamp |
 
 
-Please refer to our [API Reference](kuzzle.io/api-reference/?websocket) for a complete list of controllers-actions and their purposes.
+Please refer to our [API Reference](http://kuzzle.io/api-reference/?websocket) for a complete list of controllers-actions and their purposes.
 
 ### > Constructor: `ResponseObject`
 

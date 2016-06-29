@@ -229,7 +229,7 @@ Events triggered to report general Kuzzle server activity.
 | Event | Controller| Action | Description | Input |
 |-------|-----------|--------|-------------|-------|
 |`server:httpStarted`		| / | / |Triggered when the http server is started.|Type: String|
-|`server:mqStarted`			| / | / |Triggered when the MQ server is started.|Type: String|
+|<font color="red">(Deprecated)</font> `server:mqStarted` | / | / |Triggered when the MQ server is started.|Type: String|
 |`server:overload`			| / | / |Triggered when the server overload|Type: String.<br> Contains the overload percentage with '%' character|
 
 ### > event: subscription

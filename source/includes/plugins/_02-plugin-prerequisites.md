@@ -54,4 +54,4 @@ Where:
 
 * ``config`` (JSON Object): JSON object containing the current plugin configuration
 * ``context`` (JSON Object): the plugin context (see "Plugin Context" section)
-* ``isDummy`` (boolean): when true, the plugin should mock asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)
+* ``isDummy`` (boolean): when true, asks the plugin to not really start itself, but instead mock its functionalities (useful when testing plugins, kuzzle, or both)

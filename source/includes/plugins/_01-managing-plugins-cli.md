@@ -45,6 +45,8 @@ kuzzle-plugin-auth-passport-oauth (disabled)
 Kuzzle CLI is able to install a plugin from the NPM public registry, from a GIT repository, or from a plain directory accessible to Kuzzle instances.  
 The corresponding installation options are: `--npmVersion`, `--gitUrl` and `--path`.
 
+<aside class="notice">When installing a plugin from a directory path, make sure that all its dependencies have also been installed.</aside>
+
 Without a plugin `name` argument, the CLI will re-install (if needed) and refresh plugins configuration of all currently registered plugins.
 
 Here are a few examples to install and register plugins to Kuzzle:
@@ -104,7 +106,7 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 $ kuzzle plugins --set '{"room": "foobar", "foo": "bar"}' kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
-  config: { room: 'foobar', port: '7512', loadedBy: 'server', foo: 'bar' } }
+  config: { room: 'foobar', port: 7512, loadedBy: 'server', foo: 'bar' } }
 ```
 
 Replacing a plugin configuration on the command-line:
@@ -154,7 +156,7 @@ $ kuzzle plugins --get kuzzle-plugin-socketio
 $ kuzzle plugins --unset room kuzzle-plugin-socketio
 { npmVersion: '1.0.7',
   activated: true,
-  config: { port: '7512', loadedBy: 'server' } }
+  config: { port: 7512, loadedBy: 'server' } }
 ```
 
 ### > Uninstalling a plugin

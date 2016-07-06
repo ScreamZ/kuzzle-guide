@@ -22,7 +22,12 @@ includes:
   - core_documentation/01-architecture
   - core_documentation/02-request-scenarios
   - core_documentation/03-security
-  - core_documentation/04-plugins
+  - plugins/index
+  - plugins/01-managing-plugins-cli
+  - plugins/02-plugin-prerequisites
+  - plugins/03-plugin-context
+  - plugins/04-creating-plugins
+  - plugins/05-kuzzle-events
 
 search: true
 ---
@@ -55,7 +60,7 @@ Welcome to the Kuzzle developer guide
 
 <div class="panel">
     <a href="#user-guide">
-        <div class="panel-title"><i class="icon icon-get-started"></i> User guide</div>
+        <div class="panel-title"><i class="icon icon-contacts"></i> User guide</div>
         <div class="panel-content">
             <span>Learn more about how to use Kuzzle</span>
             <button>Read the guide</button>
@@ -68,6 +73,16 @@ Welcome to the Kuzzle developer guide
         <div class="panel-title"><i class="icon icon-get-started"></i> Core documentation</div>
         <div class="panel-content">
             <span>Learn more about how Kuzzle works</span>
+            <button>Read the documentation</button>
+        </div>
+    </a>
+</div>
+
+<div class="panel">
+    <a href="#plugins">
+        <div class="panel-title"><i class="icon icon-puzzle"></i> Plugins</div>
+        <div class="panel-content">
+            <span>Learn how to create plugins</span>
             <button>Read the documentation</button>
         </div>
     </a>

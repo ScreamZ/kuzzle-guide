@@ -56,6 +56,55 @@ var room =
     };
 ```
 
+### > ids
+
+This filter returns only documents having their unique document ID listed in the provided list.
+
+Given the following documents:
+
+```javascript
+{
+  _id: 'a',
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  _id: 'b',
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+},
+{
+  _id: 'c',
+  firstName: 'Marie',
+  lastName: 'Curie'
+}
+```
+
+The following filter validates first document:
+
+```javascript
+ids: {
+  values: ['a']
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  ids: {
+    values: ['a']
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
 ### > missing
 
 A filter matching documents with missing field.
@@ -105,9 +154,152 @@ var room =
     };
 ```
 
+### > range
+
+Filters documents with fields having number attributes within a certain range.
+
+The range filter accepts the following parameters:
+
+```gte``` Greater-than or equal to
+
+```gt``` Greater-than
+
+```lte``` Less-than or equal to
+
+```lt``` Less-than
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper',
+  age: 85,
+  city: 'NYC',
+  hobby: 'computer'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace',
+  age: 36
+  city: 'London',
+  hobby: 'computer'
+},
+{
+  firstName: 'Marie',
+  lastName: 'Curie',
+  age: 55,
+  city: 'Paris',
+  hobby: 'radium'
+}
+```
+
+The following filter validates the last two documents:
+
+```javascript
+range: {
+  age: {
+    gte: 36,
+    lt: 85
+  }
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  range: {
+    age: {
+      gte: 36,
+      lt: 85
+    }
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > regexp
+
+The `regexp` filter matches documents or messages attributes using perl-compatible regular expressions ([PCRE](https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions)).  
+You can test only 1 attribute per `regexp` filter.
+
+A `regexp` filter has the following structure, splitting the usual `/pattern/flags` into two parts:
+
+```json
+{
+  "regexp": {
+    "attributeToTest": {
+      "value": "search pattern",
+      "flags": "modifier flags"
+    }
+  }
+}
+```
+
+Or, if you don't wish to add any modifier flags:
+
+```json
+{
+  "regexp": {
+    "attributeToTest": "search pattern"
+  }
+}
+```
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+}
+```
+
+The following filter validates the first document:
+
+```javascript
+regexp: {
+  firstName: {
+    value: '^g\w+',
+    flags: 'i'
+  }
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  regexp: {
+    firstName: {
+      value: '^gr\w+',
+      flags: 'i'
+    }
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
 ### > term
 
-The `term` filter matches documents using string equality.
+The `term` filter matches documents or messages attributes using string equality.
 
 Given the following documents:
 
@@ -182,126 +374,6 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 var filter = {
   term: {
     firstName: ['Grace', 'Ada']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### > ids
-
-This filter returns only documents having their unique document ID listed in the provided list.
-
-Given the following documents:
-
-```javascript
-{
-  _id: 'a',
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  _id: 'b',
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-},
-{
-  _id: 'c',
-  firstName: 'Marie',
-  lastName: 'Curie'
-}
-```
-
-The following filter validates first document:
-
-```javascript
-ids: {
-  values: ['a']
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  ids: {
-    values: ['a']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### > range
-
-Filters documents with fields having number attributes within a certain range.
-
-The range filter accepts the following parameters:
-
-```gte``` Greater-than or equal to
-
-```gt``` Greater-than
-
-```lte``` Less-than or equal to
-
-```lt``` Less-than
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper',
-  age: 85,
-  city: 'NYC',
-  hobby: 'computer'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace',
-  age: 36
-  city: 'London',
-  hobby: 'computer'
-},
-{
-  firstName: 'Marie',
-  lastName: 'Curie',
-  age: 55,
-  city: 'Paris',
-  hobby: 'radium'
-}
-```
-
-The following filter validates the last two documents:
-
-```javascript
-range: {
-  age: {
-    gte: 36,
-    lt: 85
-  }
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  range: {
-    age: {
-      gte: 36,
-      lt: 85
-    }
   }
 };
 

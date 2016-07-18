@@ -18,9 +18,11 @@ The following diagram shows how request data is exchanged between the client app
 \#1. The REST client asks for a content using a HTTP GET Request
 
 For instance, to retrieve the document '739c26bc-7a09-469a-803d-623c4045b0cb' in the collection 'users':
-```GET http://kuzzle:7511/api/users/739c26bc-7a09-469a-803d-623c4045b0cb```
+```
+GET http://kuzzle:7511/api/users/739c26bc-7a09-469a-803d-623c4045b0cb
+```
 
-\#2. The HTTP router handles the input request and forward the message to the ```Funnel Controller```.
+\#2. The proxy forwards the input request throughs the ```HTTP Entry point``` to the ```Router```, who handles it and forwards the formatted message to the ```Funnel```.
 
 Sample message:
 
@@ -127,7 +129,7 @@ The following diagram shows how request data is exchanged between the client app
 
 ![read_scenario_websocket_details](./images/request-scenarios/read-websocket/details.png)
 
-\#1. The client application opens a Websocket connection and emit a "read" event containing the request
+\#1. The client application opens a Websocket connection to ```Kuzzle Proxy``` and emit a "read" event containing the request
 
 (see details in [API Documentation](http://kuzzleio.github.io/kuzzle-api-documentation/#socket-io))
 
@@ -151,8 +153,11 @@ Sample JS code :
   });
 ```
 
+\#2. The SocketIO plugin handles the input request and forwards the message to the ```Backend Broker```
 
-\#2. The SocketIO plugin handles the input request and forward the message to the ```Funnel Controller```
+\#3. The Backend Broker, sends the message to the server's ```Proxy Broker``` through an internal websocket connexion.
+
+\#4. The Proxy Broker forwards the input request throughs the ```Proxy Entry point``` to the ```Router```, who handles it and forwards the formatted message to the ```Funnel```.
 
 Sample message:
 
@@ -165,11 +170,11 @@ Sample message:
 }
 ```
 
-\#3. The ```Funnel Controller``` validates the message and forward the request to the ```Read Controller```
+\#5. The ```Funnel``` validates the message and forward the request to the ```Read Controller```
 
-\#4. The ```Read Controller``` calls the ```readEngine service```
+\#6. The ```Read Controller``` calls the ```readEngine service```
 
-\#5. The ```readEngine service``` performs an HTTP REST request to get the data from the data storage
+\#7. The ```readEngine service``` performs an HTTP REST request to get the data from the data storage
 
 Sample content retrieval from Elasticsearch:
 
@@ -194,7 +199,7 @@ Sample content retrieval from Elasticsearch:
 }
 ```
 
-\#6. Promises functions are resolved to forward the response message back to the SocketIO plugin
+\#8. Promises functions are resolved to forward the response message back to the Proxy Broker.
 
 Sample content resolved:
 
@@ -220,7 +225,10 @@ Sample content resolved:
   }
 }
 ```
-\#7. The SocketIO plugin emits a ```<requestId>``` event to the websocket client
+
+\#9. The Proxy Broker sends the response to the proxy's ```Backend Broker``` through the websocket connexion.
+
+\#10. The Proxy calls the plugin's callback, who emits a ```<requestId>``` event to the websocket client
 
 Sample response content:
 
@@ -249,140 +257,6 @@ Sample response content:
 }
 ```
 
-#### MQ broker
-
-Remember the [Architecture overview](#core-architecture) and focus on the components involved by reading actions:
-![read_scenario_mq_overview](./images/request-scenarios/read-mq/overview.png)
-
-The following diagram shows how request data is exchanged between the client application, the different Kuzzle components, and the external services:
-
-![read_scenario_mq_details](./images/request-scenarios/read-mq/details.png)
-
-\#1. The client application sends a message to a topic (MQTT), an ```amq.topic/kuzzle``` routing key (AMQP) or an ```amq.topic/kuzzle``` destination (STOMP).
-
-(see details in [API Documentation](http://kuzzle.io/api-reference/#message-queuing-protocols)).
-
-A MQTT client wishing to get responses back from Kuzzle must add a ```mqttClientId``` field to his message, and to subscribe to the ```mqtt.<mqttClientId>``` topic.
-
-AMQP and STOMP clients simply have to fill the ```replyTo``` metadata and to listen to the corresponding queue/destination.
-
-Sample STOMP request: retrieve the document ```739c26bc-7a09-469a-803d-623c4045b0cb``` in the collection ```users```:
-
-```
-SEND
-destination:/exchange/amq.topic/kuzzle
-reply-to:/temp-queue/739c26bc-7a09-469a-803d-623c4045b0cb
-content-type:application/json
-
-{
-  "index": "mainindex",
-  "collection": "users",
-  "controller": "read",
-  "action": "get",
-  "_id": "739c26bc-7a09-469a-803d-623c4045b0cb"
-}
-
-^@
-```
-
-\#2. The MQ plugin handles the input message and forwards it to the ```Funnel Controller```.
-
-Sample message:
-
-```json
-{
-  "index": "mainindex",
-  "collection": "users",
-  "controller": "read",
-  "action": "get",
-  "_id": "739c26bc-7a09-469a-803d-623c4045b0cb"
-}
-```
-
-\#3. The ```Funnel Controller``` validates the message and forward the request to the ```Read Controller```
-
-\#4. The ```Read Controller``` calls the ```readEngine service```
-
-\#5. The ```readEngine service``` performs an HTTP Rest request to get the data from the data storage
-
-Sample content retrieval from Elasticsearch:
-
-```json
-{
-  "_index": "mainindex",
-  "_type": "users",
-  "_id": "739c26bc-7a09-469a-803d-623c4045b0cb",
-  "_version": 1,
-  "found": true,
-  "_source": {
-      "firstName": "Grace",
-      "lastName": "Hopper",
-      "age": 85,
-      "location": {
-          "lat": 32.692742,
-          "lon": -97.114127
-      },
-      "city": "NYC",
-      "hobby": "computer"
-  }
-}
-```
-
-\#6. Promises functions are resolved to forward the response message back to the MQ plugin
-
-Sample content resolved:
-
-```json
-{
-  "data": {
-    "_index": "mainindex",
-    "_type": "users",
-    "_id": "739c26bc-7a09-469a-803d-623c4045b0cb",
-    "_version": 1,
-    "found": true,
-    "_source": {
-        "firstName": "Grace",
-        "lastName": "Hopper",
-        "age": 85,
-        "location": {
-            "lat": 32.692742,
-            "lon": -97.114127
-        },
-        "city": "NYC",
-        "hobby": "computer"
-    }
-  }
-}
-```
-
-\#7. The MQ plugin notifies the client with the response content.
-
-Sample response content:
-
-```json
-{
-  "status": 200,
-  "error": null,
-  "result": {
-    "_index": "mainindex",
-    "_type": "users",
-    "_id": "739c26bc-7a09-469a-803d-623c4045b0cb",
-    "_version": 1,
-    "found": true,
-    "_source": {
-        "firstName": "Grace",
-        "lastName": "Hopper",
-        "age": 85,
-        "location": {
-            "lat": 32.692742,
-            "lon": -97.114127
-        },
-        "city": "NYC",
-        "hobby": "computer"
-    }
-  }
-}
-```
 
 ### Subscribing and writing content to Kuzzle
 
@@ -413,9 +287,9 @@ Detailed workflow:
 
 ![persistence_scenario_details1](./images/request-scenarios/persistence/details1.png)
 
-\#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a MQ client (see [Reading scenarios](#reading-content-from-kuzzle))
+\#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a custom plugin protocol (see [Reading scenarios](#reading-content-from-kuzzle))
 
-\#2. The router handles the input request and forward the message to the ```Funnel Controller```
+\#2. The router handles the input request and forward the message to the ```Funnel```
 
 ```json
 {
@@ -437,7 +311,7 @@ Detailed workflow:
 }
 ```
 
-\#3. The ```Funnel Controller``` validates the message and forward the request to the ```Write Controller```
+\#3. The ```Funnel``` validates the message and forward the request to the ```Write Controller```
 
 \#4. The ```Write Controller``` triggers the ```Plugins Manager``` with a "data:create" event.<br/>
 The ```Plugins Manager``` calls all pipes and hooks configured by the active plugins (see [Plugin's documentation](#plugins)), and finally triggers the "add" event of the ```Write Hook```.<br/>
@@ -479,7 +353,7 @@ Detailed workflow:
 
 \#11. The ```Worker Listener``` that the ```Write Controller``` registered in step \#5. receive a notification from the ```Internal Broker```...
 
-\#12. ... and forwards it to the ```Write Controller```, who then forwards it to the ```Funnel Controller```, who in turn forwards it to ```Router Controller```...
+\#12. ... and forwards it to the ```Write Controller```, who then forwards it to the ```Funnel```, who in turn forwards it to ```Router Controller```...
 
 \#13. ... which sends a feedback to the client.
 
@@ -529,7 +403,7 @@ Sample Javascript code, using Websocket:
 ```
 
 
-\#2. The ```Router Controller``` interprets the input request and transfer the subscription message to the ```Funnel Controller```.
+\#2. The ```Router``` interprets the input request and transfer the subscription message to the ```Funnel```.
 
 Sample message:
 ```json
@@ -544,7 +418,7 @@ Sample message:
 }
 ```
 
-\#3. The ```Funnel Controller``` validates the message and transfer it to the ```Subscribe Controller```.
+\#3. The ```Funnel``` validates the message and transfer it to the ```Subscribe Controller```.
 
 \#4. The ```Subscribe Controller``` calls the ```HotelClerk``` internal component to create the subscription.
 

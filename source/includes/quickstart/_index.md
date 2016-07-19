@@ -58,7 +58,9 @@ kuzzleBo:
   ports:
     - "3000:3000"
   links:
-    - kuzzle
+    - proxy:kuzzle
+  environment:
+    - KUZZLE_URL
 ```
 
 <aside class="success">

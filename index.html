@@ -203,7 +203,9 @@ Read more on how to do a <a href="#install-on-linux">custom installation</a> for
   <span class="s">ports</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s2">"</span><span class="s">3000:3000"</span>
   <span class="s">links</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">kuzzle</span>
+    <span class="pi">-</span> <span class="s">proxy:kuzzle</span>
+  <span class="s">environment</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">KUZZLE_URL</span>
 </code></pre>
 
 <aside class="success">

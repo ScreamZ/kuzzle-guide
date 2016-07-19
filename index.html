@@ -143,7 +143,7 @@
 
             <h1 id="quickstart">Quickstart</h1>
 
-<p>In this quickstart tutorial you will learn in a few steps how to launch your own Kuzzle server 
+<p>In this quickstart tutorial you will learn in a few steps how to launch your own Kuzzle server
 and how to interact with it by indexing data (persisted data) and being informed when data is updated (pub/sub)</p>
 
 <h2 id="setup-a-kuzzle-server">Setup a Kuzzle server</h2>
@@ -163,23 +163,8 @@ You don&rsquo;t have to clone kuzzle to use it.
 </aside>
 
 <ul>
-<li>Create a <code class="prettyprint">docker-compose.yml</code> with:</li>
+<li>Copy our <a href="https://raw.githubusercontent.com/kuzzleio/kuzzle/develop/docker-compose.yml">docker-compose.yml</a> file in a directory</li>
 </ul>
-<pre class="highlight yaml"><code><span class="s">kuzzle</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">kuzzleio/kuzzle:latest</span>
-  <span class="s">ports</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7512:7512"</span>
-    <span class="pi">-</span> <span class="s2">"</span><span class="s">7511:7511"</span>
-  <span class="s">links</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">elasticsearch</span>
-    <span class="pi">-</span> <span class="s">redis</span>
-
-<span class="s">redis</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">redis:3.0</span>
-
-<span class="s">elasticsearch</span><span class="pi">:</span>
-  <span class="s">image</span><span class="pi">:</span> <span class="s">elasticsearch:2.2</span>
-</code></pre>
 
 <aside class="notice">
 You can also retrieve this file directly with curl/wget : <br />
@@ -187,13 +172,13 @@ You can also retrieve this file directly with curl/wget : <br />
 </aside>
 
 <ul>
-<li>run: </li>
+<li>run:</li>
 </ul>
 <pre class="highlight shell"><code><span class="gp">$ </span>docker-compose up
 </code></pre>
 
 <aside class="success">
-Kuzzle is running on: 
+Kuzzle is running on:
 <ul>
     <li><code>localhost:7512</code> for <strong>Websocket</strong></li>
     <li><code>localhost:7511</code> for <strong>REST</strong></li>
@@ -309,7 +294,7 @@ You have persisted your first document into kuzzle
     <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="c1">// create a subscription on the collection matching given filters </span>
+<span class="c1">// create a subscription on the collection matching given filters</span>
 <span class="nx">collection</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// this function is called each time kuzzle notifies us with a document matching our filters</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'message received from kuzzle:'</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>

@@ -17,7 +17,7 @@ and how to interact with it by indexing data (persisted data) and being informed
 You don't have to clone kuzzle to use it.
 </aside>
 
-- Copy our [docker-compose.yml](https://raw.githubusercontent.com/kuzzleio/kuzzle/develop/docker-compose.yml) file in a directory
+- Copy our [docker-compose.yml](https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml) file in a directory
 
 <aside class="notice">
 You can also retrieve this file directly with curl/wget : <br />

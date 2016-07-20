@@ -153,18 +153,6 @@ Events triggered to interact with `protocol` plugins.
 |`protocol:leaveChannel`	| / | / |Triggered before a room is removed for the user. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
 |`protocol:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channel, id}` <br>`payload` is the notification content. <br>`channel` is the channel name.<br> `id` is the connection id|
 
-### > event: rabbit
-
-<aside class="warning">Deprecated</aside>
-
-Events triggered to report RabbitMQ activity.
-
-| Event | Controller| Action | Description | Input |
-|-------|-----------|--------|-------------|-------|
-|`rabbit:error`			| / | / |Triggered when an error occured on rabbit connection|Type: Error|
-|`rabbit:started`		| / | / |Triggered when rabbit MQ service is started|Type: String.<br> `'RabbitMQ Service started'`|
-|`rabbit:stopped`		| / | / |Triggered when the rabbit MQ service is stopped|Type: String.<br> `'RabbitMQ Service stopped'`|
-
 ### > event: room
 
 Events triggered on subscription rooms activity.
@@ -229,7 +217,6 @@ Events triggered to report general Kuzzle server activity.
 | Event | Controller| Action | Description | Input |
 |-------|-----------|--------|-------------|-------|
 |`server:httpStarted`		| / | / |Triggered when the http server is started.|Type: String|
-|<font color="red">(Deprecated)</font> `server:mqStarted` | / | / |Triggered when the MQ server is started.|Type: String|
 |`server:overload`			| / | / |Triggered when the server overload|Type: String.<br> Contains the overload percentage with '%' character|
 
 ### > event: subscription

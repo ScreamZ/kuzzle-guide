@@ -4,7 +4,7 @@ Kuzzle embed a [Command line interface](https://en.wikipedia.org/wiki/Command-li
 
 - Install dependencies _(plugins, npm dependencies, ...)_
 - Run kuzzle
-- Toggle on/off internal services _(mqBroker, logger, monitoring, writeEngine, ...)_
+- Toggle on/off internal services _(logger, monitoring, writeEngine, ...)_
 - Create first administrator
 - Reset persisted data _(use with caution !)_
 
@@ -59,7 +59,7 @@ $ ./bin/kuzzle enable <service> <PID|all>
 
 Where:
 
-- service is the Kuzzle service name you want to activate (for instance: mqBroker)
+- service is the Kuzzle service name you want to activate
 - PID is the processus ID of the Kuzzle server or worker you want to control. Use 'all' if you want to broadcast a service activation to a Kuzzle server and all its workers.
 
 You can disable a service with:

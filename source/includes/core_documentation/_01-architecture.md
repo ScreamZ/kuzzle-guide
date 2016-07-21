@@ -6,7 +6,7 @@ Kuzzle Kernel API can be accessed from 3 different paths:
 
 1. a [RESTFul API](/api-reference/?rest)
 2. a [Websocket connexion](/api-reference/?websocket), using Kuzzle [Javascript SDK](/sdk-documentation)
-3. or any other custom protocol, using a Protocol Plugin (examples: [AMQP](/api-reference/?amqp), [MQTT](/api-reference/?mqtt), [STOMP](/api-reference/?stomp))
+3. or any other custom protocol, using a Protocol Plugin (example: [MQTT](/api-reference/?mqtt))
 
 In the background, Kuzzle uses:
 
@@ -60,7 +60,6 @@ In Kuzzle, a Service module is the implementation of the interface to different 
 
 Kuzzle currently implements the following Services:
 
-* [rabbit.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/services/rabbit.js): interface to [RabbitMQ](https://www.rabbitmq.com/) _(NB: will be soon deprecated)_
 * [elasticsearch.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/services/elasticsearch.js): interface to [Elasticsearch](https://www.elastic.co/products/elasticsearch), used for persistent data storage.
 * [redis.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/services/redis.js): interface to the [redis](http://redis.io) cache server.
 * [proxyBroker.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/services/proxyBroker.js): interface with the proxy.

@@ -293,9 +293,5 @@ $ export WRITE_ENGINE_HOST=myelasticsearch:9200
 $ export CACHE_HOST=myredis
 $ export CACHE_PORT=6379
 
-# Rabbit MQ (external broker for AMQP/MQTT/STOMP clients):
-$ export MQ_BROKER_HOST=myrabbitmq
-$ export MQ_BROKER_PORT=5672
-
 $ ./bin/kuzzle start
 ```

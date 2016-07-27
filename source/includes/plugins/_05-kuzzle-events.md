@@ -142,16 +142,16 @@ Events triggered during Kuzzle startup, when the database is prepared for Kuzzle
 |`prepareDb:updateMappingRoles`		| / | / |Triggered on Kuzzle start for creating the internal mapping for Roles collection|Type: Request object.<br> Contains the default mapping in `requestObject.data.body`|
 |`prepareDb:updateMappingUsers`		| / | / |Triggered on Kuzzle start for creating the internal mapping for Users collection|Type: Request object.<br> Contains the default mapping in `requestObject.data.body`|
 
-### > event: protocol
+### > event: proxy
 
-Events triggered to interact with `protocol` plugins.
+Events triggered when interacting with `proxy`.
 
 | Event | Controller| Action | Description | Input |
 |-------|-----------|--------|-------------|-------|
-|`protocol:broadcast`		| / | / |Triggered before broadcast. You can't modify the input on this event.|Type: Object.<br>  `{payload, channel}` <br>`payload` is the notification content. <br>`channel` is the channel name.|
-|`protocol:joinChannel`		| / | / |Triggered after attach a user to a room. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
-|`protocol:leaveChannel`	| / | / |Triggered before a room is removed for the user. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
-|`protocol:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channel, id}` <br>`payload` is the notification content. <br>`channel` is the channel name.<br> `id` is the connection id|
+|`proxy:broadcast`		| / | / |Triggered before broadcast. You can't modify the input on this event.|Type: Object.<br>  `{payload, channel}` <br>`payload` is the notification content. <br>`channel` is the channel name.|
+|`proxy:joinChannel`		| / | / |Triggered after attach a user to a room. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
+|`proxy:leaveChannel`	| / | / |Triggered before a room is removed for the user. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
+|`proxy:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channel, id}` <br>`payload` is the notification content. <br>`channel` is the channel name.<br> `id` is the connection id|
 
 ### > event: room
 

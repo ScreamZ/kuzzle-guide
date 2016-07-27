@@ -148,10 +148,10 @@ Events triggered when interacting with `proxy`.
 
 | Event | Controller| Action | Description | Input |
 |-------|-----------|--------|-------------|-------|
-|`proxy:broadcast`		| / | / |Triggered before broadcast. You can't modify the input on this event.|Type: Object.<br>  `{payload, channel}` <br>`payload` is the notification content. <br>`channel` is the channel name.|
+|`proxy:broadcast`		| / | / |Triggered before broadcast. You can't modify the input on this event.|Type: Object.<br>  `{payload, channelsList}` <br>`payload` is the notification content. <br>`channelsList` is an array of channels to broadcast.|
 |`proxy:joinChannel`		| / | / |Triggered after attach a user to a room. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
 |`proxy:leaveChannel`	| / | / |Triggered before a room is removed for the user. You can't modify the input on this event.|Type: Object.<br>  `{channel, id}` <br>`channel` is the channel name.<br> `id` is the connection id|
-|`proxy:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channel, id}` <br>`payload` is the notification content. <br>`channel` is the channel name.<br> `id` is the connection id|
+|`proxy:notify`			| / | / |Triggered before notify a connection id.|Type: Object.<br>  `{payload, channelsList, id}` <br>`payload` is the notification content. <br>`channelsList` is an array of channels to notify.<br> `id` is the connection id|
 
 ### > event: room
 

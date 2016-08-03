@@ -37,7 +37,6 @@ Where:
 
 | Keyword | Type | Default Value |Description                  |
 |---------|------|---------------|-----------------------------|
-|`loadedBy`|`string`| `"all"` | Tells Kuzzle to only load the plugin by `"server"`, `"worker"` or `"all"` instances types |
 |`threads`|`unsigned integer`|`0`| If > 0, the plugin will be treated as a worker plugin (see below) |
 |`privileged`|`boolean`|`false`| If `true`, the plugin is loaded with privileged access to the running Kuzzle instance (see Plugin Context below)<br/>Ignored if `threads` is greater than `0` |
 

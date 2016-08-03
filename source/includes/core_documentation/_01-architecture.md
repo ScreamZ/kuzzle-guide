@@ -69,14 +69,3 @@ Kuzzle currently implements the following Services:
 
 A Service can be added to different engines. For example, Elasticsearch is used by both the writeEngine and the readEngine (see [lib/config/services.js](https://github.com/kuzzleio/kuzzle/blob/master/lib/config/services.js)).
 
-### > Workers
-
-A worker is an independant component, detachable from a Kuzzle server container. It can be run in another container or even on another machine.
-
-Workers attach themselves to the internal broker service fed by Kuzzle to perform any kind of task.
-
-For instance, writing persistent data on Kuzzle is implemented as a write worker.
-
-Additionally, serveral Workers of the same type can be launched in parallel, on the same or on a different host.
-
-This flexibility allows administrators of Kuzzle system to leverage their resource consumption and distribute and/or scale their services to better fit their needs.

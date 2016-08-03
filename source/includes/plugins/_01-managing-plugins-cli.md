@@ -39,10 +39,8 @@ You can get an overview of installed plugins and their activation status using t
 { 'kuzzle-plugin-auth-passport-local': 
    { npmVersion: '2.0.3',
      activated: true,
-     loadedBy: 'server',
      config: 
-      { loadedBy: 'server',
-        secret: 'changeme',
+      { secret: 'changeme',
         algorithm: 'sha1',
         digest: 'hex' } },
   'kuzzle-plugin-logger': 
@@ -55,8 +53,7 @@ You can get an overview of installed plugins and their activation status using t
                { error: { level: 'error', filename: 'kuzzle-error.log' },
                  warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
               addDate: true },
-           stdout: { level: 'info', addDate: true } },
-        loadedBy: 'all' } } }`
+           stdout: { level: 'info', addDate: true } } } }
 ```
 
 ### > Install a plugin
@@ -103,8 +100,7 @@ $ ./bin/kuzzle plugins --get kuzzle-plugin-logger
             { error: { level: 'error', filename: 'kuzzle-error.log' },
               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
            addDate: true },
-        stdout: { level: 'info', addDate: true } },
-     loadedBy: 'all' } }
+        stdout: { level: 'info', addDate: true } } } }
 ```
 
 ### > Modify a plugin configuration
@@ -132,8 +128,7 @@ $ ./bin/kuzzle plugins --get kuzzle-plugin-logger
              { error: { level: 'error', filename: 'kuzzle-error.log' },
                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
             addDate: true },
-         stdout: { level: 'info', addDate: true } },
-      loadedBy: 'all' } }
+         stdout: { level: 'info', addDate: true } } } }
 $ ./bin/kuzzle plugins --set '{ "stdout": { "level": "debug"} }' kuzzle-plugin-logger
   { npmVersion: '2.0.2',
     activated: true,
@@ -144,9 +139,7 @@ $ ./bin/kuzzle plugins --set '{ "stdout": { "level": "debug"} }' kuzzle-plugin-l
               { error: { level: 'error', filename: 'kuzzle-error.log' },
                 warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
              addDate: true },
-          stdout: { level: 'info', addDate: true } },
-       loadedBy: 'all',
-       stdout: { level: 'debug' } } }
+          stdout: { level: 'debug' } } } }
 ```
 
 Replacing a plugin configuration on the command-line:
@@ -162,8 +155,7 @@ $ ./bin/kuzzle plugins --get kuzzle-plugin-logger
              { error: { level: 'error', filename: 'kuzzle-error.log' },
                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
             addDate: true },
-         stdout: { level: 'info', addDate: true } },
-      loadedBy: 'all' } }
+         stdout: { level: 'info', addDate: true } } } }
 $ ./bin/kuzzle plugins --replace '{"stdout": {"level": "debug", "addDate": true}}' kuzzle-plugin-logger
   { npmVersion: '2.0.2',
     activated: true,
@@ -195,12 +187,10 @@ $ ./bin/kuzzle plugins --get kuzzle-plugin-logger
             { error: { level: 'error', filename: 'kuzzle-error.log' },
               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
            addDate: true },
-        stdout: { level: 'info', addDate: true } },
-     loadedBy: 'all' } }
+        stdout: { level: 'info', addDate: true } } } }
 $ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
   { npmVersion: '2.0.2',
-    activated: true,
-    config: { loadedBy: 'all' } }     
+    activated: true }
 ```
 <aside class="notice">NB: Only root properties can be unset</aside>
 
@@ -232,8 +222,7 @@ To deactivate a plugin:
             { error: { level: 'error', filename: 'kuzzle-error.log' },
               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
            addDate: true },
-        stdout: { level: 'info', addDate: true } },
-     loadedBy: 'all' } }
+        stdout: { level: 'info', addDate: true } } } }
 ```
 
 
@@ -250,7 +239,6 @@ $ ./bin/kuzzle plugins --activate kuzzle-plugin-logger
               { error: { level: 'error', filename: 'kuzzle-error.log' },
                 warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
              addDate: true },
-          stdout: { level: 'info', addDate: true } },
-       loadedBy: 'all' } }
+          stdout: { level: 'info', addDate: true } } } }
 ```
 

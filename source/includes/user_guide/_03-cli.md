@@ -26,7 +26,7 @@ $ ./bin/kuzzle
     install                      install all plugins configured in .kuzzlerc
     likeAvirgin [options]        delete Kuzzle configuration and users from database. Makes Kuzzle look like a virgin, touched for the very first time
     plugins [options] [name]     manage plugins
-    start [options]              start a Kuzzle server|worker node
+    start [options]              start a Kuzzle instance
   Options:
 
     -h, --help      output usage information
@@ -38,7 +38,7 @@ $ ./bin/kuzzle
 ### createFirstAdmin
 
 ```
-$ ./bin/kuzzle createFirstAdmin --pid <kuzzle server pid>
+$ ./bin/kuzzle createFirstAdmin
 ```
 
 When Kuzzle runs for the first time, no users are defined and the anonymous user is granted with super admin rights.
@@ -47,15 +47,12 @@ The `createFirstAdmin` command lets you define an administrator user and set you
 
 <aside class="notice">NB: This command can only be run interactively</aside>
 
-The `pid` parameter must be the pid of a running Kuzzle server.  
-Please refer to the [start command documentation](#start) for more information about Kuzzle server vs worker modes.
-
 ### disable
 
 <aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
 
 ```bash
-$ ./bin/kuzzle disable <service> <pid|all>
+$ ./bin/kuzzle disable <service>
 ```
 
 ### enable
@@ -63,7 +60,7 @@ $ ./bin/kuzzle disable <service> <pid|all>
 <aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
 
 ```bash
-$ ./bin/kuzzle enable <service> <pid|all>
+$ ./bin/kuzzle enable <service>
 ```
 
 ### install
@@ -94,7 +91,6 @@ $ ./bin/kuzzle likeAvirgin --help
     Options:
   
       -h, --help             output usage information
-      --pid <pid>            [all|integer] the pid to apply the action
       --fixtures <fixtures>  import some fixtures from file
       --mappings <mappings>  load and apply mappings from file
       --noint                non interractive mode, will perform the reset immediately
@@ -106,15 +102,9 @@ If some business data were imported in Kuzzle database layer, these are kept int
 
 Its main purpose is to be used during early development cycles to iterate some new tries.
 
-The `pid` parameter must be the pid of a running Kuzzle server.  
-Please refer to the [start command documentation](#start) for more information about Kuzzle server vs worker modes.
-
 ### plugins
 
 Please refer to the [dedicated plugin CLI documentation](#managing-plugins-using-the-cli).
-
-#### install
-
 
 ### start
 
@@ -123,40 +113,17 @@ $ ./bin/kuzzle start --help
   
     Usage: start [options]
   
-    start a Kuzzle server|worker node
+    start a Kuzzle instance
   
     Options:
   
       -h, --help                 output usage information
       -p, --port <port>          Kuzzle port number
-      -s, --server               start Kuzzle in server mode (default)
-      -w, --worker               start Kuzzle in worker mode
           --likeAvirgin          delete Kuzzle configuration and users from database
           --fixtures <fixtures>  import some fixtures from file
           --mappings <mappings>  load and apply mappings from file
 ```
 
 The `start` command starts a Kuzzle instance in the foreground.
-
-#### Server vs Worker
-
-<aside class="warning">This section refers to some Kuzzle behaviour that is subject to change.<br>
-Please check this documentation again if upgrading to a new version of Kuzzle.</aside>
-
-Kuzzle nodes can work in two different modes: `server` or `worker`.
-
-A Kuzzle `server` acts as a middle-tier in Kuzzle architecture. It receives the users requests and, depending on 
-their nature, either treats them immediately or dispatch them to a `worker`.
-
-A Kuzzle `worker` acts as an interface component between Kuzzle `servers` and the database layer.
-
-The minimal components to run Kuzzle are
-
-1. An elasticsearch server/cluster
-2. A Redis server/cluster
-3. A Kuzzle proxy
-4. A Kuzzle server
-5. A Kuzzle worker
-
 
 

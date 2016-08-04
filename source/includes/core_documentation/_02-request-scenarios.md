@@ -273,19 +273,11 @@ Kuzzle handles data differently, depending if it's persistent or not.
 This subsection describes the process for **persistent** data, with an example using the "_create_" action.
 (see also [API Documentation](http://kuzzle.io/api-reference/#create))
 
-Remember the [Architecture overview](#core-architecture)
-
-Kuzzle persistent data writing is a 3-steps process:
-
-##### 1st step: Send a Write request to a task queue
-
-Involved components overview:
-
-![persistence_overview1](./images/request-scenarios/persistence/overview1.png)
+![persistence_overview](./images/request-scenarios/persistence/overview.png)
 
 Detailed workflow:
 
-![persistence_scenario_details1](./images/request-scenarios/persistence/details1.png)
+![persistence_scenario_details](./images/request-scenarios/persistence/details.png)
 
 \#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a custom plugin protocol (see [Reading scenarios](#reading-content-from-kuzzle))
 
@@ -314,49 +306,15 @@ Detailed workflow:
 \#3. The ```Funnel``` validates the message and forward the request to the ```Write Controller```
 
 \#4. The ```Write Controller``` triggers the ```Plugins Manager``` with a "data:create" event.<br/>
-The ```Plugins Manager``` calls all pipes and hooks configured by the active plugins (see [Plugin's documentation](#plugins)), and finally triggers the "add" event of the ```Write Hook```.<br/>
-The ```Write Hook``` sends the request to the ```Internal Broker```. (see [Hooks Readme](https://github.com/kuzzleio/kuzzle/blob/master/lib/hooks/README.md) for more details about hooks).
+The ```Plugins Manager``` calls all pipes and hooks configured by the active plugins (see [Plugin's documentation](#plugins)).
 
-\#5. The ```Write Controller``` asks the ```Worker Listener``` to listen to the ```Internal Broker```'s feedback message.
+\#5. The ```Write Controller``` sends the request to the ``WriteEngine``service.
 
-That way Kuzzle parallelizes the processing of writing contents.
+The `Write Engine` sends the request to the database.
 
-##### 2nd step: Save content into the storage engine
+\#6. Once the `Write Engine` gets the response back, it replies to the `Write Controller`
 
-Involved components overview:
-
-![persistence_overview2](./images/request-scenarios/persistence/overview2.png)
-
-Detailed workflow:
-
-![persistence_scenario_details2](./images/request-scenarios/persistence/details2.png)
-
-\#6. A ```Write Worker``` is notified by the internal broker about a new write request.
-
-\#7. The worker calls the ```Write Engine``` service.
-
-\#8. The ```Write Engine``` service performs a request to send the data to the data storage.
-
-\#9. Promises functions are resolved to forward the response message back to the ```Write Worker```
-
-\#10. The worker sends the feedback message from ElasticSearch to the worker _response_ queue (see \#5).
-
-##### 3rd step: Send feedback
-
-Involved components overview:
-
-![persistence_overview3](./images/request-scenarios/persistence/overview3.png)
-
-Detailed workflow:
-
-![persistence_scenario_details3](./images/request-scenarios/persistence/details3.png)
-
-\#11. The ```Worker Listener``` that the ```Write Controller``` registered in step \#5. receive a notification from the ```Internal Broker```...
-
-\#12. ... and forwards it to the ```Write Controller```, who then forwards it to the ```Funnel```, who in turn forwards it to ```Router Controller```...
-
-\#13. ... which sends a feedback to the client.
-
+\#7. The `Write Controller` wraps the response in a Kuzzle Response and forwards it back to the user.
 
 #### Subscribe and Notification scenario
 

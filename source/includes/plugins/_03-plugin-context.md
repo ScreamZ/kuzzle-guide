@@ -18,7 +18,13 @@ Here is the list of shared objects contained in the provided ``context``:
 | `context.constructors.ResponseObject` | Constructor for the standardized Kuzzle response objects |
 | `errors.<ErrorConstructor>` |Kuzzle error constructors, built dynamically from available Kuzzle error objects at runtime|
 
+**Note:** `context.accessors` are not available to [worker plugins](#gt-worker-plugins), as they are run in their own process(es), without access to Kuzzle instances.
+
 ### > Accessor: `passport`
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don't have access to accessors
+</aside>
 
 The `passport` accessor allow [authentication plugins](/#gt-authentication-plugin) to register a new login strategy to Kuzzle.
 
@@ -55,6 +61,10 @@ pluginContext.accessors.passport.use(new LocalStrategy(verify.bind(this)));
 ```
 
 ### > Accessor: `router`
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don't have access to accessors
+</aside>
 
 The `router` accessor allows protocol plugins to interface themselves with Kuzzle. This accessor exposes the following methods:
 
@@ -103,6 +113,10 @@ Not calling this method after a connection is dropped will result in a memory-le
 
 
 ### > Accessor: `users`
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don't have access to accessors
+</aside>
 
 The `users` accessor provides methods for handling users. This accessor is mainly used by authentication plugins.
 

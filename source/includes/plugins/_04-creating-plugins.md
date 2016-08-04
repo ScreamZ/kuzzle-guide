@@ -33,14 +33,16 @@ module.exports = function () {
 
 ### > Worker plugins
 
+<aside class="notice">
+The <a href="#the-plugin-context">plugin context</a> provided to worker plugins do not contain <code>accessors</code>
+</aside>
+
 A `worker` plugin is simply a `listener` plugin running in separate threads. This is especially useful when you have to perform cost-heavy operations without impeding Kuzzle performances.
 
 To convert a `listener` plugin to a `worker` one, just add the following attribute to the plugin configuration: `threads: <number of threads>`
 
 If this number of threads is greater than 0, Kuzzle will launch the plugin on a single separate thread.  
 If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.
-
-**Note:** `worker` plugins can only be launched by server instances of Kuzzle.
 
 
 Plugin configuration example:

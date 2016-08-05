@@ -572,11 +572,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <h4 id="finally">Finally</h4>
 
 <p>Start a server instance (we override the default port to avoid a conflict with the proxy):</p>
-<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
-</code></pre>
-
-<p>And then start as many worker instances as you want. At least one worker is required:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>bin/kuzzle start --worker
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start
 </code></pre>
 
 <p>For more information, you can execute:</p>
@@ -600,8 +596,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
 <span class="gp">$ </span>./bin/kuzzle install
-<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
-<span class="gp">$ </span>./bin/kuzzle start --worker
+<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start
 </code></pre>
 
 <h4 id="run-it-again">Run it again</h4>
@@ -617,8 +612,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
-<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start --server
-<span class="gp">$ </span>./bin/kuzzle start --worker
+<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start 
 </code></pre>
 
 <h4 id="going-further">Going further</h4>
@@ -643,10 +637,6 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="c"># Redis (cache services):</span>
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>myredis
 <span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
-
-<span class="c"># Rabbit MQ (external broker for AMQP/MQTT/STOMP clients):</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">MQ_BROKER_HOST</span><span class="o">=</span>myrabbitmq
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">MQ_BROKER_PORT</span><span class="o">=</span>5672
 
 <span class="gp">$ </span>./bin/kuzzle start
 </code></pre>
@@ -690,104 +680,119 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
             <h2 id="command-line-interface">Command line interface</h2>
 
-<p>Kuzzle embed a <a href="https://en.wikipedia.org/wiki/Command-line_interface">Command line interface</a> which permit you to :</p>
+<p>Kuzzle embeds a <a href="https://en.wikipedia.org/wiki/Command-line_interface">Command line interface</a> which enables you to:</p>
 
 <ul>
-<li>Install dependencies <em>(plugins, npm dependencies, &hellip;)</em></li>
-<li>Run kuzzle</li>
-<li>Toggle on/off internal services <em>(mqBroker, logger, monitoring, writeEngine, &hellip;)</em></li>
-<li>Create first administrator</li>
-<li>Reset persisted data <em>(use with caution !)</em></li>
+<li>install and configure plugins</li>
+<li>run kuzzle</li>
+<li>toggle on/off internal services <em>(logger, monitoring, writeEngine, &hellip;)</em></li>
+<li>create a first administrator user</li>
+<li>reset kuzzle internal data <em>(use with caution !)</em></li>
 </ul>
 
 <aside class="warning">
-If you have launched kuzzle with docker, you have to enter in the kuzzle container to run theses commands
+If you used docker to start Kuzzle, you will have to enter the kuzzle container to run theses commands.
 </aside>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle
 
-<h3 id="install-dependencies">Install dependencies</h3>
+  Usage: kuzzle [options] [command]
 
-<p>Before start kuzzle, you have to install his dependencies, 
-to do that just run the following command in the root folder of your kuzzle installation</p>
+
+  Commands:
+
+    createFirstAdmin [options]   create the first administrator user
+    disable [options]            disable a service without reloading Kuzzle
+    enable [options]             enable a service without reloading Kuzzle
+    install                      install all plugins configured in .kuzzlerc
+    likeAvirgin [options]        delete Kuzzle configuration and users from database. Makes Kuzzle look like a virgin, touched for the very first time
+    plugins [options] [name]     manage plugins
+    start [options]              start a Kuzzle instance
+  Options:
+
+    -h, --help      output usage information
+    -V, --version   output the version number
+    -d, --debug     make errors more verbose
+    -C, --noColors  do not use ANSI coloring
+</code></pre>
+
+<h3 id="createfirstadmin">createFirstAdmin</h3>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle createFirstAdmin
+</code></pre>
+
+<p>When Kuzzle runs for the first time, no users are defined and the anonymous user is granted with super admin rights.</p>
+
+<p>The <code class="prettyprint">createFirstAdmin</code> command lets you define an administrator user and set your own permissions. </p>
+
+<aside class="notice">NB: This command can only be run interactively</aside>
+
+<h3 id="disable">disable</h3>
+
+<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle disable &lt;service&gt;
+</code></pre>
+
+<h3 id="enable">enable</h3>
+
+<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle <span class="nb">enable</span> &lt;service&gt;
+</code></pre>
+
+<h3 id="install">install</h3>
+
+<p>Kuzzle is dependent on some external plugins.<br>
+These need to be installed before Kuzzle is started.</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
 </code></pre>
 
-<aside class="notice">
-The plugins configuration is located into 2 files: 
-<ul>
-    <li><code>config/defaultPlugins.json</code> which contains default plugins configuration embed with kuzzle</li>
-    <li><code>config/customPlugins.json</code> which contains plugins configuration for your own installation</li>
-</ul>
-</aside>
+<p>The <code class="prettyprint">install</code> command will install the plugins listed in the <code class="prettyprint">.kuzzlerc</code> file.<br>
+The configuration of the plugin can be edited using Kuzzle CLI.</p>
 
-<h3 id="start-kuzzle">Start kuzzle</h3>
+<p>Please refer to <a href="#plugins">Kuzzle plugin documentation</a> for more information about how to use and configure plugins.</p>
 
-<p>To run kuzzle, you just have to run :</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle start
+<h3 id="likeavirgin">likeAvirgin</h3>
+
+<aside class="warning">NB: This command has some destructive effect. Use it with care</aside>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle likeAvirgin --help
+
+    Usage: likeAvirgin [options]
+
+    delete Kuzzle configuration and users from database. Makes Kuzzle look like a virgin, touched for the very first time
+
+    Options:
+
+      -h, --help             output usage information
+      --fixtures &lt;fixtures&gt;  import some fixtures from file
+      --mappings &lt;mappings&gt;  load and apply mappings from file
+      --noint                non interractive mode, will perform the reset immediately
 </code></pre>
 
-<aside class="notice">
-The start command have a lot of options which permit you to:
-<ul>
-    <li>change the port used by kuzzle</li>
-    <li>reset the persistent layer before start</li>
-    <li>import fixtures/mapping before start</li>
-</ul>
-<br />
-To get the full list of available options, just type <code>./bin/kuzzle start --help</code>
-</aside>
+<p>The <code class="prettyprint">likeAvirgin</code> command deletes all currently set configurations and the users from the database.</p>
 
-<h3 id="enable-disable-services">Enable/Disable services</h3>
+<p>If some business data were imported in Kuzzle database layer, these are kept intact.</p>
 
-<p>You can enable services in a running Kuzzle without restarting it with a simple command line:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle <span class="nb">enable</span> &lt;service&gt; &lt;PID|all&gt;
+<p>Its main purpose is to be used during early development cycles to iterate some new tries.</p>
+
+<h3 id="plugins">plugins</h3>
+
+<p>Please refer to the <a href="#managing-plugins-using-the-cli">dedicated plugin CLI documentation</a>.</p>
+
+<h3 id="start">start</h3>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle start --help
+
+    Usage: start [options]
+
+    start a Kuzzle instance
+
+    Options:
+
+      -h, --help                 output usage information
+      -p, --port &lt;port&gt;          Kuzzle port number
+          --likeAvirgin          delete Kuzzle configuration and users from database
+          --fixtures &lt;fixtures&gt;  import some fixtures from file
+          --mappings &lt;mappings&gt;  load and apply mappings from file
 </code></pre>
 
-<p>Where:</p>
-
-<ul>
-<li>service is the Kuzzle service name you want to activate (for instance: mqBroker)</li>
-<li>PID is the processus ID of the Kuzzle server or worker you want to control. Use &lsquo;all&rsquo; if you want to broadcast a service activation to a Kuzzle server and all its workers.</li>
-</ul>
-
-<p>You can disable a service with:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle disable &lt;service&gt; &lt;PID|all&gt;
-</code></pre>
-
-<aside class="notice">
-All services containing a toggle() method can be activated or deactivated on the fly. Some vital services can not be toggled. 
-</aside>
-
-<h3 id="create-the-first-administrative-user-account">Create the first administrative user account</h3>
-
-<p>You will need a first admin to connect to the back-office</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle createFirstAdmin
-</code></pre>
-
-<aside class="notice">
-This command is interactive and let you choose to reset the roles rights or not.
-</aside>
-
-<h3 id="reset-kuzzle">Reset Kuzzle</h3>
-
-<p>To empty the persistent data storage into kuzzle without restarting it, you have to run this command: </p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle likeAvirgin
-</code></pre>
-
-<h4 id="reset-and-add-fixtures-or-mappings">Reset and add fixtures or mappings</h4>
-
-<p>You can perform a reset followed by a fixtures and/or mappings import by doing:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle likeAvirgin --fixtures /path/to/the/fixtures/file.json --mappings /path/to/the/mappings/file.json
-</code></pre>
-
-<h3 id="getting-help">Getting help</h3>
-
-<p>You can, of course, get some help by using the  <code class="prettyprint">--help</code> option. </p>
-
-<p>Try those: </p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle --help
-<span class="gp">$ </span>./bin/kuzzle start --help
-<span class="gp">$ </span>./bin/kuzzle likeAvirgin --help
-</code></pre>
+<p>The <code class="prettyprint">start</code> command starts a Kuzzle instance in the foreground.</p>
 
             <h2 id="filtering-syntax">Filtering Syntax</h2>
 
@@ -2091,7 +2096,7 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 <ol>
 <li>a <a href="/api-reference/?rest">RESTFul API</a></li>
 <li>a <a href="/api-reference/?websocket">Websocket connexion</a>, using Kuzzle <a href="/sdk-documentation">Javascript SDK</a></li>
-<li>or any other custom protocol, using a Protocol Plugin (examples: <a href="/api-reference/?amqp">AMQP</a>, <a href="/api-reference/?mqtt">MQTT</a>, <a href="/api-reference/?stomp">STOMP</a>)</li>
+<li>or any other custom protocol, using a Protocol Plugin (example: <a href="/api-reference/?mqtt">MQTT</a>)</li>
 </ol>
 
 <p>In the background, Kuzzle uses:</p>
@@ -2110,24 +2115,24 @@ You can think to a <code class="prettyprint">profile</code> as a user group. All
 <h4 id="main-core-components">Main core components</h4>
 
 <ul>
-<li><strong>Router Controller</strong>: implements the 3 API routers, normalizes the input message and sends them to the Funnel Controller</li>
-<li><strong>Funnel Controller</strong>: analyses the input message and calls the appropriate controller</li>
-<li><strong>Admin Controller</strong>, <strong>Auth Controller</strong>, <strong>Bulk Controller</strong>, <strong>Write Controller</strong>, <strong>Subscribe Controller</strong>, <strong>Read Controller</strong>: handles the input message (see <a href="/api-reference">API reference</a>)</li>
-<li><strong>Internal Components</strong>: Any component used internally by controllers and any other internal component to interact with services</li>
+<li><strong>Proxy and entry points</strong>: proxifies the communication beetween the client and Kuzzle (see <a href="/api-reference/#connecting-to-kuzzle">Connecting to kuzzle</a>), and forward the input message to the Router.</li>
+<li><strong>Router</strong>: implements the API routers, normalizes the input message and sends them to the Funnel</li>
+<li><strong>Funnel</strong>: analyses the input message and calls the appropriate controller</li>
+<li><strong>Controllers</strong>: handles the input message (see <a href="/api-reference">API reference</a>)</li>
+<li><strong>Internal Components</strong>: Any component used internally by controllers</li>
+<li><strong>Service Components</strong>: Any component used to interact with services (see <a href="#gt-services">below</a>)</li>
 </ul>
 
 <h3 id="gt-hooks">&gt; Hooks</h3>
 
 <p>Hooks allow to attach actions to Kuzzle events.</p>
 
-<p>For example, Admin, Bulk and Writer controllers emit a &ldquo;data:create&rdquo; event to handle some writing actions through the storage engine.
-This event will trigger the execution of the <em>add</em> method and of the <em>write</em> hook, which will send the received message to the internal broker.</p>
+<p>For example, Admin, Bulk and Writer controllers emit a <code class="prettyprint">data:beforeCreate</code> event to handle some writing actions through the storage engine.
+This event will trigger the execution of the <em>emit</em> method and of the <em>write</em> hook, which will send the received message to the internal broker.</p>
 
 <p>Then it is possible to implement custom hooks to trigger any event emitted by Kuzzle.</p>
 
-<p>The list of available events and their default attached actions can be found in the <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/config/hooks.js">config/hooks.js</a> file.</p>
-
-<p>As an example, when the &ldquo;data:afterCreate&rdquo; event is emitted by kuzzle, it will trigger the execution of the <em>add</em> method of the <em>write</em> hook, which will send the received message to the broker.</p>
+<p>See also <a href="#kuzzle-events-list">The list of available events</a>.</p>
 
 <h5 id="contributing">Contributing</h5>
 
@@ -2148,27 +2153,14 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 <p>Kuzzle currently implements the following Services:</p>
 
 <ul>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/rabbit.js">rabbit.js</a>: interface to <a href="https://www.rabbitmq.com/">RabbitMQ</a></li>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/elasticsearch.js">elasticsearch.js</a>: interface to <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a>, used for persistent data storage.</li>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/redis.js">redis.js</a>: interface to the <a href="http://redis.io">redis</a> cache server.</li>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/logger.js">logger.js</a>: interface to the <a href="https://www.elastic.co/products/logstash">Logstash</a> server.</li>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/ipc.js">ipc.js</a>: IPC implementation of the internal message broker</li>
-<li><a href="https://github.com/kuzzleio/kuzzle/blob/develop/lib/services/index.js">index.js</a>: module entry point. Used to initialize all implemented services.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/services/elasticsearch.js">elasticsearch.js</a>: interface to <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a>, used for persistent data storage.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/services/redis.js">redis.js</a>: interface to the <a href="http://redis.io">redis</a> cache server.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/services/proxyBroker.js">proxyBroker.js</a>: interface with the proxy.</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/services/broker">Broker Client and Server</a>: implementation of the internal message broker</li>
+<li><a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/services/internalEngine.js">internalEngine.js</a>: light interface with the internal index (containing kuzzle&rsquo;s configuration) in Elastic Search.</li>
 </ul>
 
-<p>A Service can be added to different engines. For example, Elasticsearch is used by both the writeEngine and the readEngine (see <a href="./index.js">index.js</a>).</p>
-
-<h4 id="workers">Workers</h4>
-
-<p>A worker is an independant component, detachable from a Kuzzle server container. It can be run in another container or even on another machine.</p>
-
-<p>Workers attach themselves to the internal broker service fed by Kuzzle to perform any kind of task.</p>
-
-<p>For instance, writing persistent data on Kuzzle is implemented as a write worker.</p>
-
-<p>Additionally, serveral Workers of the same type can be launched in parallel, on the same or on a different host.</p>
-
-<p>This flexibility allows administrators of Kuzzle system to leverage their resource consumption and distribute and/or scale their services to better fit their needs.</p>
+<p>A Service can be added to different engines. For example, Elasticsearch is used by both the writeEngine and the readEngine (see <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/config/services.js">lib/config/services.js</a>).</p>
 
             <h2 id="request-scenarios">Request Scenarios</h2>
 
@@ -2190,9 +2182,11 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 <p>#1. The REST client asks for a content using a HTTP GET Request</p>
 
 <p>For instance, to retrieve the document &lsquo;739c26bc-7a09-469a-803d-623c4045b0cb&rsquo; in the collection &#39;users&rsquo;:
-<code class="prettyprint">GET http://kuzzle:7511/api/users/739c26bc-7a09-469a-803d-623c4045b0cb</code></p>
+<code class="prettyprint">
+GET http://kuzzle:7511/api/users/739c26bc-7a09-469a-803d-623c4045b0cb
+</code></p>
 
-<p>#2. The HTTP router handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code>.</p>
+<p>#2. The proxy forwards the input request throughs the <code class="prettyprint">HTTP Entry point</code> to the <code class="prettyprint">Router</code>, who handles it and forwards the formatted message to the <code class="prettyprint">Funnel</code>.</p>
 
 <p>Sample message:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2292,7 +2286,7 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 
 <p><img alt="read_scenario_websocket_details" src="images/request-scenarios/read-websocket/details.png" /></p>
 
-<p>#1. The client application opens a Websocket connection and emit a &ldquo;read&rdquo; event containing the request</p>
+<p>#1. The client application opens a Websocket connection to <code class="prettyprint">Kuzzle Proxy</code> and emit a &ldquo;read&rdquo; event containing the request</p>
 
 <p>(see details in <a href="http://kuzzleio.github.io/kuzzle-api-documentation/#socket-io">API Documentation</a>)</p>
 
@@ -2314,7 +2308,11 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
   });
 </code></p>
 
-<p>#2. The SocketIO plugin handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code></p>
+<p>#2. The SocketIO plugin handles the input request and forwards the message to the <code class="prettyprint">Backend Broker</code></p>
+
+<p>#3. The Backend Broker, sends the message to the server&rsquo;s <code class="prettyprint">Proxy Broker</code> through an internal websocket connexion.</p>
+
+<p>#4. The Proxy Broker forwards the input request throughs the <code class="prettyprint">Proxy Entry point</code> to the <code class="prettyprint">Router</code>, who handles it and forwards the formatted message to the <code class="prettyprint">Funnel</code>.</p>
 
 <p>Sample message:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2325,11 +2323,11 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Read Controller</code></p>
+<p>#5. The <code class="prettyprint">Funnel</code> validates the message and forward the request to the <code class="prettyprint">Read Controller</code></p>
 
-<p>#4. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
+<p>#6. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
 
-<p>#5. The <code class="prettyprint">readEngine service</code> performs an HTTP REST request to get the data from the data storage</p>
+<p>#7. The <code class="prettyprint">readEngine service</code> performs an HTTP REST request to get the data from the data storage</p>
 
 <p>Sample content retrieval from Elasticsearch:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2352,7 +2350,7 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>#6. Promises functions are resolved to forward the response message back to the SocketIO plugin</p>
+<p>#8. Promises functions are resolved to forward the response message back to the Proxy Broker.</p>
 
 <p>Sample content resolved:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2377,132 +2375,9 @@ This event will trigger the execution of the <em>add</em> method and of the <em>
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>#7. The SocketIO plugin emits a <code class="prettyprint">&lt;requestId&gt;</code> event to the websocket client</p>
+<p>#9. The Proxy Broker sends the response to the proxy&rsquo;s <code class="prettyprint">Backend Broker</code> through the websocket connexion.</p>
 
-<p>Sample response content:</p>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-
-<h4 id="mq-broker">MQ broker</h4>
-
-<p>Remember the <a href="#core-architecture">Architecture overview</a> and focus on the components involved by reading actions:
-<img alt="read_scenario_mq_overview" src="images/request-scenarios/read-mq/overview.png" /></p>
-
-<p>The following diagram shows how request data is exchanged between the client application, the different Kuzzle components, and the external services:</p>
-
-<p><img alt="read_scenario_mq_details" src="images/request-scenarios/read-mq/details.png" /></p>
-
-<p>#1. The client application sends a message to a topic (MQTT), an <code class="prettyprint">amq.topic/kuzzle</code> routing key (AMQP) or an <code class="prettyprint">amq.topic/kuzzle</code> destination (STOMP).</p>
-
-<p>(see details in <a href="http://kuzzle.io/api-reference/#message-queuing-protocols">API Documentation</a>).</p>
-
-<p>A MQTT client wishing to get responses back from Kuzzle must add a <code class="prettyprint">mqttClientId</code> field to his message, and to subscribe to the <code class="prettyprint">mqtt.&lt;mqttClientId&gt;</code> topic.</p>
-
-<p>AMQP and STOMP clients simply have to fill the <code class="prettyprint">replyTo</code> metadata and to listen to the corresponding queue/destination.</p>
-
-<p>Sample STOMP request: retrieve the document <code class="prettyprint">739c26bc-7a09-469a-803d-623c4045b0cb</code> in the collection <code class="prettyprint">users</code>:</p>
-<pre class="highlight plaintext"><code>SEND
-destination:/exchange/amq.topic/kuzzle
-reply-to:/temp-queue/739c26bc-7a09-469a-803d-623c4045b0cb
-content-type:application/json
-
-{
-  "index": "mainindex",
-  "collection": "users",
-  "controller": "read",
-  "action": "get",
-  "_id": "739c26bc-7a09-469a-803d-623c4045b0cb"
-}
-
-^@
-</code></pre>
-
-<p>#2. The MQ plugin handles the input message and forwards it to the <code class="prettyprint">Funnel Controller</code>.</p>
-
-<p>Sample message:</p>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-
-<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Read Controller</code></p>
-
-<p>#4. The <code class="prettyprint">Read Controller</code> calls the <code class="prettyprint">readEngine service</code></p>
-
-<p>#5. The <code class="prettyprint">readEngine service</code> performs an HTTP Rest request to get the data from the data storage</p>
-
-<p>Sample content retrieval from Elasticsearch:</p>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-          </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
-      </span><span class="p">},</span><span class="w">
-      </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-
-<p>#6. Promises functions are resolved to forward the response message back to the MQ plugin</p>
-
-<p>Sample content resolved:</p>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"_index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"739c26bc-7a09-469a-803d-623c4045b0cb"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"found"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"_source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nt">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Grace"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hopper"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"lat"</span><span class="p">:</span><span class="w"> </span><span class="mf">32.692742</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"lon"</span><span class="p">:</span><span class="w"> </span><span class="mf">-97.114127</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="nt">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NYC"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"hobby"</span><span class="p">:</span><span class="w"> </span><span class="s2">"computer"</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-
-<p>#7. The MQ plugin notifies the client with the response content.</p>
+<p>#10. The Proxy calls the plugin&rsquo;s callback, who emits a <code class="prettyprint">&lt;requestId&gt;</code> event to the websocket client</p>
 
 <p>Sample response content:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2544,23 +2419,15 @@ content-type:application/json
 <p>This subsection describes the process for <strong>persistent</strong> data, with an example using the &ldquo;<em>create</em>&rdquo; action.
 (see also <a href="http://kuzzle.io/api-reference/#create">API Documentation</a>)</p>
 
-<p>Remember the <a href="#core-architecture">Architecture overview</a></p>
-
-<p>Kuzzle persistent data writing is a 3-steps process:</p>
-
-<h5 id="1st-step-send-a-write-request-to-a-task-queue">1st step: Send a Write request to a task queue</h5>
-
-<p>Involved components overview:</p>
-
-<p><img alt="persistence_overview1" src="images/request-scenarios/persistence/overview1.png" /></p>
+<p><img alt="persistence_overview" src="images/request-scenarios/persistence/overview.png" /></p>
 
 <p>Detailed workflow:</p>
 
-<p><img alt="persistence_scenario_details1" src="images/request-scenarios/persistence/details1.png" /></p>
+<p><img alt="persistence_scenario_details" src="images/request-scenarios/persistence/details.png" /></p>
 
-<p>#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a MQ client (see <a href="#reading-content-from-kuzzle">Reading scenarios</a>)</p>
+<p>#1. A client sends new content to Kuzzle, either with an HTTP request, through a websocket connection or using a custom plugin protocol (see <a href="#reading-content-from-kuzzle">Reading scenarios</a>)</p>
 
-<p>#2. The router handles the input request and forward the message to the <code class="prettyprint">Funnel Controller</code></p>
+<p>#2. The router handles the input request and forward the message to the <code class="prettyprint">Funnel</code></p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mainindex"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"collection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
@@ -2580,51 +2447,18 @@ content-type:application/json
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and forward the request to the <code class="prettyprint">Write Controller</code></p>
+<p>#3. The <code class="prettyprint">Funnel</code> validates the message and forward the request to the <code class="prettyprint">Write Controller</code></p>
 
 <p>#4. The <code class="prettyprint">Write Controller</code> triggers the <code class="prettyprint">Plugins Manager</code> with a &ldquo;data:create&rdquo; event.<br/>
-The <code class="prettyprint">Plugins Manager</code> calls all pipes and hooks configured by the active plugins (see <a href="#plugins">Plugin&rsquo;s documentation</a>), and finally triggers the &ldquo;add&rdquo; event of the <code class="prettyprint">Write Hook</code>.<br/>
-The <code class="prettyprint">Write Hook</code> sends the request to the <code class="prettyprint">Internal Broker</code>. (see <a href="https://github.com/kuzzleio/kuzzle/blob/master/lib/hooks/README.md">Hooks Readme</a> for more details about hooks).</p>
+The <code class="prettyprint">Plugins Manager</code> calls all pipes and hooks configured by the active plugins (see <a href="#plugins">Plugin&rsquo;s documentation</a>).</p>
 
-<p>#5. The <code class="prettyprint">Write Controller</code> asks the <code class="prettyprint">Worker Listener</code> to listen to the <code class="prettyprint">Internal Broker</code>&rsquo;s feedback message.</p>
+<p>#5. The <code class="prettyprint">Write Controller</code> sends the request to the <code class="prettyprint">WriteEngine</code>service.</p>
 
-<p>That way Kuzzle parallelizes the processing of writing contents.</p>
+<p>The <code class="prettyprint">Write Engine</code> sends the request to the database.</p>
 
-<h5 id="2nd-step-save-content-into-the-storage-engine">2nd step: Save content into the storage engine</h5>
+<p>#6. Once the <code class="prettyprint">Write Engine</code> gets the response back, it replies to the <code class="prettyprint">Write Controller</code></p>
 
-<p>Involved components overview:</p>
-
-<p><img alt="persistence_overview2" src="images/request-scenarios/persistence/overview2.png" /></p>
-
-<p>Detailed workflow:</p>
-
-<p><img alt="persistence_scenario_details2" src="images/request-scenarios/persistence/details2.png" /></p>
-
-<p>#6. A <code class="prettyprint">Write Worker</code> is notified by the internal broker about a new write request.</p>
-
-<p>#7. The worker calls the <code class="prettyprint">Write Engine</code> service.</p>
-
-<p>#8. The <code class="prettyprint">Write Engine</code> service performs a request to send the data to the data storage.</p>
-
-<p>#9. Promises functions are resolved to forward the response message back to the <code class="prettyprint">Write Worker</code></p>
-
-<p>#10. The worker sends the feedback message from ElasticSearch to the worker <em>response</em> queue (see #5).</p>
-
-<h5 id="3rd-step-send-feedback">3rd step: Send feedback</h5>
-
-<p>Involved components overview:</p>
-
-<p><img alt="persistence_overview3" src="images/request-scenarios/persistence/overview3.png" /></p>
-
-<p>Detailed workflow:</p>
-
-<p><img alt="persistence_scenario_details3" src="images/request-scenarios/persistence/details3.png" /></p>
-
-<p>#11. The <code class="prettyprint">Worker Listener</code> that the <code class="prettyprint">Write Controller</code> registered in step #5. receive a notification from the <code class="prettyprint">Internal Broker</code>&hellip;</p>
-
-<p>#12. &hellip; and forwards it to the <code class="prettyprint">Write Controller</code>, who then forwards it to the <code class="prettyprint">Funnel Controller</code>, who in turn forwards it to <code class="prettyprint">Router Controller</code>&hellip;</p>
-
-<p>#13. &hellip; which sends a feedback to the client.</p>
+<p>#7. The <code class="prettyprint">Write Controller</code> wraps the response in a Kuzzle Response and forwards it back to the user.</p>
 
 <h4 id="subscribe-and-notification-scenario">Subscribe and Notification scenario</h4>
 
@@ -2667,7 +2501,7 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
   <span class="p">});</span>
 </code></pre>
 
-<p>#2. The <code class="prettyprint">Router Controller</code> interprets the input request and transfer the subscription message to the <code class="prettyprint">Funnel Controller</code>.</p>
+<p>#2. The <code class="prettyprint">Router</code> interprets the input request and transfer the subscription message to the <code class="prettyprint">Funnel</code>.</p>
 
 <p>Sample message:
 <code class="prettyprint">json
@@ -2682,7 +2516,7 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
 }
 </code></p>
 
-<p>#3. The <code class="prettyprint">Funnel Controller</code> validates the message and transfer it to the <code class="prettyprint">Subscribe Controller</code>.</p>
+<p>#3. The <code class="prettyprint">Funnel</code> validates the message and transfer it to the <code class="prettyprint">Subscribe Controller</code>.</p>
 
 <p>#4. The <code class="prettyprint">Subscribe Controller</code> calls the <code class="prettyprint">HotelClerk</code> internal component to create the subscription.</p>
 
@@ -2781,7 +2615,7 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
 
 <p>Detailed workflow:</p>
 
-<p><img alt="auth_scenario_details_local" src="images/images/request-scenarios/auth/details_local.png" /></p>
+<p><img alt="auth_scenario_details_local" src="images/request-scenarios/auth/details-local.png" /></p>
 
 <p>#1. The user calls the <em>login</em> action of the <code class="prettyprint">Auth Controller</code>:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -2831,7 +2665,7 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
 
 <p>Detailed workflow:</p>
 
-<p><img alt="auth_scenario_details_oauth2" src="images/images/request-scenarios/auth/details_oauth2.png" /></p>
+<p><img alt="auth_scenario_details_oauth2" src="images/request-scenarios/auth/details-oauth2.png" /></p>
 
 <p>The authentication flow is a 2-step flow:</p>
 
@@ -3219,28 +3053,29 @@ Each <em>args</em> item will look like:</p>
             <h2 id="managing-plugins-using-the-cli">Managing plugins using the CLI</h2>
 
 <p>Plugins can be managed using the Kuzzle command-line interface:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --help
+<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle plugins --help
 
-Usage: plugins <span class="o">[</span>options] <span class="o">[</span>name]
+    Usage: plugins <span class="o">[</span>options] <span class="o">[</span>name]
 
-Manage plugins
+    manage plugins
 
-Options:
+    Options:
 
-  -h, --help                  output usage information
-  --list                      <span class="k">*</span>List currently installed plugins
-  --install                   <span class="k">*</span>If plugin <span class="o">[</span>name] is provided, installs it using --npmVersion, --gitUrl or --path. Otherwise, <span class="o">(</span>re-<span class="o">)</span>installs all listed plugins
-  --get                       <span class="k">*</span>Gets the plugin <span class="o">[</span>name] current stored configuration
-  --set &lt;JSONObject&gt;          <span class="k">*</span>Updates the plugin configuration with new properties
-  --replace &lt;JSONObject&gt;      <span class="k">*</span>Replaces a plugin configuration with a new one
-  --unset &lt;property&gt;          <span class="k">*</span>Deletes the property <span class="o">[</span>property] from the plugin configuration
-  --remove                    <span class="k">*</span>Removes the supplied plugin <span class="o">[</span>name] from Kuzzle
-  --activate                  <span class="k">*</span>Marks the plugin as <span class="s2">"activated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
-  --deactivate                <span class="k">*</span>Marks the plugin as <span class="s2">"deactivated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
-  --importConfig &lt;file&gt;       <span class="k">*</span>Imports a configuration from a file <span class="k">for </span>a given plugin
-  -v, --npmVersion &lt;version&gt;  Installs plugin &lt;version&gt; from NPM <span class="o">(</span>work only with --install<span class="o">)</span>
-  -u, --gitUrl &lt;url&gt;          Installs plugin from a GIT repo &lt;url&gt; <span class="o">(</span>work only with --install<span class="o">)</span>
-  -p, --path &lt;path&gt;           Installs a plugin from directory &lt;path&gt; <span class="o">(</span>work only with --install<span class="o">)</span>
+      -h, --help                  output usage information
+          --list                  list currently installed plugins
+          --install               <span class="k">if </span>plugin <span class="o">[</span>name] is provided, install it from --npmVersion, --gitUrl or --path, otherwise, <span class="o">(</span>re-<span class="o">)</span>install all listed plugins
+          --remove                removes plugin <span class="o">[</span>name] from Kuzzle
+          --activate              mark the plugin as <span class="s2">"activated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
+          --deactivate            mark the plugin as <span class="s2">"deactivated"</span> <span class="o">(</span>Kuzzle ignores deactivated plugins<span class="o">)</span>
+          --importConfig &lt;file&gt;   import a configuration from a file <span class="k">for </span>a given plugin
+          --get                   get plugin <span class="o">[</span>name] configuration stored <span class="k">in </span>Kuzzle
+          --set &lt;JSONObject&gt;      merge current plugin configuration with JSONObject
+          --unset &lt;property&gt;      <span class="nb">unset </span>property from the plugin configuration
+          --replace &lt;JSONObject&gt;  erase the plugin configuration and apply JSONObject instead
+      -v, --npmVersion &lt;version&gt;  install plugin &lt;version&gt; from npm
+      -u, --gitUrl &lt;url&gt;          install plugin from a git repository
+      -p, --path &lt;path&gt;           install plugin from the file system
+
 </code></pre>
 
 <aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
@@ -3248,10 +3083,25 @@ Options:
 <h3 id="gt-list-installed-plugins">&gt; List installed plugins</h3>
 
 <p>You can get an overview of installed plugins and their activation status using the <code class="prettyprint">--list</code> option:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --list
-kuzzle-plugin-auth-passport-local <span class="o">(</span>activated<span class="o">)</span>
-kuzzle-plugin-logger <span class="o">(</span>activated<span class="o">)</span>
-kuzzle-plugin-auth-passport-oauth <span class="o">(</span>disabled<span class="o">)</span>
+<pre class="highlight plaintext"><code>./bin/kuzzle plugins --list
+{ 'kuzzle-plugin-auth-passport-local': 
+   { npmVersion: '2.0.3',
+     activated: true,
+     config: 
+      { secret: 'changeme',
+        algorithm: 'sha1',
+        digest: 'hex' } },
+  'kuzzle-plugin-logger': 
+   { npmVersion: '2.0.2',
+     activated: true,
+     config: 
+      { services: 
+         { file: 
+            { outputs: 
+               { error: { level: 'error', filename: 'kuzzle-error.log' },
+                 warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+              addDate: true },
+           stdout: { level: 'info', addDate: true } } } }
 </code></pre>
 
 <h3 id="gt-install-a-plugin">&gt; Install a plugin</h3>
@@ -3280,12 +3130,17 @@ The corresponding installation options are: <code class="prettyprint">--npmVersi
 <h3 id="gt-view-plugin-configuration">&gt; View plugin configuration</h3>
 
 <p>To view a plugin configuration, use the <code class="prettyprint">--get</code> option.</p>
-
-<p>Example:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
+  activated: true,
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
 </code></pre>
 
 <h3 id="gt-modify-a-plugin-configuration">&gt; Modify a plugin configuration</h3>
@@ -3303,69 +3158,81 @@ The corresponding installation options are: <code class="prettyprint">--npmVersi
 </ul>
 
 <p>Updating a plugin configuration:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
-
-<span class="gp">$ </span>kuzzle plugins --set <span class="s1">'{"room": "foobar", "foo": "bar"}'</span> kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> room: <span class="s1">'foobar'</span>, port: 7512, loadedBy: <span class="s1">'server'</span>, foo: <span class="s1">'bar'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+ { npmVersion: '2.0.2',
+   activated: true,
+   config: 
+    { services: 
+       { file: 
+          { outputs: 
+             { error: { level: 'error', filename: 'kuzzle-error.log' },
+               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+            addDate: true },
+         stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --set '{ "stdout": { "level": "debug"} }' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: 
+     { services: 
+        { file: 
+           { outputs: 
+              { error: { level: 'error', filename: 'kuzzle-error.log' },
+                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+             addDate: true },
+          stdout: { level: 'debug' } } } }
 </code></pre>
 
 <p>Replacing a plugin configuration on the command-line:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
-
-<span class="gp">$ </span>kuzzle plugins --replace <span class="s1">'{"foo": "bar"}'</span> kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> foo: <span class="s1">'bar'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+ { npmVersion: '2.0.2',
+   activated: true,
+   config: 
+    { services: 
+       { file: 
+          { outputs: 
+             { error: { level: 'error', filename: 'kuzzle-error.log' },
+               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+            addDate: true },
+         stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --replace '{"stdout": {"level": "debug", "addDate": true}}' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: { stdout: { level: 'debug', addDate: true } } }
 </code></pre>
 
 <p>Replacing a plugin configuration using a JSON file:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>cat someConfigurationFile.json
-<span class="o">{</span>
-  <span class="s2">"room"</span>: <span class="s2">"foobar"</span>,
-  <span class="s2">"foo"</span>: <span class="s2">"bar"</span>,
-  <span class="s2">"port"</span>: 7512,
-  <span class="s2">"loadedBy"</span>: <span class="s2">"server"</span>
-<span class="o">}</span>
-
-<span class="gp">$ </span>kuzzle plugins --importConfig someConfigurationFile.json kuzzle-plugin-socketio
-<span class="o">[</span>✔] Successfully imported configuration
-
-<span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'foobar'</span>, loadedBy: <span class="s1">'server'</span>, foo: <span class="s1">'bar'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --importConfig foo.json kuzzle-plugin-logger
+[✔] Successfully imported configuration
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2', activated: true, config: { foo: 'bar' } }
 </code></pre>
 
 <h3 id="gt-removing-a-plugin-configuration-property">&gt; Removing a plugin configuration property</h3>
 
 <p>You can remove a plugin configuration property by using the <code class="prettyprint">--unset</code> action:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --get kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
-
-<span class="gp">$ </span>kuzzle plugins --unset room kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
+  activated: true,
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true }
 </code></pre>
+
+<aside class="notice">NB: Only root properties can be unset</aside>
 
 <h3 id="gt-uninstalling-a-plugin">&gt; Uninstalling a plugin</h3>
 
 <p>Plugins can be uninstalled using the <code class="prettyprint">--remove</code> option. If the plugin has been installed from NPM or from a GIT repository, the plugin installation directory will also be deleted.</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --remove kuzzle-plugin-socketio
-███ kuzzle-plugin: Loading Kuzzle configuration...
-███ kuzzle-plugin: Removing plugin kuzzle-plugin-socketio...
-███ kuzzle-plugin: Plugin configuration deleted
-███ kuzzle-plugin: Plugin directory deleted
+<span class="err">$</span>
 </code></pre>
 
 <h3 id="gt-activating-deactivating-a-plugin">&gt; Activating/Deactivating a plugin</h3>
@@ -3375,17 +3242,31 @@ The corresponding installation options are: <code class="prettyprint">--npmVersi
 <p>You may want to activate or deactivate a plugin, without uninstalling it.</p>
 
 <p>To deactivate a plugin:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --deactivate kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">false</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>./bin/kuzzle plugins --deactivate kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
+  activated: false,
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
 </code></pre>
 
 <p>To activate a plugin:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>kuzzle plugins --activate kuzzle-plugin-socketio
-<span class="o">{</span> npmVersion: <span class="s1">'1.0.7'</span>,
-  activated: <span class="nb">true</span>,
-  config: <span class="o">{</span> port: 7512, room: <span class="s1">'kuzzle'</span>, loadedBy: <span class="s1">'server'</span> <span class="o">}</span> <span class="o">}</span>
+<pre class="highlight plaintext"><code>$ ./bin/kuzzle plugins --activate kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: 
+     { services: 
+        { file: 
+           { outputs: 
+              { error: { level: 'error', filename: 'kuzzle-error.log' },
+                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+             addDate: true },
+          stdout: { level: 'info', addDate: true } } } }
 </code></pre>
 
             <h2 id="plugin-creation-prerequisites">Plugin creation prerequisites</h2>
@@ -3429,12 +3310,6 @@ The corresponding installation options are: <code class="prettyprint">--npmVersi
 <th>Description</th>
 </tr>
 </thead><tbody>
-<tr>
-<td><code class="prettyprint">loadedBy</code></td>
-<td><code class="prettyprint">string</code></td>
-<td><code class="prettyprint">&quot;all&quot;</code></td>
-<td>Tells Kuzzle to only load the plugin by <code class="prettyprint">&quot;server&quot;</code>, <code class="prettyprint">&quot;worker&quot;</code> or <code class="prettyprint">&quot;all&quot;</code> instances types</td>
-</tr>
 <tr>
 <td><code class="prettyprint">threads</code></td>
 <td><code class="prettyprint">unsigned integer</code></td>
@@ -3515,7 +3390,13 @@ Each plugin receives its own plugin context instance.</p>
 </tr>
 </tbody></table>
 
+<p><strong>Note:</strong> <code class="prettyprint">context.accessors</code> are not available to <a href="#gt-worker-plugins">worker plugins</a>, as they are run in their own process(es), without access to Kuzzle instances.</p>
+
 <h3 id="gt-accessor-passport">&gt; Accessor: <code class="prettyprint">passport</code></h3>
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don&rsquo;t have access to accessors
+</aside>
 
 <p>The <code class="prettyprint">passport</code> accessor allow <a href="/#gt-authentication-plugin">authentication plugins</a> to register a new login strategy to Kuzzle.</p>
 
@@ -3560,6 +3441,10 @@ Each plugin receives its own plugin context instance.</p>
 </code></pre>
 
 <h3 id="gt-accessor-router">&gt; Accessor: <code class="prettyprint">router</code></h3>
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don&rsquo;t have access to accessors
+</aside>
 
 <p>The <code class="prettyprint">router</code> accessor allows protocol plugins to interface themselves with Kuzzle. This accessor exposes the following methods:</p>
 
@@ -3649,6 +3534,10 @@ Not calling this method after a connection is dropped will result in a memory-le
 </tbody></table>
 
 <h3 id="gt-accessor-users">&gt; Accessor: <code class="prettyprint">users</code></h3>
+
+<aside class="notice">
+<a href="#gt-worker-plugins">Worker plugins</a> don&rsquo;t have access to accessors
+</aside>
 
 <p>The <code class="prettyprint">users</code> accessor provides methods for handling users. This accessor is mainly used by authentication plugins.</p>
 
@@ -4267,14 +4156,16 @@ Not calling this method after a connection is dropped will result in a memory-le
 
 <h3 id="gt-worker-plugins">&gt; Worker plugins</h3>
 
+<aside class="notice">
+The <a href="#the-plugin-context">plugin context</a> provided to worker plugins do not contain <code>accessors</code>
+</aside>
+
 <p>A <code class="prettyprint">worker</code> plugin is simply a <code class="prettyprint">listener</code> plugin running in separate threads. This is especially useful when you have to perform cost-heavy operations without impeding Kuzzle performances.</p>
 
 <p>To convert a <code class="prettyprint">listener</code> plugin to a <code class="prettyprint">worker</code> one, just add the following attribute to the plugin configuration: <code class="prettyprint">threads: &lt;number of threads&gt;</code></p>
 
 <p>If this number of threads is greater than 0, Kuzzle will launch the plugin on a single separate thread.<br>
 If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.</p>
-
-<p><strong>Note:</strong> <code class="prettyprint">worker</code> plugins can only be launched by server instances of Kuzzle.</p>
 
 <p>Plugin configuration example:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
@@ -4442,7 +4333,12 @@ The order of plugin execution is not guaranteed.</p>
 <h3 id="gt-protocol-plugins">&gt; Protocol plugins</h3>
 
 <p>Kuzzle core only supports REST communications. All other supported protocols are implemented as <code class="prettyprint">protocol</code> plugins.<br>
-By default, the Kuzzle official docker image is shipped with the <a href="https://github.com/kuzzleio/kuzzle-plugin-socketio">Socket.io</a> <code class="prettyprint">protocol</code> plugin.</p>
+By default, the Kuzzle official docker image is shipped with the following protocol plugins:</p>
+
+<ul>
+<li><a href="https://www.npmjs.com/package/kuzzle-plugin-socketio">Socket.io</a></li>
+<li><a href="https://www.npmjs.com/package/kuzzle-plugin-websocket">WebSocket</a></li>
+</ul>
 
 <h4 id="how-it-works">How it works</h4>
 
@@ -4479,34 +4375,39 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 </tr>
 </tbody></table>
 
-<p>Messages emanating from Kuzzle are emitted using the following hooks. Protocol plugins are free to ignore some or all of these hooks:</p>
+<p>Kuzzle expects <code class="prettyprint">protocol</code> plugins to expose the following methods:</p>
 
 <table><thead>
 <tr>
-<th>Hook</th>
-<th>Emitted object</th>
+<th>Method</th>
+<th>Arguments</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td><code class="prettyprint">protocol:joinChannel</code></td>
+<td><code class="prettyprint">init</code></td>
+<td><code class="prettyprint">pluginConfiguration, context, isDummy</code></td>
+<td><a href="http://kuzzle.io/guide/#gt-plugin-init-function">Plugin initialization function</a></td>
+</tr>
+<tr>
+<td><code class="prettyprint">joinChannel</code></td>
 <td><code class="prettyprint">{channel, id}</code></td>
 <td>Tells protocol plugins that the connection <code class="prettyprint">id</code> subscribed to the channel <code class="prettyprint">channel</code></td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:leaveChannel</code></td>
+<td><code class="prettyprint">leaveChannel</code></td>
 <td><code class="prettyprint">{channel, id}</code></td>
 <td>Tells protocol plugins that the connection <code class="prettyprint">id</code> left the channel <code class="prettyprint">channel</code></td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:notify</code></td>
-<td><code class="prettyprint">{channel, id, payload}</code></td>
-<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> to the connection <code class="prettyprint">id</code>, on the channel <code class="prettyprint">channel</code></td>
+<td><code class="prettyprint">notify</code></td>
+<td><code class="prettyprint">{channels, id, payload}</code></td>
+<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> (JSON Object) to the connection <code class="prettyprint">id</code> (string), on the channels  <code class="prettyprint">channels</code> (array of strings)</td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:broadcast</code></td>
-<td><code class="prettyprint">{channel, payload}</code></td>
-<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> to clients connected to the channel <code class="prettyprint">channel</code></td>
+<td><code class="prettyprint">broadcast</code></td>
+<td><code class="prettyprint">{channels, payload}</code></td>
+<td>Asks protocol plugins to emit a data <code class="prettyprint">payload</code> (JSON Object) to clients connected to the channels list <code class="prettyprint">channels</code> (array of strings)</td>
 </tr>
 </tbody></table>
 
@@ -4515,21 +4416,8 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 <p><em>For more information about channels, see our <a href="http://kuzzle.io/api-reference/#on">API Documentation</a></em></p>
 
 <h4 id="protocol-plugin-implementation-example"><code class="prettyprint">protocol</code> plugin implementation example</h4>
-
-<p>First, link protocol hooks to their corresponding implementation methods:</p>
-<pre class="highlight javascript"><code><span class="c1">// Content of a hooks.js file:</span>
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s1">'protocol:broadcast'</span><span class="p">:</span> <span class="s1">'broadcast'</span><span class="p">,</span>
-  <span class="s1">'protocol:notify'</span><span class="p">:</span> <span class="s1">'notify'</span><span class="p">,</span>
-  <span class="s1">'protocol:joinChannel'</span><span class="p">:</span> <span class="s1">'join'</span><span class="p">,</span>
-  <span class="s1">'protocol:leaveChannel'</span><span class="p">:</span> <span class="s1">'leave'</span>
-<span class="p">};</span>
-</code></pre>
-
-<p>Then, implement the corresponding methods:</p>
 <pre class="highlight javascript"><code><span class="c1">// Protocol plugin implementation</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">hooks</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./hooks.js'</span><span class="p">);</span>
   <span class="c1">// for instance, maintain client contexts in a global object</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">contexts</span> <span class="o">=</span> <span class="p">{};</span>
 
@@ -4559,36 +4447,39 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 
   <span class="k">this</span><span class="p">.</span><span class="nx">broadcast</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="cm">/*
-     Linked to the protocol:broadcast hook, emitted
-     by Kuzzle when a "data.payload" needs to be broadcasted to the
-     "data.channel" channel
+     Invoked by Kuzzle when a "data.payload" payload needs to be
+     broadcasted to the "data.channels" channels
 
      The payload is a ResponseObject
     */</span>
+    <span class="nx">data</span><span class="p">.</span><span class="nx">channels</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">channel</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// ...</span>
+    <span class="p">});</span>
   <span class="p">};</span>
 
   <span class="k">this</span><span class="p">.</span><span class="nx">notify</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="cm">/*
-     Linked to the protocol:notify hook, emitted
-     by Kuzzle when a "data.payload" needs to be emitted to the
-     connection "data.id", on the channel "data.channel"
+     Invoked by Kuzzle when a "data.payload" payload needs to be
+     notified to the connection "data.id", on the "data.channels" channels
 
      The payload is a ResponseObject
     */</span>
+
   <span class="p">};</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">joinChannel</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="cm">/*
-      Linked to the protocol:joinChannel hook, emitted  
-      by Kuzzle when the connection "data.id" joins the
+      Invoked by Kuzzle when the connection "data.id" joins the
       channel "data.channel"
      */</span>
+     <span class="nx">data</span><span class="p">.</span><span class="nx">channels</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">channel</span> <span class="o">=&gt;</span> <span class="p">{</span>
+       <span class="c1">// ...</span>
+     <span class="p">});</span>
   <span class="p">};</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">leave</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">leaveChannel</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="cm">/*
-      Linked to the protocol:leaveChannel hook, emitted  
-      by Kuzzle when the connection "data.id" leaves the
+      Invoked by Kuzzle when the connection "data.id" leaves the
       channel "data.channel"
      */</span>
   <span class="p">};</span>
@@ -5392,9 +5283,9 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 </tr>
 </tbody></table>
 
-<h3 id="gt-event-protocol">&gt; event: protocol</h3>
+<h3 id="gt-event-proxy">&gt; event: proxy</h3>
 
-<p>Events triggered to interact with <code class="prettyprint">protocol</code> plugins.</p>
+<p>Events triggered when interacting with <code class="prettyprint">proxy</code>.</p>
 
 <table><thead>
 <tr>
@@ -5406,70 +5297,32 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 </tr>
 </thead><tbody>
 <tr>
-<td><code class="prettyprint">protocol:broadcast</code></td>
+<td><code class="prettyprint">proxy:broadcast</code></td>
 <td>/</td>
 <td>/</td>
 <td>Triggered before broadcast. You can&rsquo;t modify the input on this event.</td>
-<td>Type: Object.<br>  <code class="prettyprint">{payload, channel}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channel</code> is the channel name.</td>
+<td>Type: Object.<br>  <code class="prettyprint">{payload, channelsList}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channelsList</code> is an array of channels to broadcast.</td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:joinChannel</code></td>
+<td><code class="prettyprint">proxy:joinChannel</code></td>
 <td>/</td>
 <td>/</td>
 <td>Triggered after attach a user to a room. You can&rsquo;t modify the input on this event.</td>
 <td>Type: Object.<br>  <code class="prettyprint">{channel, id}</code> <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:leaveChannel</code></td>
+<td><code class="prettyprint">proxy:leaveChannel</code></td>
 <td>/</td>
 <td>/</td>
 <td>Triggered before a room is removed for the user. You can&rsquo;t modify the input on this event.</td>
 <td>Type: Object.<br>  <code class="prettyprint">{channel, id}</code> <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
 </tr>
 <tr>
-<td><code class="prettyprint">protocol:notify</code></td>
+<td><code class="prettyprint">proxy:notify</code></td>
 <td>/</td>
 <td>/</td>
 <td>Triggered before notify a connection id.</td>
-<td>Type: Object.<br>  <code class="prettyprint">{payload, channel, id}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channel</code> is the channel name.<br> <code class="prettyprint">id</code> is the connection id</td>
-</tr>
-</tbody></table>
-
-<h3 id="gt-event-rabbit">&gt; event: rabbit</h3>
-
-<aside class="warning">Deprecated</aside>
-
-<p>Events triggered to report RabbitMQ activity.</p>
-
-<table><thead>
-<tr>
-<th>Event</th>
-<th>Controller</th>
-<th>Action</th>
-<th>Description</th>
-<th>Input</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><code class="prettyprint">rabbit:error</code></td>
-<td>/</td>
-<td>/</td>
-<td>Triggered when an error occured on rabbit connection</td>
-<td>Type: Error</td>
-</tr>
-<tr>
-<td><code class="prettyprint">rabbit:started</code></td>
-<td>/</td>
-<td>/</td>
-<td>Triggered when rabbit MQ service is started</td>
-<td>Type: String.<br> <code class="prettyprint">&#39;RabbitMQ Service started&#39;</code></td>
-</tr>
-<tr>
-<td><code class="prettyprint">rabbit:stopped</code></td>
-<td>/</td>
-<td>/</td>
-<td>Triggered when the rabbit MQ service is stopped</td>
-<td>Type: String.<br> <code class="prettyprint">&#39;RabbitMQ Service stopped&#39;</code></td>
+<td>Type: Object.<br>  <code class="prettyprint">{payload, channelsList, id}</code> <br><code class="prettyprint">payload</code> is the notification content. <br><code class="prettyprint">channelsList</code> is an array of channels to notify.<br> <code class="prettyprint">id</code> is the connection id</td>
 </tr>
 </tbody></table>
 
@@ -5822,13 +5675,6 @@ To access these methods, simply call <code class="prettyprint">context.accessors
 <td>/</td>
 <td>/</td>
 <td>Triggered when the http server is started.</td>
-<td>Type: String</td>
-</tr>
-<tr>
-<td><font color="red">(Deprecated)</font> <code class="prettyprint">server:mqStarted</code></td>
-<td>/</td>
-<td>/</td>
-<td>Triggered when the MQ server is started.</td>
 <td>Type: String</td>
 </tr>
 <tr>

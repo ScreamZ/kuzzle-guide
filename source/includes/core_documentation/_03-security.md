@@ -28,7 +28,7 @@ The "Local" strategy authenticates a user locally with his username/password, im
 
 Detailed workflow:
 
-![auth_scenario_details_local](./images/request-scenarios/auth/details_local.png)
+![auth_scenario_details_local](./images/request-scenarios/auth/details-local.png)
 
 \#1. The user calls the *login* action of the ```Auth Controller```:
 
@@ -82,7 +82,7 @@ For more details about OAuth2 protocol, see [here](https://www.digitalocean.com/
 
 Detailed workflow:
 
-![auth_scenario_details_oauth2](./images/request-scenarios/auth/details_oauth2.png)
+![auth_scenario_details_oauth2](./images/request-scenarios/auth/details-oauth2.png)
 
 The authentication flow is a 2-step flow:
 

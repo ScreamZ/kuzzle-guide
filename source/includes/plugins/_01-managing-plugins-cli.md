@@ -3,28 +3,29 @@
 Plugins can be managed using the Kuzzle command-line interface:
 
 ```sh
-$ kuzzle plugins --help
+$ ./bin/kuzzle plugins --help
+  
+    Usage: plugins [options] [name]
+  
+    manage plugins
+  
+    Options:
+  
+      -h, --help                  output usage information
+          --list                  list currently installed plugins
+          --install               if plugin [name] is provided, install it from --npmVersion, --gitUrl or --path, otherwise, (re-)install all listed plugins
+          --remove                removes plugin [name] from Kuzzle
+          --activate              mark the plugin as "activated" (Kuzzle ignores deactivated plugins)
+          --deactivate            mark the plugin as "deactivated" (Kuzzle ignores deactivated plugins)
+          --importConfig <file>   import a configuration from a file for a given plugin
+          --get                   get plugin [name] configuration stored in Kuzzle
+          --set <JSONObject>      merge current plugin configuration with JSONObject
+          --unset <property>      unset property from the plugin configuration
+          --replace <JSONObject>  erase the plugin configuration and apply JSONObject instead
+      -v, --npmVersion <version>  install plugin <version> from npm
+      -u, --gitUrl <url>          install plugin from a git repository
+      -p, --path <path>           install plugin from the file system
 
-Usage: plugins [options] [name]
-
-Manage plugins
-
-Options:
-
-  -h, --help                  output usage information
-  --list                      *List currently installed plugins
-  --install                   *If plugin [name] is provided, installs it using --npmVersion, --gitUrl or --path. Otherwise, (re-)installs all listed plugins
-  --get                       *Gets the plugin [name] current stored configuration
-  --set <JSONObject>          *Updates the plugin configuration with new properties
-  --replace <JSONObject>      *Replaces a plugin configuration with a new one
-  --unset <property>          *Deletes the property [property] from the plugin configuration
-  --remove                    *Removes the supplied plugin [name] from Kuzzle
-  --activate                  *Marks the plugin as "activated" (Kuzzle ignores deactivated plugins)
-  --deactivate                *Marks the plugin as "deactivated" (Kuzzle ignores deactivated plugins)
-  --importConfig <file>       *Imports a configuration from a file for a given plugin
-  -v, --npmVersion <version>  Installs plugin <version> from NPM (work only with --install)
-  -u, --gitUrl <url>          Installs plugin from a GIT repo <url> (work only with --install)
-  -p, --path <path>           Installs a plugin from directory <path> (work only with --install)
 ```
 
 <aside class="warning">Restarting Kuzzle is required to apply any change made to plugins using the command-line interface</aside>
@@ -33,11 +34,26 @@ Options:
 
 You can get an overview of installed plugins and their activation status using the ``--list`` option:
 
-```sh
-$ kuzzle plugins --list
-kuzzle-plugin-auth-passport-local (activated)
-kuzzle-plugin-logger (activated)
-kuzzle-plugin-auth-passport-oauth (disabled)
+```
+./bin/kuzzle plugins --list
+{ 'kuzzle-plugin-auth-passport-local': 
+   { npmVersion: '2.0.3',
+     activated: true,
+     config: 
+      { secret: 'changeme',
+        algorithm: 'sha1',
+        digest: 'hex' } },
+  'kuzzle-plugin-logger': 
+   { npmVersion: '2.0.2',
+     activated: true,
+     config: 
+      { services: 
+         { file: 
+            { outputs: 
+               { error: { level: 'error', filename: 'kuzzle-error.log' },
+                 warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+              addDate: true },
+           stdout: { level: 'info', addDate: true } } } }
 ```
 
 ### > Install a plugin
@@ -73,14 +89,18 @@ $ kuzzle plugins --install --path /directory/absolute/path plugin_name
 
 To view a plugin configuration, use the `--get` option.
 
-
-Example:
-
-```sh
-$ kuzzle plugins --get kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
+```
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
   activated: true,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
 ```
 
 ### > Modify a plugin configuration
@@ -91,73 +111,88 @@ There are multiple ways of changing a plugin configuration.
 
 You can either:
 
-- perform a partial update, using the ``--set`` action. This allows adding or updating parts of the configuration
-- replace the entire plugin configuration on the command-line, with the ``--replace`` action
-- replace the entire plugin configuration by loading a JSON file, with the ``--importConfig <file>`` action
+* perform a partial update, using the ``--set`` action. This allows adding or updating parts of the configuration
+* replace the entire plugin configuration on the command-line, with the ``--replace`` action
+* replace the entire plugin configuration by loading a JSON file, with the ``--importConfig <file>`` action
 
 Updating a plugin configuration:
 
-```sh
-$ kuzzle plugins --get kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-
-$ kuzzle plugins --set '{"room": "foobar", "foo": "bar"}' kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { room: 'foobar', port: 7512, loadedBy: 'server', foo: 'bar' } }
+```
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+ { npmVersion: '2.0.2',
+   activated: true,
+   config: 
+    { services: 
+       { file: 
+          { outputs: 
+             { error: { level: 'error', filename: 'kuzzle-error.log' },
+               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+            addDate: true },
+         stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --set '{ "stdout": { "level": "debug"} }' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: 
+     { services: 
+        { file: 
+           { outputs: 
+              { error: { level: 'error', filename: 'kuzzle-error.log' },
+                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+             addDate: true },
+          stdout: { level: 'debug' } } } }
 ```
 
 Replacing a plugin configuration on the command-line:
 
-```sh
-$ kuzzle plugins --get kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-
-$ kuzzle plugins --replace '{"foo": "bar"}' kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { foo: 'bar' } }
+```
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+ { npmVersion: '2.0.2',
+   activated: true,
+   config: 
+    { services: 
+       { file: 
+          { outputs: 
+             { error: { level: 'error', filename: 'kuzzle-error.log' },
+               warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+            addDate: true },
+         stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --replace '{"stdout": {"level": "debug", "addDate": true}}' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: { stdout: { level: 'debug', addDate: true } } }
 ```
 
 Replacing a plugin configuration using a JSON file:
 
-```sh
-$ cat someConfigurationFile.json
-{
-  "room": "foobar",
-  "foo": "bar",
-  "port": 7512,
-  "loadedBy": "server"
-}
-
-$ kuzzle plugins --importConfig someConfigurationFile.json kuzzle-plugin-socketio
-[✔] Successfully imported configuration
-
-$ kuzzle plugins --get kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, room: 'foobar', loadedBy: 'server', foo: 'bar' } }
 ```
+$ ./bin/kuzzle plugins --importConfig foo.json kuzzle-plugin-logger
+[✔] Successfully imported configuration
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2', activated: true, config: { foo: 'bar' } }
+```
+
 
 ### > Removing a plugin configuration property
 
 You can remove a plugin configuration property by using the ``--unset`` action:
 
-```sh
-$ kuzzle plugins --get kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
-
-$ kuzzle plugins --unset room kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, loadedBy: 'server' } }
 ```
+$ ./bin/kuzzle plugins --get kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
+  activated: true,
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
+$ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true }
+```
+<aside class="notice">NB: Only root properties can be unset</aside>
 
 ### > Uninstalling a plugin
 
@@ -165,10 +200,7 @@ Plugins can be uninstalled using the ``--remove`` option. If the plugin has been
 
 ```sh
 $ kuzzle plugins --remove kuzzle-plugin-socketio
-███ kuzzle-plugin: Loading Kuzzle configuration...
-███ kuzzle-plugin: Removing plugin kuzzle-plugin-socketio...
-███ kuzzle-plugin: Plugin configuration deleted
-███ kuzzle-plugin: Plugin directory deleted
+$
 ```
 
 ### > Activating/Deactivating a plugin
@@ -179,18 +211,34 @@ You may want to activate or deactivate a plugin, without uninstalling it.
 
 To deactivate a plugin:
 
-```sh
-$ kuzzle plugins --deactivate kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: false,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
 ```
+./bin/kuzzle plugins --deactivate kuzzle-plugin-logger
+{ npmVersion: '2.0.2',
+  activated: false,
+  config: 
+   { services: 
+      { file: 
+         { outputs: 
+            { error: { level: 'error', filename: 'kuzzle-error.log' },
+              warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+           addDate: true },
+        stdout: { level: 'info', addDate: true } } } }
+```
+
 
 To activate a plugin:
 
-```sh
-$ kuzzle plugins --activate kuzzle-plugin-socketio
-{ npmVersion: '1.0.7',
-  activated: true,
-  config: { port: 7512, room: 'kuzzle', loadedBy: 'server' } }
 ```
+$ ./bin/kuzzle plugins --activate kuzzle-plugin-logger
+  { npmVersion: '2.0.2',
+    activated: true,
+    config: 
+     { services: 
+        { file: 
+           { outputs: 
+              { error: { level: 'error', filename: 'kuzzle-error.log' },
+                warning: { level: 'warn', filename: 'kuzzle-warning.log' } },
+             addDate: true },
+          stdout: { level: 'info', addDate: true } } } }
+```
+

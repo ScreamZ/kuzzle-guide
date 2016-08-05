@@ -33,14 +33,16 @@ module.exports = function () {
 
 ### > Worker plugins
 
+<aside class="notice">
+The <a href="#the-plugin-context">plugin context</a> provided to worker plugins do not contain <code>accessors</code>
+</aside>
+
 A `worker` plugin is simply a `listener` plugin running in separate threads. This is especially useful when you have to perform cost-heavy operations without impeding Kuzzle performances.
 
 To convert a `listener` plugin to a `worker` one, just add the following attribute to the plugin configuration: `threads: <number of threads>`
 
 If this number of threads is greater than 0, Kuzzle will launch the plugin on a single separate thread.  
 If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.
-
-**Note:** `worker` plugins can only be launched by server instances of Kuzzle.
 
 
 Plugin configuration example:
@@ -220,7 +222,10 @@ module.exports = function () {
 ### > Protocol plugins
 
 Kuzzle core only supports REST communications. All other supported protocols are implemented as `protocol` plugins.  
-By default, the Kuzzle official docker image is shipped with the [Socket.io](https://github.com/kuzzleio/kuzzle-plugin-socketio) `protocol` plugin.
+By default, the Kuzzle official docker image is shipped with the following protocol plugins:
+
+* [Socket.io](https://www.npmjs.com/package/kuzzle-plugin-socketio)
+* [WebSocket](https://www.npmjs.com/package/kuzzle-plugin-websocket)
 
 #### How it works
 
@@ -236,14 +241,15 @@ To access these methods, simply call ``context.accessors.router.<router method>`
 | ``removeConnection`` | ``connection context`` (obtained with ``newConnection``) | | Asks Kuzzle to remove the corresponding connection and all its subscriptions |
 
 
-Messages emanating from Kuzzle are emitted using the following hooks. Protocol plugins are free to ignore some or all of these hooks:
+Kuzzle expects `protocol` plugins to expose the following methods:
 
-| Hook | Emitted object | Description                 |
+| Method | Arguments | Description                 |
 |------|----------------|-----------------------------|
-| ``protocol:joinChannel`` | `{channel, id}`| Tells protocol plugins that the connection `id` subscribed to the channel `channel` |
-| ``protocol:leaveChannel`` | `{channel, id}` | Tells protocol plugins that the connection `id` left the channel `channel` |
-| ``protocol:notify`` | `{channel, id, payload}` | Asks protocol plugins to emit a data `payload` to the connection `id`, on the channel `channel` |
-| ``protocol:broadcast`` | `{channel, payload}` | Asks protocol plugins to emit a data `payload` to clients connected to the channel `channel` |
+| ``init`` | `pluginConfiguration, context, isDummy` | [Plugin initialization function](http://kuzzle.io/guide/#gt-plugin-init-function) |
+| ``joinChannel`` | `{channel, id}`| Tells protocol plugins that the connection `id` subscribed to the channel `channel` |
+| ``leaveChannel`` | `{channel, id}` | Tells protocol plugins that the connection `id` left the channel `channel` |
+| ``notify`` | `{channels, id, payload}` | Asks protocol plugins to emit a data `payload` (JSON Object) to the connection `id` (string), on the channels  `channels` (array of strings)|
+| ``broadcast`` | `{channels, payload}` | Asks protocol plugins to emit a data `payload` (JSON Object) to clients connected to the channels list `channels` (array of strings) |
 
 The `connection ID` Kuzzle send to plugins is the one declared by `protocol` plugins using `context.accessors.router.newConnection`.
 
@@ -252,24 +258,9 @@ The `connection ID` Kuzzle send to plugins is the one declared by `protocol` plu
 
 #### `protocol` plugin implementation example
 
-First, link protocol hooks to their corresponding implementation methods:
-
-```javascript
-// Content of a hooks.js file:
-module.exports = {
-  'protocol:broadcast': 'broadcast',
-  'protocol:notify': 'notify',
-  'protocol:joinChannel': 'join',
-  'protocol:leaveChannel': 'leave'
-};
-```
-
-Then, implement the corresponding methods:
-
 ```javascript
 // Protocol plugin implementation
 module.exports = function () {
-  this.hooks = require('./hooks.js');
   // for instance, maintain client contexts in a global object
   this.contexts = {};
 
@@ -299,36 +290,39 @@ module.exports = function () {
 
   this.broadcast = function (data) {
     /*
-     Linked to the protocol:broadcast hook, emitted
-     by Kuzzle when a "data.payload" needs to be broadcasted to the
-     "data.channel" channel
+     Invoked by Kuzzle when a "data.payload" payload needs to be
+     broadcasted to the "data.channels" channels
 
      The payload is a ResponseObject
     */
+    data.channels.forEach(channel => {
+      // ...
+    });
   };
 
   this.notify = function (data) {
     /*
-     Linked to the protocol:notify hook, emitted
-     by Kuzzle when a "data.payload" needs to be emitted to the
-     connection "data.id", on the channel "data.channel"
+     Invoked by Kuzzle when a "data.payload" payload needs to be
+     notified to the connection "data.id", on the "data.channels" channels
 
      The payload is a ResponseObject
     */
+
   };
 
-  this.join = function (data) {
+  this.joinChannel = function (data) {
     /*
-      Linked to the protocol:joinChannel hook, emitted  
-      by Kuzzle when the connection "data.id" joins the
+      Invoked by Kuzzle when the connection "data.id" joins the
       channel "data.channel"
      */
+     data.channels.forEach(channel => {
+       // ...
+     });
   };
 
-  this.leave = function (data) {
+  this.leaveChannel = function (data) {
     /*
-      Linked to the protocol:leaveChannel hook, emitted  
-      by Kuzzle when the connection "data.id" leaves the
+      Invoked by Kuzzle when the connection "data.id" leaves the
       channel "data.channel"
      */
   };

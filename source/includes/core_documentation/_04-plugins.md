@@ -200,6 +200,9 @@ A plugin is a Javascript module that can be installed with NPM or via a public G
 The module must have a `package.json` file with a `pluginInfo` entry. The optional `defaultConfig` will be used by Kuzzle to initialize the plugin configuration on a fresh install.
 
 ```json
+"name": "plugin-name",
+"version": "0.0.1",
+"main": "./lib/index.js",
 "pluginInfo": {
     "loadedBy": "all",
     "defaultConfig": {

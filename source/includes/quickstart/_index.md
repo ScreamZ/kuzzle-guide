@@ -1,6 +1,6 @@
 # Quickstart
 
-In this quickstart tutorial you will learn in a few steps how to launch your own Kuzzle server 
+In this quickstart tutorial you will learn in a few steps how to launch your own Kuzzle server
 and how to interact with it by indexing data (persisted data) and being informed when data is updated (pub/sub)
 
 ## Setup a Kuzzle server
@@ -17,38 +17,21 @@ and how to interact with it by indexing data (persisted data) and being informed
 You don't have to clone kuzzle to use it.
 </aside>
 
-- Create a `docker-compose.yml` with:
-
-```yml
-kuzzle:
-  image: kuzzleio/kuzzle:latest
-  ports:
-    - "7512:7512"
-    - "7511:7511"
-  links:
-    - elasticsearch
-    - redis
-
-redis:
-  image: redis:3.0
-
-elasticsearch:
-  image: elasticsearch:2.2
-```
+- Copy our [docker-compose.yml](https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml) file in a directory
 
 <aside class="notice">
 You can also retrieve this file directly with curl/wget : <br />
 <code>wget https://raw.githubusercontent.com/kuzzleio/kuzzle/master/docker-compose.yml</code>
 </aside>
 
-- run: 
+- run:
 
 ```bash
 $ docker-compose up
 ```
 
 <aside class="success">
-Kuzzle is running on: 
+Kuzzle is running on:
 <ul>
     <li><code>localhost:7512</code> for <strong>Websocket</strong></li>
     <li><code>localhost:7511</code> for <strong>REST</strong></li>
@@ -75,7 +58,9 @@ kuzzleBo:
   ports:
     - "3000:3000"
   links:
-    - kuzzle
+    - proxy:kuzzle
+  environment:
+    - KUZZLE_URL
 ```
 
 <aside class="success">
@@ -152,15 +137,15 @@ new Kuzzle('http://localhost:7512')
 
 // create a reference to the data collection
 var collection = kuzzle.dataCollectionFactory('myindex', 'mycollection')
-    
+
 // define a filter
 var filter = {
     exists: {
         field: 'message'
     }
 }
-    
-// create a subscription on the collection matching given filters 
+
+// create a subscription on the collection matching given filters
 collection.subscribe(filter, function(error, result) {
     // this function is called each time kuzzle notifies us with a document matching our filters
     console.log('message received from kuzzle:', result)

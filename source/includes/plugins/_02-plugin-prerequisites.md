@@ -11,6 +11,9 @@ This configuration can then be changed using the command-line interface.
 Default configuration example:
 
 ```json
+"name": "plugin-name",
+"version": "0.0.1",
+"main": "./lib/index.js",
 "pluginInfo": {
   "defaultConfig": {
     "any": "information",
@@ -24,6 +27,9 @@ Default configuration example:
 Additionally to plugins' custom configuration, there are a few reserved words used by Kuzzle to configure how a plugin is loaded:
 
 ```json
+"name": "plugin-name",
+"version": "0.0.1",
+"main": "./lib/index.js",
 "pluginInfo": {
     "defaultConfig": {
       "loadedBy": "all",

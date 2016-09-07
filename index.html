@@ -3280,7 +3280,10 @@ $ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
 <p>This configuration can then be changed using the command-line interface.</p>
 
 <p>Default configuration example:</p>
-<pre class="highlight json"><code><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+<pre class="highlight json"><code><span class="s2">"name"</span><span class="err">:</span><span class="w"> </span><span class="s2">"plugin-name"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"version"</span><span class="err">:</span><span class="w"> </span><span class="s2">"0.0.1"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"main"</span><span class="err">:</span><span class="w"> </span><span class="s2">"./lib/index.js"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"any"</span><span class="p">:</span><span class="w"> </span><span class="s2">"information"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"useful"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"to"</span><span class="p">,</span><span class="w"> </span><span class="s2">"the"</span><span class="p">,</span><span class="w"> </span><span class="s2">"plugin"</span><span class="p">]</span><span class="w">
@@ -3291,7 +3294,10 @@ $ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
 <h3 id="gt-special-plugin-configurations">&gt; Special plugin configurations</h3>
 
 <p>Additionally to plugins&rsquo; custom configuration, there are a few reserved words used by Kuzzle to configure how a plugin is loaded:</p>
-<pre class="highlight json"><code><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+<pre class="highlight json"><code><span class="s2">"name"</span><span class="err">:</span><span class="w"> </span><span class="s2">"plugin-name"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"version"</span><span class="err">:</span><span class="w"> </span><span class="s2">"0.0.1"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"main"</span><span class="err">:</span><span class="w"> </span><span class="s2">"./lib/index.js"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"threads"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">

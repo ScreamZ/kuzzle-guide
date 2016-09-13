@@ -51,7 +51,6 @@ Plugin configuration example:
 {
     "path": "/var/kuzzle-plugin-very-useful",
     "defaultConfig": {
-      "loadedBy": "server",
       "threads": 2
     },
     "activated": true

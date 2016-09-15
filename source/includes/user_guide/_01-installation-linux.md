@@ -229,7 +229,7 @@ $ ./bin/kuzzle install
 
 #### Finally
 
-Start a server instance (we override the default port to avoid a conflict with the proxy if we didn't change the http port of the proxy, kuzzle will automatically tell the proxy which http port it is using):
+Start a server instance, by overriding the default proxy HTTP port to avoid conflict with Kuzzle server instances (it will be propagated through the cluster)
 
 ```bash
 $ kuzzle_server__http__port=17511 ./bin/kuzzle start

@@ -44,14 +44,12 @@ To convert a `listener` plugin to a `worker` one, just add the following attribu
 If this number of threads is greater than 0, Kuzzle will launch the plugin on a single separate thread.  
 If the number of configured thread is greater than 1, Kuzzle will dispatch events between these threads using round-robin.
 
-
 Plugin configuration example:
 
 ```json
 {
     "path": "/var/kuzzle-plugin-very-useful",
     "defaultConfig": {
-      "loadedBy": "server",
       "threads": 2
     },
     "activated": true

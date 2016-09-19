@@ -526,7 +526,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <li>A properly installed <a href="https://nodejs.org/en/download/package-manager/">nodeJs</a> <strong>version 4</strong> or upper</li>
 </ul>
 
-<h4 id="step-one">Step one</h4>
+<h4 id="step-1">Step 1</h4>
 
 <p>Retrieve the Kuzzle proxy source code from the <a href="https://github.com/kuzzleio/kuzzle-proxy.git">GitHub repo</a>:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle-proxy.git
@@ -538,13 +538,19 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span>npm run plugins
 </code></pre>
 
-<h4 id="step-two">Step two</h4>
+<h4 id="step-2">Step 2</h4>
+
+<p>By default the proxy is using plugin to communicate with websocket and socketio. If you need to change those plugins configuration you will need to copy the pluginsConfig.json.example into pluginsConfig.json and edit it.</p>
+
+<p>In case you want to change the configuration of the kuzzle proxy itself you will need to edit the .proxyrc file.</p>
+
+<h4 id="step-3">Step 3</h4>
 
 <p>Start a proxy instance:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>npm start
 </code></pre>
 
-<h4 id="step-three">Step three</h4>
+<h4 id="step-4">Step 4</h4>
 
 <p>Retrieve the Kuzzle source code from the <a href="https://github.com/kuzzleio/kuzzle.git">GitHub repo</a>:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
@@ -555,16 +561,33 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <pre class="highlight shell"><code><span class="gp">$ </span>npm install
 </code></pre>
 
-<h4 id="step-four">Step four</h4>
+<h4 id="step-5">Step 5</h4>
 
-<p>Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+<p>Configure your environment.
+Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones (the values in this example are the default one):</p>
+<pre class="highlight shell"><code><span class="c"># elasticsearch</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
+
+<span class="c"># internal broker</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
+
+<span class="c"># redis</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
+
+<span class="c"># proxy</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
+
+<span class="c"># http port for REST request</span>
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
 </code></pre>
 
-<h4 id="step-five">Step five</h4>
+<p>Or copy and paste the .kuzzlerc.sample into .kuzzlerc and change it.</p>
+
+<h4 id="step-6">Step 6</h4>
 
 <p>Install the default plugins:</p>
 <pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
@@ -572,8 +595,8 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 <h4 id="finally">Finally</h4>
 
-<p>Start a server instance (we override the default port to avoid a conflict with the proxy):</p>
-<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start
+<p>Start a server instance, by overriding the default proxy HTTP port to avoid conflict with Kuzzle server instances (it will be propagated through the cluster)</p>
+<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
 </code></pre>
 
 <p>For more information, you can execute:</p>
@@ -592,12 +615,17 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
 <span class="gp">$ </span><span class="nb">cd </span>kuzzle
 <span class="gp">$ </span>npm install
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
 <span class="gp">$ </span>./bin/kuzzle install
-<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
 </code></pre>
 
 <h4 id="run-it-again">Run it again</h4>
@@ -609,11 +637,16 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 <span class="c"># Kuzzle</span>
 <span class="gp">$ </span><span class="nb">cd </span>kuzzle
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>localhost:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
-<span class="gp">$ </span><span class="nv">kuzzle_httpPort</span><span class="o">=</span>17511 ./bin/kuzzle start 
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
 </code></pre>
 
 <h4 id="going-further">Going further</h4>
@@ -632,12 +665,12 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 
 <p>examples:</p>
 <pre class="highlight shell"><code><span class="c"># Elastic Search (read/write engine):</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">READ_ENGINE_HOST</span><span class="o">=</span>myelasticsearch:9200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">WRITE_ENGINE_HOST</span><span class="o">=</span>myelasticsearch:9200
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
 
 <span class="c"># Redis (cache services):</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_HOST</span><span class="o">=</span>myredis
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">CACHE_PORT</span><span class="o">=</span>6379
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
+<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
 
 <span class="gp">$ </span>./bin/kuzzle start
 </code></pre>

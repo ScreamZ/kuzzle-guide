@@ -146,7 +146,7 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 * A service [Redis](http://redis.io/) running on localhost:6379
 * A properly installed [nodeJs](https://nodejs.org/en/download/package-manager/) **version 4** or upper
 
-#### Step one
+#### Step 1
 
 Retrieve the Kuzzle proxy source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle-proxy.git):
 
@@ -162,7 +162,13 @@ $ npm install
 $ npm run plugins
 ```
 
-#### Step two
+#### Step 2
+
+By default the proxy is using plugin to communicate with websocket and socketio. If you need to change those plugins configuration you will need to copy the pluginsConfig.json.example into pluginsConfig.json and edit it.
+
+In case you want to change the configuration of the kuzzle proxy itself you will need to edit the .proxyrc file.
+
+#### Step 3
 
 Start a proxy instance:
 
@@ -170,7 +176,7 @@ Start a proxy instance:
 $ npm start
 ```
 
-#### Step three
+#### Step 4
 
 Retrieve the Kuzzle source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle.git):
 
@@ -185,18 +191,35 @@ then install the dependencies:
 $ npm install
 ```
 
-#### Step four
+#### Step 5
 
-Configure your environment. Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones:
+Configure your environment.
+Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones (the values in this example are the default one):
 
 ```bash
-$ export READ_ENGINE_HOST=localhost:9200
-$ export WRITE_ENGINE_HOST=localhost:9200
-$ export CACHE_HOST=localhost
-$ export CACHE_PORT=6379
+# elasticsearch
+$ export kuzzle_services_db_host=localhost
+$ export kuzzle_services_db_port=10200
+
+# internal broker
+$ export kuzzle_services__internalBroker__host=localhost
+$ export kuzzle_services__internalBroker__port=7511
+
+# redis
+$ export kuzzle_services__cache__node__host=localhost
+$ export kuzzle_services__cache__node__port=6379
+
+# proxy
+$ export kuzzle_services__proxyBroker__host=localhost
+$ export kuzzle_services__proxyBroker__port=7331
+
+# http port for REST request
+$ export kuzzle_server__http__port=7511
 ```
 
-#### Step five
+Or copy and paste the .kuzzlerc.sample into .kuzzlerc and change it.
+
+#### Step 6
 
 Install the default plugins:
 
@@ -206,10 +229,10 @@ $ ./bin/kuzzle install
 
 #### Finally
 
-Start a server instance (we override the default port to avoid a conflict with the proxy):
+Start a server instance, by overriding the default proxy HTTP port to avoid conflict with Kuzzle server instances (it will be propagated through the cluster)
 
 ```bash
-$ kuzzle_httpPort=17511 ./bin/kuzzle start
+$ kuzzle_server__http__port=17511 ./bin/kuzzle start
 ```
 
 For more information, you can execute:
@@ -232,12 +255,17 @@ $ npm start
 $ git clone https://github.com/kuzzleio/kuzzle.git
 $ cd kuzzle
 $ npm install
-$ export READ_ENGINE_HOST=localhost:9200
-$ export WRITE_ENGINE_HOST=localhost:9200
-$ export CACHE_HOST=localhost
-$ export CACHE_PORT=6379
+$ export kuzzle_services_db_host=localhost
+$ export kuzzle_services_db_port=10200
+$ export kuzzle_services__internalBroker__host=localhost
+$ export kuzzle_services__internalBroker__port=7511
+$ export kuzzle_services__cache__node__host=localhost
+$ export kuzzle_services__cache__node__port=6379
+$ export kuzzle_services__proxyBroker__host=localhost
+$ export kuzzle_services__proxyBroker__port=7331
+$ export kuzzle_server__http__port=7511
 $ ./bin/kuzzle install
-$ kuzzle_httpPort=17511 ./bin/kuzzle start
+$ export kuzzle_server__http__port=17511 ./bin/kuzzle start
 ```
 
 #### Run it again
@@ -251,11 +279,16 @@ $ npm start
 
 # Kuzzle
 $ cd kuzzle
-$ export READ_ENGINE_HOST=localhost:9200
-$ export WRITE_ENGINE_HOST=localhost:9200
-$ export CACHE_HOST=localhost
-$ export CACHE_PORT=6379
-$ kuzzle_httpPort=17511 ./bin/kuzzle start 
+$ export kuzzle_services_db_host=localhost
+$ export kuzzle_services_db_port=10200
+$ export kuzzle_services__internalBroker__host=localhost
+$ export kuzzle_services__internalBroker__port=7511
+$ export kuzzle_services__cache__node__host=localhost
+$ export kuzzle_services__cache__node__port=6379
+$ export kuzzle_services__proxyBroker__host=localhost
+$ export kuzzle_services__proxyBroker__port=7331
+$ export kuzzle_server__http__port=7511
+$ export kuzzle_server__http__port=17511 ./bin/kuzzle start
 ```
 
 #### Going further
@@ -278,12 +311,12 @@ examples:
 
 ```bash
 # Elastic Search (read/write engine):
-$ export READ_ENGINE_HOST=myelasticsearch:9200
-$ export WRITE_ENGINE_HOST=myelasticsearch:9200
+$ export kuzzle_services_db_host=localhost
+$ export kuzzle_services_db_port=10200
 
 # Redis (cache services):
-$ export CACHE_HOST=myredis
-$ export CACHE_PORT=6379
+$ export kuzzle_services__cache__node__host=localhost
+$ export kuzzle_services__cache__node__port=6379
 
 $ ./bin/kuzzle start
 ```

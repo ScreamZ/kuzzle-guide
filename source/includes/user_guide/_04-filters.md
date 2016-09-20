@@ -7,6 +7,48 @@ Kuzzle subscriptions use a subset of Elasticsearch Query DSL, called Kuzzle DSL.
 
 ### Filter terms
 
+### > equals
+
+The `equals` filter matches documents or messages attributes using string equality.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+}
+```
+
+The following filter validates the first document:
+
+```javascript
+equals: {
+  firstName: 'Grace'
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  equals: {
+    firstName: 'Grace'
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
 ### > exists
 
 The `exists` filter matches documents containing non-null fields.
@@ -94,6 +136,52 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 var filter = {
   ids: {
     values: ['a']
+  }
+};
+
+var room =
+  kuzzle
+    .dataCollectionFactory('collection')
+    .subscribe(filter, function (error, result) {
+      // called each time a new notification on this filter is received
+    };
+```
+
+### > in
+
+This filter allows testing a string field against multiple possibilities.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+},
+{
+  firstName: 'Marie',
+  lastName: 'Curie'
+}
+```
+
+The following filter validates the first two documents:
+
+```javascript
+in: {
+  firstName: ['Grace', 'Ada']
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  in: {
+    firstName: ['Grace', 'Ada']
   }
 };
 
@@ -297,94 +385,6 @@ var room =
     };
 ```
 
-### > term
-
-The `term` filter matches documents or messages attributes using string equality.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-}
-```
-
-The following filter validates the first document:
-
-```javascript
-term: {
-  firstName: 'Grace'
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: 'Grace'
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### > terms
-
-This filter allows testing a string field against multiple possibilities.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-},
-{
-  firstName: 'Marie',
-  lastName: 'Curie'
-}
-```
-
-The following filter validates the first two documents:
-
-```javascript
-terms: {
-  firstName: ['Grace', 'Ada']
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: ['Grace', 'Ada']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
 ### Filter controls
 
 Filter controls allow regrouping or inverting filters and/or geospatial filters.
@@ -416,12 +416,12 @@ The following filter validates the first document:
 {
   and: [
     {
-      term: {
+      equals: {
         city: 'NYC'
       }
     },
     {
-      term: {
+      equals: {
         hobby: 'computer'
       }
     }
@@ -435,12 +435,12 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 var filter = {
     and: [
       {
-        term: {
+        equals: {
           city: 'NYC'
         }
       },
       {
-        term: {
+        equals: {
           hobby: 'computer'
         }
       }
@@ -491,7 +491,7 @@ The following filter validates the second document:
 bool: {
   must : [
     {
-      terms : {
+      in : {
         firstName : ['Grace', 'Ada']
       }
     },
@@ -506,14 +506,14 @@ bool: {
   ],
   'must_not' : [
     {
-      term: {
+      equals: {
         city: 'NYC'
       }
     }
   ],
   should : [
     {
-      term : {
+      equals : {
         hobby : 'computer'
       }
     },
@@ -533,7 +533,7 @@ var filter = {
     bool: {
       must : [
         {
-          terms : {
+          in : {
             firstName : ['Grace', 'Ada']
           }
         },
@@ -548,14 +548,14 @@ var filter = {
       ],
       'must_not' : [
         {
-          term: {
+          equals: {
             city: 'NYC'
           }
         }
       ],
       should : [
         {
-          term : {
+          equals : {
             hobby : 'computer'
           }
         },
@@ -602,7 +602,7 @@ The following filter validates the first document:
 ```
 {
   not: {
-    term: {
+    equals: {
       city: 'London'
     }
   }
@@ -614,7 +614,7 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 ```javascript
 var filter = {
   not: {
-    term: {
+    equals: {
       city: 'London'
     }
   }
@@ -660,12 +660,12 @@ The following filter validates the first two documents:
 ```javascript
 {
   or: {
-    term: {
+    equals: {
       city: 'NYC'
     }
   },
   {
-    term: {
+    equals: {
       city: 'London'
     }
   }
@@ -677,12 +677,12 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 ```javascript
 var filter = {
   or: {
-    term: {
+    equals: {
       city: 'NYC'
     }
   },
   {
-    term: {
+    equals: {
       city: 'London'
     }
   }

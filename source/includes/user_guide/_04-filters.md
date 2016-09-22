@@ -378,9 +378,9 @@ kuzzle
   };
 ```
 
-### Filter controls
+### Filter operands
 
-Filter controls allow regrouping or inverting filters and/or geospatial filters.
+Filter operands allow combining multiple filters using boolean operands.
 
 ### > and
 

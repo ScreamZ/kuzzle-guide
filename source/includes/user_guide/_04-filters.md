@@ -525,6 +525,7 @@ The following filter validates the second document:
         }
       }
     ]
+  }
 }
 ```
 

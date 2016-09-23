@@ -489,41 +489,42 @@ Given the following documents:
 The following filter validates the second document:
 
 ```javascript
-bool: {
-  must : [
-    {
-      in : {
-        firstName : ['Grace', 'Ada']
-      }
-    },
-    {
-      range: {
-        age: {
-          gte: 36,
-          lt: 85
+{
+  bool: {
+    must : [
+      {
+        in : {
+          firstName : ['Grace', 'Ada']
+        }
+      },
+      {
+        range: {
+          age: {
+            gte: 36,
+            lt: 85
+          }
         }
       }
-    }
-  ],
-  'must_not' : [
-    {
-      equals: {
-        city: 'NYC'
+    ],
+    'must_not' : [
+      {
+        equals: {
+          city: 'NYC'
+        }
       }
-    }
-  ],
-  should : [
-    {
-      equals : {
-        hobby : 'computer'
+    ],
+    should : [
+      {
+        equals : {
+          hobby : 'computer'
+        }
+      },
+      {
+        exists : {
+          field : 'lastName'
+        }
       }
-    },
-    {
-      exists : {
-        field : 'lastName'
-      }
-    }
-  ]
+    ]
 }
 ```
 

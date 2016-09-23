@@ -43,9 +43,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > exists
@@ -91,9 +94,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > ids
@@ -139,9 +145,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > in
@@ -184,9 +193,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > missing
@@ -232,9 +244,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > range
@@ -302,9 +317,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > regexp
@@ -373,9 +391,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### Filter operands
@@ -442,9 +463,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > bool
@@ -573,9 +597,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > not
@@ -624,9 +651,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > or
@@ -695,9 +725,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### Geospatial filters
@@ -956,9 +989,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > geoDistance
@@ -1015,9 +1051,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 
@@ -1077,9 +1116,12 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > geoPolygon
@@ -1144,7 +1186,10 @@ var filter = {
 
 kuzzle
   .dataCollectionFactory('collection')
-  .subscribe(filter, function (error, result) {
-    // called each time a new notification on this filter is received
-  };
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```

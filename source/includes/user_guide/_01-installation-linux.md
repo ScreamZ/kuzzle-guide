@@ -137,159 +137,117 @@ $ vagrant up
 ### Manual install
 
 <aside class="notice">
-we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
+We will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
 </aside>
+
+The example given here will run the Kuzzle stack using [pm2](https://github.com/kuzzleio/kuzzle/blob/master/.kuzzlerc.sample), from the current user home directory.
 
 #### Prerequisites
 
 * A service [Elasticsearch](https://www.elastic.co/products/elasticsearch) running on localhost:9200
 * A service [Redis](http://redis.io/) running on localhost:6379
 * A properly installed [nodeJs](https://nodejs.org/en/download/package-manager/) **version 4** or upper
+* `gcc` and `python`. On Debian-based systems: `sudo apt-get install build-essential python`.
 
-#### Step 1
+#### Step 1 - Retrieve Kuzzle components source code
 
-Retrieve the Kuzzle proxy source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle-proxy.git):
+1. Create kuzzle root path
 
-```bash
-$ git clone https://github.com/kuzzleio/kuzzle-proxy.git
-$ cd kuzzle-proxy
-```
+    ```bash
+    mkdir -p ~/kuzzle
+    cd ~/kuzzle
+    ```
 
-then install the dependencies:
+2. Kuzzle proxy
 
-```bash
-$ npm install
-$ npm run plugins
-```
+    ```bash
+    cd ~/kuzzle
+    git clone https://github.com/kuzzleio/kuzzle-proxy.git
+    cd kuzzle-proxy
+    npm install
+    npm run plugins
+    ```
 
-#### Step 2
+3. Kuzzle
 
-By default the proxy is using plugin to communicate with websocket and socketio. If you need to change those plugins configuration you will need to copy the pluginsConfig.json.example into pluginsConfig.json and edit it.
+    ```bash
+    cd ~/kuzzle
+    git clone https://github.com/kuzzleio/kuzzle.git
+    cd kuzzle
+    npm install
+    kuzzle_services__db__host=localhost node bin/kuzzle install
+    ```
 
-In case you want to change the configuration of the kuzzle proxy itself you will need to edit the .proxyrc file.
+4. Kuzzle Back Office
 
-#### Step 3
+    ```bash
+    sudo npm install -g bower
+    cd ~/kuzzle
+    git clone https://github.com/kuzzleio/kuzzle-backoffice.git
+    cd kuzzle-backoffice
+    npm install
+    bower install
+    npm run build
+    ```
 
-Start a proxy instance:
+#### Step 2 - pm2
 
-```bash
-$ npm start
-```
+1. Install pm2
 
-#### Step 4
+    ```bash
+    sudo npm install -g pm2
+    ```
 
-Retrieve the Kuzzle source code from the [GitHub repo](https://github.com/kuzzleio/kuzzle.git):
+2. pm2 configuration  
+     
+     ```bash
+     echo "apps:
+       - name: kuzzle-proxy
+         cwd: ${HOME}/kuzzle/kuzzle-proxy
+         script: index.js
+       - name: kuzzle
+         cwd: ${HOME}/kuzzle/kuzzle
+         script: bin/kuzzle
+         args: start
+         env:
+           kuzzle_server__http__port: 7510
+           kuzzle_services__db__host: localhost
+           kuzzle_services__cache__node__host: localhost
+           kuzzle_services__proxyBroker__host: localhost
+       - name: kuzzle-bo
+         cwd: ${HOME}/kuzzle/kuzzle-backoffice
+         script: node_modules/.bin/http-server
+         args: -p 3000 dist/
+      " > ~/kuzzle/pm2.conf.yml
+      ```
 
-```bash
-$ git clone https://github.com/kuzzleio/kuzzle.git
-$ cd kuzzle
-```
+3. run Kuzzle
 
-then install the dependencies:
-
-```bash
-$ npm install
-```
-
-#### Step 5
-
-Configure your environment.
-Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones (the values in this example are the default one):
-
-```bash
-# elasticsearch
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
-
-# internal broker
-$ export kuzzle_services__internalBroker__host=localhost
-$ export kuzzle_services__internalBroker__port=7511
-
-# redis
-$ export kuzzle_services__cache__node__host=localhost
-$ export kuzzle_services__cache__node__port=6379
-
-# proxy
-$ export kuzzle_services__proxyBroker__host=localhost
-$ export kuzzle_services__proxyBroker__port=7331
-
-# http port for REST request
-$ export kuzzle_server__http__port=7511
-```
-
-Or copy and paste the .kuzzlerc.sample into .kuzzlerc and change it.
-
-#### Step 6
-
-Install the default plugins:
-
-```bash
-$ ./bin/kuzzle install
-```
-
-#### Finally
-
-Start a server instance, by overriding the default proxy HTTP port to avoid conflict with Kuzzle server instances (it will be propagated through the cluster)
-
-```bash
-$ kuzzle_server__http__port=17511 ./bin/kuzzle start
-```
-
-For more information, you can execute:
-
-```bash
-$ bin/kuzzle start --help
-```
-
-#### All steps in one
-
-```bash
-# Proxy
-$ git clone https://github.com/kuzzleio/kuzzle-proxy.git
-$ cd kuzzle-proxy
-$ npm install
-$ npm run plugins
-$ npm start
-
-# Kuzzle
-$ git clone https://github.com/kuzzleio/kuzzle.git
-$ cd kuzzle
-$ npm install
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
-$ export kuzzle_services__internalBroker__host=localhost
-$ export kuzzle_services__internalBroker__port=7511
-$ export kuzzle_services__cache__node__host=localhost
-$ export kuzzle_services__cache__node__port=6379
-$ export kuzzle_services__proxyBroker__host=localhost
-$ export kuzzle_services__proxyBroker__port=7331
-$ export kuzzle_server__http__port=7511
-$ ./bin/kuzzle install
-$ export kuzzle_server__http__port=17511 ./bin/kuzzle start
-```
-
-#### Run it again
-
-To run kuzzle again, you will need to redo following steps (prerequisites are still needed as well):
-
-```bash
-# Proxy
-$ cd kuzzle-proxy
-$ npm start
-
-# Kuzzle
-$ cd kuzzle
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
-$ export kuzzle_services__internalBroker__host=localhost
-$ export kuzzle_services__internalBroker__port=7511
-$ export kuzzle_services__cache__node__host=localhost
-$ export kuzzle_services__cache__node__port=6379
-$ export kuzzle_services__proxyBroker__host=localhost
-$ export kuzzle_services__proxyBroker__port=7331
-$ export kuzzle_server__http__port=7511
-$ export kuzzle_server__http__port=17511 ./bin/kuzzle start
-```
+    ```bash
+    pm2 start ~/kuzzle/pm2.conf.yml
+    pm2 logs
+    1|kuzzle   |       ▄▄▄▄▄      ▄███▄      ▄▄▄▄
+    1|kuzzle   |    ▄█████████▄▄█████████▄▄████████▄
+    1|kuzzle   |   ██████████████████████████████████
+    1|kuzzle   |    ▀██████████████████████████████▀
+    1|kuzzle   |     ▄███████████████████████████▄
+    1|kuzzle   |   ▄███████████████████████████████▄
+    1|kuzzle   |  ▀█████████████████████████████████▀
+    1|kuzzle   |    ▀██▀        ▀██████▀       ▀██▀
+    1|kuzzle   |           ██     ████    ██
+    1|kuzzle   |                 ▄████▄
+    1|kuzzle   |                 ▀████▀
+    1|kuzzle   |                   ▀▀
+    1|kuzzle   |  ████████████████████████████████████
+    1|kuzzle   |  ██         KUZZLE IS READY        ██
+    1|kuzzle   |  ████████████████████████████████████
+    1|kuzzle   | [ℹ] There is no administrator user yet. You can use the CLI or the back-office to create one.
+    1|kuzzle   | [ℹ] Entering no-administrator mode: everyone has administrator rights.
+    ```
+    
+Kuzzle Back-office can be reached on http://localhost:3000.  
+Kuzzle REST API can be reached on http://localhost:7511/api/1.0/  
+Socket IO and Websocket channels can respectively be reached on ports 7512 and 7513.
 
 #### Going further
 
@@ -305,18 +263,6 @@ $ ./bin/kuzzle start -h
 
 ##### Change external services hosts or ports
 
-If you are running some of the service(s) externally, you can configure their host and port using some environment variables:
+If you are running some of the service(s) externally, you can configure their host and port using some environment variables and/or a `.kuzzlerc` file.
 
-examples:
-
-```bash
-# Elastic Search (read/write engine):
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
-
-# Redis (cache services):
-$ export kuzzle_services__cache__node__host=localhost
-$ export kuzzle_services__cache__node__port=6379
-
-$ ./bin/kuzzle start
-```
+Please refer to [Kuzzle configuration section](#configuration) for more information.

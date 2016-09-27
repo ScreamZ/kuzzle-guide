@@ -255,8 +255,8 @@ $ npm start
 $ git clone https://github.com/kuzzleio/kuzzle.git
 $ cd kuzzle
 $ npm install
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
+$ export kuzzle_services__db__host=localhost
+$ export kuzzle_services__db__port=10200
 $ export kuzzle_services__internalBroker__host=localhost
 $ export kuzzle_services__internalBroker__port=7511
 $ export kuzzle_services__cache__node__host=localhost
@@ -279,8 +279,8 @@ $ npm start
 
 # Kuzzle
 $ cd kuzzle
-$ export kuzzle_services_db_host=localhost
-$ export kuzzle_services_db_port=10200
+$ export kuzzle_services__db__host=localhost
+$ export kuzzle_services__db__port=10200
 $ export kuzzle_services__internalBroker__host=localhost
 $ export kuzzle_services__internalBroker__port=7511
 $ export kuzzle_services__cache__node__host=localhost

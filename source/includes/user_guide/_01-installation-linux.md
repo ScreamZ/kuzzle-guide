@@ -279,7 +279,7 @@ $ npm start
 
 # Kuzzle
 $ cd kuzzle
-$ export kuzzle_services_db_host=localhost
+$ export kuzzle_services__db__host=localhost
 $ export kuzzle_services_db_port=10200
 $ export kuzzle_services__internalBroker__host=localhost
 $ export kuzzle_services__internalBroker__port=7511

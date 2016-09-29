@@ -162,25 +162,8 @@ var dsl = new context.constructors.Dsl();
 
 The DSL exposes the following methods:
 
-#### `createFilterId(index, collection, filters)`
 
-Creates a filter unique ID using the provided arguments.
-
-The calculation is predictable, meaning that the resulting filter ID will always be the same if invoked multiple times with the same arguments.
-
-##### Arguments
-
-| Name | Type | Description                      |
-|------|------|----------------------------------|
-|`index`|`string`| Data index name |
-|`collection`|`string`| Data collection name |
-|`filters`|`object`| Filters in [Kuzzle DSL](#filtering-syntax) format |
-
-##### Returns
-
-A `string` containing the filter unique ID.
-
-#### `register(filterId, index, collection, filters)`
+#### `register(index, collection, filters)`
 
 Registers a filter to the DSL.
 
@@ -188,14 +171,17 @@ Registers a filter to the DSL.
 
 | Name | Type | Description                      |
 |------|------|----------------------------------|
-|`filterId`|`string`| Filter unique ID. Can be generated with `createFilterId` |
 |`index`|`string`| Data index name |
 |`collection`|`string`| Data collection name |
 |`filters`|`object`| Filters in [Kuzzle DSL](#filtering-syntax) format |
 
 ##### Returns
 
-A `promise` resolving to the successfully added `filterId`.
+A `promise` resolving to an object containing the following attributes:
+
+* `id`: the filter unique identifier
+* `diff`: the difference between the added filters and what already existed in memory. Falsey if no difference occured
+* `filter`: a normalized version of the provided filters
 
 #### `remove(filterId)`
 
@@ -205,7 +191,7 @@ Removes all references to a given filter from the DSL
 
 | Name | Type | Description                      |
 |------|------|----------------------------------|
-|`filterId`|`string`| Filter unique ID.|
+|`filterId`|`string`| Filter unique ID. Obtained by using `register`|
 
 ##### Returns
 

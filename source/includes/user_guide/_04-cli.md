@@ -47,22 +47,6 @@ The `createFirstAdmin` command lets you define an administrator user and set you
 
 <aside class="notice">NB: This command can only be run interactively</aside>
 
-### disable
-
-<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
-
-```bash
-$ ./bin/kuzzle disable <service>
-```
-
-### enable
-
-<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
-
-```bash
-$ ./bin/kuzzle enable <service>
-```
-
 ### install
 
 Kuzzle is dependent on some external plugins.  

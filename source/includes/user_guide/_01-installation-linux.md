@@ -140,7 +140,7 @@ $ vagrant up
 We will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
 </aside>
 
-The example given here will run the Kuzzle stack using [pm2](https://github.com/kuzzleio/kuzzle/blob/master/.kuzzlerc.sample), from the current user home directory.
+The example given here will run the Kuzzle stack using [pm2](http://pm2.keymetrics.io/), from the current user home directory.
 
 #### Prerequisites
 

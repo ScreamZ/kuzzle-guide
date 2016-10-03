@@ -175,7 +175,7 @@ The example given here will run the Kuzzle stack using [pm2](http://pm2.keymetri
     git clone https://github.com/kuzzleio/kuzzle.git
     cd kuzzle
     npm install
-    kuzzle_services__db__host=localhost node bin/kuzzle install
+    node bin/kuzzle install
     ```
 
 4. Kuzzle Back Office

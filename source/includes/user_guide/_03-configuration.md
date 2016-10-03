@@ -19,11 +19,9 @@ at the root of Kuzzle installation path.
 
 #### Typical variables to override
 
-Here is some configuration that are likely to be customized:
+Here are some configurations that are likely to be customized:
 
 - `server.http.port`: Kuzzle internal http port. Defaults to `7511`, which conflicts with Kuzzle proxy's one.
-- `services.db.host`: elasticsearch host. Defaults to `elasticsearch`
-- `services.cache.node.host`: redis host. Defaults to `redis`
 - `services.proxyBroker.host`: Kuzzle proxy host. Defaults to `api`.
 
 
@@ -33,8 +31,6 @@ Here is some configuration that are likely to be customized:
 
     ```
     kuzzle_server__http_port: 7510 \
-    kuzzle_services__db__host=<ES_HOST> \
-    kuzzle_services__db__port=<ES_PORT> \
     kuzzle_services__proxyBroker__host=<PROXY_HOST> \
     node bin/kuzzle start
     ```

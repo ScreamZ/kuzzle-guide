@@ -211,8 +211,6 @@ The example given here will run the Kuzzle stack using [pm2](http://pm2.keymetri
          args: start
          env:
            kuzzle_server__http__port: 7510
-           kuzzle_services__db__host: localhost
-           kuzzle_services__cache__node__host: localhost
            kuzzle_services__proxyBroker__host: localhost
        - name: kuzzle-bo
          cwd: ${HOME}/kuzzle/kuzzle-backoffice

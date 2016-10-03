@@ -14,10 +14,11 @@ includes:
   - user_guide/index
   - user_guide/01-installation-linux
   - user_guide/02-installation-windows
-  - user_guide/03-cli
-  - user_guide/04-filters
-  - user_guide/05-status-code
-  - user_guide/06-security
+  - user_guide/03-configuration
+  - user_guide/04-cli
+  - user_guide/05-filters
+  - user_guide/06-status-code
+  - user_guide/07-security
   - core_documentation/index
   - core_documentation/01-architecture
   - core_documentation/02-request-scenarios

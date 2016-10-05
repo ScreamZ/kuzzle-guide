@@ -515,8 +515,10 @@ You don&rsquo;t have to clone kuzzle to use it.
 <h3 id="manual-install">Manual install</h3>
 
 <aside class="notice">
-we will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
+We will assume that you want to launch Kuzzle and other services on the same host (localhost), but you can, of course, host kuzzle and any of its services on different hosts.
 </aside>
+
+<p>The example given here will run the Kuzzle stack using <a href="http://pm2.keymetrics.io/">pm2</a>, from the current user home directory.</p>
 
 <h4 id="prerequisites">Prerequisites</h4>
 
@@ -524,130 +526,91 @@ we will assume that you want to launch Kuzzle and other services on the same hos
 <li>A service <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> running on localhost:9200</li>
 <li>A service <a href="http://redis.io/">Redis</a> running on localhost:6379</li>
 <li>A properly installed <a href="https://nodejs.org/en/download/package-manager/">nodeJs</a> <strong>version 4</strong> or upper</li>
+<li><code class="prettyprint">gcc</code> and <code class="prettyprint">python</code>. On Debian-based systems: <code class="prettyprint">sudo apt-get install build-essential python</code>.</li>
 </ul>
 
-<h4 id="step-1">Step 1</h4>
+<h4 id="step-1-retrieve-kuzzle-components-source-code">Step 1 - Retrieve Kuzzle components source code</h4>
 
-<p>Retrieve the Kuzzle proxy source code from the <a href="https://github.com/kuzzleio/kuzzle-proxy.git">GitHub repo</a>:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle-proxy.git
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
-</code></pre>
+<ol>
+<li><p>Create kuzzle root path</p>
+<pre class="highlight shell"><code>mkdir -p ~/kuzzle
+<span class="nb">cd</span> ~/kuzzle
+</code></pre></li>
+<li><p>Kuzzle proxy</p>
+<pre class="highlight shell"><code><span class="nb">cd</span> ~/kuzzle
+git clone https://github.com/kuzzleio/kuzzle-proxy.git
+<span class="nb">cd </span>kuzzle-proxy
+npm install
+npm run plugins
+</code></pre></li>
+<li><p>Kuzzle</p>
+<pre class="highlight shell"><code><span class="nb">cd</span> ~/kuzzle
+git clone https://github.com/kuzzleio/kuzzle.git
+<span class="nb">cd </span>kuzzle
+npm install
+node bin/kuzzle install
+</code></pre></li>
+<li><p>Kuzzle Back Office</p>
+<pre class="highlight shell"><code>sudo npm install -g bower
+<span class="nb">cd</span> ~/kuzzle
+git clone https://github.com/kuzzleio/kuzzle-backoffice.git
+<span class="nb">cd </span>kuzzle-backoffice
+npm install
+bower install
+npm run build
+</code></pre></li>
+</ol>
 
-<p>then install the dependencies:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>npm install
-<span class="gp">$ </span>npm run plugins
-</code></pre>
+<h4 id="step-2-pm2">Step 2 - pm2</h4>
 
-<h4 id="step-2">Step 2</h4>
+<ol>
+<li><p>Install pm2</p>
+<pre class="highlight shell"><code>sudo npm install -g pm2
+</code></pre></li>
+<li><p>pm2 configuration  </p>
+<pre class="highlight shell"><code> <span class="nb">echo</span> <span class="s2">"apps:
+   - name: kuzzle-proxy
+     cwd: </span><span class="k">${</span><span class="nv">HOME</span><span class="k">}</span><span class="s2">/kuzzle/kuzzle-proxy
+     script: index.js
+   - name: kuzzle
+     cwd: </span><span class="k">${</span><span class="nv">HOME</span><span class="k">}</span><span class="s2">/kuzzle/kuzzle
+     script: bin/kuzzle
+     args: start
+     env:
+       kuzzle_server__http__port: 7510
+       kuzzle_services__proxyBroker__host: localhost
+   - name: kuzzle-bo
+     cwd: </span><span class="k">${</span><span class="nv">HOME</span><span class="k">}</span><span class="s2">/kuzzle/kuzzle-backoffice
+     script: node_modules/.bin/http-server
+     args: -p 3000 dist/
+  "</span> &gt; ~/kuzzle/pm2.conf.yml
+</code></pre></li>
+<li><p>run Kuzzle</p>
+<pre class="highlight shell"><code>pm2 start ~/kuzzle/pm2.conf.yml
+pm2 logs
+1|kuzzle   |       ▄▄▄▄▄      ▄███▄      ▄▄▄▄
+1|kuzzle   |    ▄█████████▄▄█████████▄▄████████▄
+1|kuzzle   |   ██████████████████████████████████
+1|kuzzle   |    ▀██████████████████████████████▀
+1|kuzzle   |     ▄███████████████████████████▄
+1|kuzzle   |   ▄███████████████████████████████▄
+1|kuzzle   |  ▀█████████████████████████████████▀
+1|kuzzle   |    ▀██▀        ▀██████▀       ▀██▀
+1|kuzzle   |           ██     ████    ██
+1|kuzzle   |                 ▄████▄
+1|kuzzle   |                 ▀████▀
+1|kuzzle   |                   ▀▀
+1|kuzzle   |  ████████████████████████████████████
+1|kuzzle   |  ██         KUZZLE IS READY        ██
+1|kuzzle   |  ████████████████████████████████████
+1|kuzzle   | <span class="o">[</span>ℹ] There is no administrator user yet. You can use the CLI or the back-office to create one.
+1|kuzzle   | <span class="o">[</span>ℹ] Entering no-administrator mode: everyone has administrator rights.
+</code></pre></li>
+</ol>
 
-<p>By default the proxy is using plugin to communicate with websocket and socketio. If you need to change those plugins configuration you will need to copy the pluginsConfig.json.example into pluginsConfig.json and edit it.</p>
-
-<p>In case you want to change the configuration of the kuzzle proxy itself you will need to edit the .proxyrc file.</p>
-
-<h4 id="step-3">Step 3</h4>
-
-<p>Start a proxy instance:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>npm start
-</code></pre>
-
-<h4 id="step-4">Step 4</h4>
-
-<p>Retrieve the Kuzzle source code from the <a href="https://github.com/kuzzleio/kuzzle.git">GitHub repo</a>:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle
-</code></pre>
-
-<p>then install the dependencies:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>npm install
-</code></pre>
-
-<h4 id="step-5">Step 5</h4>
-
-<p>Configure your environment.
-Kuzzle has been designed to be launched from inside a container, so the default hosts used to access to the ElasticSearch and Redis servers needs to be tweaked to hit the right hosts. If everything is hosted on localhost, you can use environment variable to overwrite default ones (the values in this example are the default one):</p>
-<pre class="highlight shell"><code><span class="c"># elasticsearch</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
-
-<span class="c"># internal broker</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
-
-<span class="c"># redis</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
-
-<span class="c"># proxy</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
-
-<span class="c"># http port for REST request</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
-</code></pre>
-
-<p>Or copy and paste the .kuzzlerc.sample into .kuzzlerc and change it.</p>
-
-<h4 id="step-6">Step 6</h4>
-
-<p>Install the default plugins:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle install
-</code></pre>
-
-<h4 id="finally">Finally</h4>
-
-<p>Start a server instance, by overriding the default proxy HTTP port to avoid conflict with Kuzzle server instances (it will be propagated through the cluster)</p>
-<pre class="highlight shell"><code><span class="gp">$ </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
-</code></pre>
-
-<p>For more information, you can execute:</p>
-<pre class="highlight shell"><code><span class="gp">$ </span>bin/kuzzle start --help
-</code></pre>
-
-<h4 id="all-steps-in-one">All steps in one</h4>
-<pre class="highlight shell"><code><span class="c"># Proxy</span>
-<span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle-proxy.git
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
-<span class="gp">$ </span>npm install
-<span class="gp">$ </span>npm run plugins
-<span class="gp">$ </span>npm start
-
-<span class="c"># Kuzzle</span>
-<span class="gp">$ </span>git clone https://github.com/kuzzleio/kuzzle.git
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle
-<span class="gp">$ </span>npm install
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__db__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__db__port</span><span class="o">=</span>10200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
-<span class="gp">$ </span>./bin/kuzzle install
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
-</code></pre>
-
-<h4 id="run-it-again">Run it again</h4>
-
-<p>To run kuzzle again, you will need to redo following steps (prerequisites are still needed as well):</p>
-<pre class="highlight shell"><code><span class="c"># Proxy</span>
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle-proxy
-<span class="gp">$ </span>npm start
-
-<span class="c"># Kuzzle</span>
-<span class="gp">$ </span><span class="nb">cd </span>kuzzle
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__db__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__db__port</span><span class="o">=</span>10200
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__internalBroker__port</span><span class="o">=</span>7511
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__proxyBroker__port</span><span class="o">=</span>7331
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>7511
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_server__http__port</span><span class="o">=</span>17511 ./bin/kuzzle start
-</code></pre>
+<p>Kuzzle Back-office can be reached on http://localhost:3000.<br>
+Kuzzle REST API can be reached on http://localhost:7511/api/1.0/<br>
+Socket IO and Websocket channels can respectively be reached on ports 7512 and 7513.</p>
 
 <h4 id="going-further">Going further</h4>
 
@@ -661,19 +624,9 @@ Kuzzle has been designed to be launched from inside a container, so the default 
 
 <h5 id="change-external-services-hosts-or-ports">Change external services hosts or ports</h5>
 
-<p>If you are running some of the service(s) externally, you can configure their host and port using some environment variables:</p>
+<p>If you are running some of the service(s) externally, you can configure their host and port using some environment variables and/or a <code class="prettyprint">.kuzzlerc</code> file.</p>
 
-<p>examples:</p>
-<pre class="highlight shell"><code><span class="c"># Elastic Search (read/write engine):</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services_db_port</span><span class="o">=</span>10200
-
-<span class="c"># Redis (cache services):</span>
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__host</span><span class="o">=</span>localhost
-<span class="gp">$ </span><span class="nb">export </span><span class="nv">kuzzle_services__cache__node__port</span><span class="o">=</span>6379
-
-<span class="gp">$ </span>./bin/kuzzle start
-</code></pre>
+<p>Please refer to <a href="#configuration">Kuzzle configuration section</a> for more information.</p>
 
             <h2 id="install-on-windows">Install on Windows</h2>
 
@@ -711,6 +664,68 @@ Kuzzle has been designed to be launched from inside a container, so the default 
     <span class="s2">"status"</span><span class="err">:</span> <span class="mi">200</span>
 <span class="p">}</span>
 </code></pre>
+
+            <h2 id="configure-kuzzle">Configure Kuzzle</h2>
+
+<h3 id="rc">RC</h3>
+
+<p>Kuzzle relies on the <a href="https://github.com/dominictarr/rc">rc package</a> for its configuration system.</p>
+
+<p>Kuzzle configuration can be overridden in several ways, notably:</p>
+
+<ul>
+<li>using some environment variables prefixed with <code class="prettyprint">kuzzle_</code></li>
+<li>using a .kuzzlerc file</li>
+</ul>
+
+<p>Please refer to <a href="https://github.com/dominictarr/rc/blob/master/README.md">rc Readme</a> for more information on the 
+different configuration possibilities.</p>
+
+<h3 id="configuration-options">Configuration options</h3>
+
+<p>You can get a comprehensive list of configuration options from the <a href="https://github.com/kuzzleio/kuzzle/blob/master/.kuzzlerc.sample">.kuzzlerc.sample file</a> 
+at the root of Kuzzle installation path.</p>
+
+<h4 id="typical-variables-to-override">Typical variables to override</h4>
+
+<p>Here are some configurations that are likely to be customized:</p>
+
+<ul>
+<li><code class="prettyprint">server.http.port</code>: Kuzzle internal http port. Defaults to <code class="prettyprint">7511</code>, which conflicts with Kuzzle proxy&rsquo;s one.</li>
+<li><code class="prettyprint">services.proxyBroker.host</code>: Kuzzle proxy host. Defaults to <code class="prettyprint">api</code>.</li>
+</ul>
+
+<h3 id="examples">Examples</h3>
+
+<ol>
+<li><p>Using some environment variables</p>
+<pre class="highlight plaintext"><code>kuzzle_server__http_port: 7510 \
+kuzzle_services__proxyBroker__host=&lt;PROXY_HOST&gt; \
+node bin/kuzzle start
+</code></pre>
+
+<p>These variables can also easily be configured for <a href="https://docs.docker.com/compose/compose-file/#/environment">Docker-compose</a> or <a href="http://pm2.keymetrics.io/docs/usage/application-declaration/">pm2</a>.</p></li>
+<li><p>Using a custom <code class="prettyprint">.kuzzlerc</code> file</p>
+
+<p><code class="prettyprint">/etc/kuzzle/config</code>, <code class="prettyprint">/path/to/kuzzle/.kuzzlerc</code>, <code class="prettyprint">$HOME/.kuzzlerc</code> or any other valid location:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+   </span><span class="nt">"server"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nt">"http"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="nt">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">7510</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="nt">"services"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+     </span><span class="nt">"db"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;ES_HOST&gt;"</span><span class="p">,</span><span class="w">
+       </span><span class="nt">"port"</span><span class="p">:</span><span class="w"> </span><span class="err">&lt;ES_PORT&gt;</span><span class="w">
+     </span><span class="p">},</span><span class="w">
+     </span><span class="nt">"proxyBroker"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+       </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;PROXY_HOST&gt;"</span><span class="w">
+     </span><span class="p">}</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></li>
+</ol>
 
             <h2 id="command-line-interface">Command line interface</h2>
 
@@ -758,18 +773,6 @@ If you used docker to start Kuzzle, you will have to enter the kuzzle container 
 <p>The <code class="prettyprint">createFirstAdmin</code> command lets you define an administrator user and set your own permissions. </p>
 
 <aside class="notice">NB: This command can only be run interactively</aside>
-
-<h3 id="disable">disable</h3>
-
-<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle disable &lt;service&gt;
-</code></pre>
-
-<h3 id="enable">enable</h3>
-
-<aside class="warning">This command is deprecated and will be removed in next Kuzzle release.</aside>
-<pre class="highlight shell"><code><span class="gp">$ </span>./bin/kuzzle <span class="nb">enable</span> &lt;service&gt;
-</code></pre>
 
 <h3 id="install">install</h3>
 
@@ -837,6 +840,44 @@ This is different from document searches, which are performed using <a href="htt
 
 <h3 id="filter-terms">Filter terms</h3>
 
+<h3 id="gt-equals">&gt; equals</h3>
+
+<p>The <code class="prettyprint">equals</code> filter matches documents or messages attributes using string equality.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the first document:</p>
+<pre class="highlight javascript"><code><span class="nx">equals</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
+</code></pre>
+
 <h3 id="gt-exists">&gt; exists</h3>
 
 <p>The <code class="prettyprint">exists</code> filter matches documents containing non-null fields.</p>
@@ -872,12 +913,14 @@ This is different from document searches, which are performed using <a href="htt
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-ids">&gt; ids</h3>
@@ -915,17 +958,61 @@ This is different from document searches, which are performed using <a href="htt
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
+</code></pre>
+
+<h3 id="gt-in">&gt; in</h3>
+
+<p>This filter allows testing a string field against multiple possibilities.</p>
+
+<p>Given the following documents:</p>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>The following filter validates the first two documents:</p>
+<pre class="highlight javascript"><code><span class="k">in</span><span class="err">:</span> <span class="p">{</span>
+  <span class="nl">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">in</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-missing">&gt; missing</h3>
 
-<p>A filter matching documents with missing field.</p>
+<p>A filter matching documents with a missing field.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -958,12 +1045,14 @@ This is different from document searches, which are performed using <a href="htt
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-range">&gt; range</h3>
@@ -1023,12 +1112,14 @@ This is different from document searches, which are performed using <a href="htt
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-regexp">&gt; regexp</h3>
@@ -1085,97 +1176,23 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
-<h3 id="gt-term">&gt; term</h3>
+<h3 id="filter-operands">Filter operands</h3>
 
-<p>The <code class="prettyprint">term</code> filter matches documents or messages attributes using string equality.</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter validates the first document:</p>
-<pre class="highlight javascript"><code><span class="nx">term</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="gt-terms">&gt; terms</h3>
-
-<p>This filter allows testing a string field against multiple possibilities.</p>
-
-<p>Given the following documents:</p>
-<pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Grace'</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="err">:</span> <span class="s1">'Hopper'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Ada'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lovelace'</span>
-<span class="p">},</span>
-<span class="p">{</span>
-  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Marie'</span><span class="p">,</span>
-  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Curie'</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>The following filter validates the first two documents:</p>
-<pre class="highlight javascript"><code><span class="nx">terms</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
-</code></pre>
-
-<h3 id="filter-controls">Filter controls</h3>
-
-<p>Filter controls allow regrouping or inverting filters and/or geospatial filters.</p>
+<p>Filter operands allow combining multiple filters using boolean operands.</p>
 
 <h3 id="gt-and">&gt; and</h3>
 
-<p>The <code class="prettyprint">and</code> filter allows filtering documents on two or more terms.</p>
+<p>The <code class="prettyprint">and</code> filter takes an array of filter objects, combining them with AND operands.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1196,12 +1213,12 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">and</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span>
-      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
       <span class="p">}</span>
     <span class="p">},</span>
     <span class="p">{</span>
-      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -1213,29 +1230,42 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">and</span><span class="p">:</span> <span class="p">[</span>
       <span class="p">{</span>
-        <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
         <span class="p">}</span>
       <span class="p">},</span>
       <span class="p">{</span>
-        <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">hobby</span><span class="p">:</span> <span class="s1">'computer'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">]</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-bool">&gt; bool</h3>
 
 <p>A filter matching documents matching boolean combinations of other queries.</p>
+
+<p>This operand accepts the following attributes:</p>
+
+<ul>
+<li><code class="prettyprint">must</code>: all listed conditions must be true</li>
+<li><code class="prettyprint">must_not</code>: all listed conditions must be false</li>
+<li><code class="prettyprint">should</code>: one of the listed condition must be true</li>
+<li><code class="prettyprint">should_not</code>: one of the listed condition must be false</li>
+</ul>
+
+<p>Each one of these attributes are an array of filter objects.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1262,41 +1292,43 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 </code></pre>
 
 <p>The following filter validates the second document:</p>
-<pre class="highlight javascript"><code><span class="nx">bool</span><span class="err">:</span> <span class="p">{</span>
-  <span class="nl">must</span> <span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="na">terms</span> <span class="p">:</span> <span class="p">{</span>
-        <span class="na">firstName</span> <span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
-      <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="p">{</span>
-      <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
-          <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">bool</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">must</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">in</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="na">firstName</span> <span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="na">range</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">age</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">gte</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+            <span class="na">lt</span><span class="p">:</span> <span class="mi">85</span>
+          <span class="p">}</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">],</span>
-  <span class="s1">'must_not'</span> <span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+    <span class="p">],</span>
+    <span class="s1">'must_not'</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+        <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">],</span>
-  <span class="na">should</span> <span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="na">term</span> <span class="p">:</span> <span class="p">{</span>
-        <span class="na">hobby</span> <span class="p">:</span> <span class="s1">'computer'</span>
+    <span class="p">],</span>
+    <span class="na">should</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">equals</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="na">hobby</span> <span class="p">:</span> <span class="s1">'computer'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="na">exists</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="na">field</span> <span class="p">:</span> <span class="s1">'lastName'</span>
+        <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="p">{</span>
-      <span class="na">exists</span> <span class="p">:</span> <span class="p">{</span>
-        <span class="na">field</span> <span class="p">:</span> <span class="s1">'lastName'</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1305,7 +1337,7 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
     <span class="na">bool</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">must</span> <span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-          <span class="na">terms</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="na">in</span> <span class="p">:</span> <span class="p">{</span>
             <span class="na">firstName</span> <span class="p">:</span> <span class="p">[</span><span class="s1">'Grace'</span><span class="p">,</span> <span class="s1">'Ada'</span><span class="p">]</span>
           <span class="p">}</span>
         <span class="p">},</span>
@@ -1320,14 +1352,14 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
       <span class="p">],</span>
       <span class="s1">'must_not'</span> <span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-          <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
             <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
           <span class="p">}</span>
         <span class="p">}</span>
       <span class="p">],</span>
       <span class="na">should</span> <span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-          <span class="na">term</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="na">equals</span> <span class="p">:</span> <span class="p">{</span>
             <span class="na">hobby</span> <span class="p">:</span> <span class="s1">'computer'</span>
           <span class="p">}</span>
         <span class="p">},</span>
@@ -1340,12 +1372,14 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-not">&gt; not</h3>
@@ -1370,7 +1404,7 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 <p>The following filter validates the first document:</p>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="err">not:</span><span class="w"> </span><span class="err">{</span><span class="w">
-    </span><span class="err">term:</span><span class="w"> </span><span class="err">{</span><span class="w">
+    </span><span class="err">equals:</span><span class="w"> </span><span class="err">{</span><span class="w">
       </span><span class="err">city:</span><span class="w"> </span><span class="err">'London'</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="err">}</span><span class="w">
@@ -1380,23 +1414,25 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 <p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">not</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-or">&gt; or</h3>
 
-<p>The <code class="prettyprint">or</code> filter allows combining multiple filters with a OR boolean operator.</p>
+<p>The <code class="prettyprint">or</code> filter takes an array containing filter objects, combining them using OR operands.</p>
 
 <p>Given the following documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1421,52 +1457,58 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 
 <p>The following filter validates the first two documents:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
-  <span class="nl">or</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nl">term</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nl">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+  <span class="nl">or</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
+      <span class="p">}</span>
     <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="p">{</span>
-    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+  <span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
 
 <p>With the <a href="/sdk-documentation/#subscribe">JavaScript SDK</a>:</p>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">or</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+  <span class="na">or</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'NYC'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">equals</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
+      <span class="p">}</span>
     <span class="p">}</span>
-  <span class="p">},</span>
-  <span class="p">{</span>
-    <span class="na">term</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">city</span><span class="p">:</span> <span class="s1">'London'</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+  <span class="p">]</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="geospatial-filters">Geospatial filters</h3>
 
-<p>Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).</p>
+<p>Geospatial filters allow you to find documents containing a geolocation field.</p>
 
-<p>There are some inherent objects and concepts which are good to understand before going further. Most of them are taken from the ElasticSearch DSL format, some have been simplified.</p>
+<p>There are some inherent objects and concepts that are good to understand before going further.</p>
 
 <h4 id="geospatial-objects-and-concepts">Geospatial objects and concepts</h4>
 
 <ul>
 <li>Point</li>
-<li>Bounding Box aka BBox</li>
+<li>Bounding Box</li>
 <li>Polygon</li>
 <li>Distance</li>
 </ul>
@@ -1475,8 +1517,10 @@ You can test only 1 attribute per <code class="prettyprint">regexp</code> filter
 
 <p>A point is a single longitude-latitude coordinate pair.</p>
 
-<p>The following notations are valid:</p>
+<p>The following notations are accepted and valid:</p>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="mf">40.73</span> <span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat_lon</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">}</span> <span class="p">}</span>
 </code></pre>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">}</span> <span class="p">}</span>
 </code></pre>
@@ -1486,27 +1530,33 @@ When coordinates are in array format, the format is [lon, lat] to comply with <a
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">]</span> <span class="p">}</span>
 </code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat_lon</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">]</span> <span class="p">}</span>
+</code></pre>
 
 <aside class="note">
 As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 </aside>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span> <span class="p">}</span>
 </code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat_lon</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span> <span class="p">}</span>
+</code></pre>
 
 <p>Here is the <a href="https://en.wikipedia.org/wiki/Geohash">geoHash</a> representation</p>
 <pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">latLon</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span> <span class="p">}</span>
 </code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span> <span class="nl">lat_lon</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span> <span class="p">}</span>
+</code></pre>
 
 <h5 id="bounding-box">Bounding Box</h5>
 
-<p>A bounding box (also known as BBox) is a 2D box that can be defined using:</p>
+<p>A bounding box is a 2D box that can be defined using:</p>
 
 <ol>
 <li>2 points coordinates tuples, defining the top left and bottom right corners of the box</li>
-<li>4 values defining the 4 BBox sides. <code class="prettyprint">top</code> and <code class="prettyprint">bottom</code> are latitudes and <code class="prettyprint">left</code> and <code class="prettyprint">right</code> are longitudes</li>
+<li>4 values defining the 4 box sides: <code class="prettyprint">top</code> and <code class="prettyprint">bottom</code> are latitudes, and <code class="prettyprint">left</code> and <code class="prettyprint">right</code> are longitudes</li>
 </ol>
 
-<p>All of these representations are defining the same BBox:</p>
+<p>All of these representations are defining the same bounding box:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">top</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span>
   <span class="nx">left</span><span class="err">:</span> <span class="mf">40.73</span><span class="p">,</span>
@@ -1519,6 +1569,11 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.01</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">71.12</span> <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">top_left</span><span class="p">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.73</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">74.1</span> <span class="p">},</span>
+  <span class="nx">bottom_right</span><span class="err">:</span> <span class="p">{</span> <span class="nl">lat</span><span class="p">:</span> <span class="mf">40.01</span><span class="p">,</span> <span class="nx">lon</span><span class="err">:</span> <span class="o">-</span><span class="mf">71.12</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 
 <aside class="note">
 When cooddinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
@@ -1526,6 +1581,11 @@ When cooddinates are in array format, the format is [lon, lat] to comply with <a
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">topLeft</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">],</span>
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">71.12</span><span class="p">,</span> <span class="mf">40.01</span> <span class="p">]</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">top_left</span><span class="p">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">74.1</span><span class="p">,</span> <span class="mf">40.73</span> <span class="p">],</span>
+  <span class="nx">bottom_right</span><span class="err">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">71.12</span><span class="p">,</span> <span class="mf">40.01</span> <span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1537,11 +1597,21 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"40.01, -71.12"</span>
 <span class="p">}</span>
 </code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">top_left</span><span class="p">:</span> <span class="s2">"40.73, -74.1"</span><span class="p">,</span>
+  <span class="nx">bottom_right</span><span class="err">:</span> <span class="s2">"40.01, -71.12"</span>
+<span class="p">}</span>
+</code></pre>
 
 <p>Here is the <a href="https://en.wikipedia.org/wiki/Geohash">geoHash</a> representation</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">topLeft</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span><span class="p">,</span>
   <span class="nx">bottomRight</span><span class="err">:</span> <span class="s2">"drj7teegp"</span>
+<span class="p">}</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="nl">top_left</span><span class="p">:</span> <span class="s2">"dr5r9ydj2"</span><span class="p">,</span>
+  <span class="nx">bottom_right</span><span class="err">:</span> <span class="s2">"drj7teegp"</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -1550,7 +1620,7 @@ As a string, the coordinates format is &ldquo;lat, lon&rdquo;
 <p>Unlike the GeoJSON representation, a polygon, here, must contain at least 3 <a href="#point">points</a>.<br>
 The last point do not have to be the same as the first one, but the points must be sorted in the right order. The polygon is automatically closed.</p>
 
-<p>For each polygon points, all the possible point notations are valid.</p>
+<p>For each polygon points, all the possible point notations are valid (see above).</p>
 
 <p>Example of a valid polygon representation:</p>
 <pre class="highlight javascript"><code><span class="p">{</span>
@@ -1565,7 +1635,8 @@ The last point do not have to be the same as the first one, but the points must 
 
 <h5 id="distance">Distance</h5>
 
-<p>By default, when it is not specified, the distance unit is expressed in meters.  </p>
+<p>By default, when it is not specified, the distance unit is expressed in meters.<br>
+Note that distance values are strings (including <code class="prettyprint">from</code> and <code class="prettyprint">to</code> attributes for <code class="prettyprint">geoDistanceRange</code>)</p>
 
 <p>All formats supported by the <a href="https://github.com/brettlangdon/node-units">node-units</a> library can be used:</p>
 
@@ -1658,12 +1729,14 @@ The last point do not have to be the same as the first one, but the points must 
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-geodistance">&gt; geoDistance</h3>
@@ -1712,12 +1785,14 @@ The last point do not have to be the same as the first one, but the points must 
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-geodistancerange">&gt; geoDistanceRange</h3>
@@ -1768,12 +1843,14 @@ The last point do not have to be the same as the first one, but the points must 
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
 <h3 id="gt-geopolygon">&gt; geoPolygon</h3>
@@ -1830,12 +1907,14 @@ The last point do not have to be the same as the first one, but the points must 
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span>
-  <span class="nx">kuzzle</span>
-    <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// called each time a new notification on this filter is received</span>
-    <span class="p">};</span>
+<span class="nx">kuzzle</span>
+  <span class="p">.</span><span class="nx">dataCollectionFactory</span><span class="p">(</span><span class="s1">'collection'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">notification</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// called on notification</span>
+   <span class="p">})</span>
+  <span class="p">.</span><span class="nx">onDone</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">kuzzleRoom</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// subscription result</span>
+  <span class="p">});</span>
 </code></pre>
 
             <h2 id="status-codes-and-error-format">Status Codes and Error format</h2>
@@ -2518,7 +2597,7 @@ The <code class="prettyprint">Plugins Manager</code> calls all pipes and hooks c
   &quot;collection&quot;: &quot;users&quot;,
   &quot;action&quot;: &quot;on&quot;,
   &quot;body&quot;: {
-    &quot;term&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
+    &quot;equals&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
   },
   &quot;state&quot;: &quot;all&quot;
 }
@@ -2545,7 +2624,7 @@ Kuzzle will get back to him with a corresponding Room ID and a Room Channel usin
   &quot;controller&quot;: &quot;subscribe&quot;,
   &quot;action&quot;: &quot;on&quot;,
   &quot;filter&quot;: {
-    &quot;term&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
+    &quot;equals&quot;: {&quot;hobby&quot;: &quot;computer&quot; }
   }
 }
 </code></p>
@@ -3333,7 +3412,6 @@ $ ./bin/kuzzle plugins --unset 'services' kuzzle-plugin-logger
 </span><span class="s2">"main"</span><span class="err">:</span><span class="w"> </span><span class="s2">"./lib/index.js"</span><span class="err">,</span><span class="w">
 </span><span class="s2">"pluginInfo"</span><span class="err">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"threads"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
       </span><span class="nt">"privileged"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
     </span><span class="p">}</span><span class="w">
@@ -3653,43 +3731,7 @@ Not calling this method after a connection is dropped will result in a memory-le
 
 <p>The DSL exposes the following methods:</p>
 
-<h4 id="createfilterid-index-collection-filters"><code class="prettyprint">createFilterId(index, collection, filters)</code></h4>
-
-<p>Creates a filter unique ID using the provided arguments.</p>
-
-<p>The calculation is predictable, meaning that the resulting filter ID will always be the same if invoked multiple times with the same arguments.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><code class="prettyprint">index</code></td>
-<td><code class="prettyprint">string</code></td>
-<td>Data index name</td>
-</tr>
-<tr>
-<td><code class="prettyprint">collection</code></td>
-<td><code class="prettyprint">string</code></td>
-<td>Data collection name</td>
-</tr>
-<tr>
-<td><code class="prettyprint">filters</code></td>
-<td><code class="prettyprint">object</code></td>
-<td>Filters in <a href="#filtering-syntax">Kuzzle DSL</a> format</td>
-</tr>
-</tbody></table>
-
-<h5 id="returns">Returns</h5>
-
-<p>A <code class="prettyprint">string</code> containing the filter unique ID.</p>
-
-<h4 id="register-filterid-index-collection-filters"><code class="prettyprint">register(filterId, index, collection, filters)</code></h4>
+<h4 id="register-index-collection-filters"><code class="prettyprint">register(index, collection, filters)</code></h4>
 
 <p>Registers a filter to the DSL.</p>
 
@@ -3703,11 +3745,6 @@ Not calling this method after a connection is dropped will result in a memory-le
 </tr>
 </thead><tbody>
 <tr>
-<td><code class="prettyprint">filterId</code></td>
-<td><code class="prettyprint">string</code></td>
-<td>Filter unique ID. Can be generated with <code class="prettyprint">createFilterId</code></td>
-</tr>
-<tr>
 <td><code class="prettyprint">index</code></td>
 <td><code class="prettyprint">string</code></td>
 <td>Data index name</td>
@@ -3726,7 +3763,13 @@ Not calling this method after a connection is dropped will result in a memory-le
 
 <h5 id="returns">Returns</h5>
 
-<p>A <code class="prettyprint">promise</code> resolving to the successfully added <code class="prettyprint">filterId</code>.</p>
+<p>A <code class="prettyprint">promise</code> resolving to an object containing the following attributes:</p>
+
+<ul>
+<li><code class="prettyprint">id</code>: the filter unique identifier</li>
+<li><code class="prettyprint">diff</code>: the difference between the added filters and what already existed in memory. Falsey if no difference occured</li>
+<li><code class="prettyprint">filter</code>: a normalized version of the provided filters</li>
+</ul>
 
 <h4 id="remove-filterid"><code class="prettyprint">remove(filterId)</code></h4>
 
@@ -3744,7 +3787,7 @@ Not calling this method after a connection is dropped will result in a memory-le
 <tr>
 <td><code class="prettyprint">filterId</code></td>
 <td><code class="prettyprint">string</code></td>
-<td>Filter unique ID.</td>
+<td>Filter unique ID. Obtained by using <code class="prettyprint">register</code></td>
 </tr>
 </tbody></table>
 
@@ -4211,7 +4254,6 @@ If the number of configured thread is greater than 1, Kuzzle will dispatch event
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
     </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/var/kuzzle-plugin-very-useful"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"defaultConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"loadedBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"server"</span><span class="p">,</span><span class="w">
       </span><span class="nt">"threads"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nt">"activated"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">

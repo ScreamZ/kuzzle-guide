@@ -7,6 +7,50 @@ Kuzzle subscriptions use a subset of Elasticsearch Query DSL, called Kuzzle DSL.
 
 ### Filter terms
 
+### > equals
+
+The `equals` filter matches documents or messages attributes using string equality.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+}
+```
+
+The following filter validates the first document:
+
+```javascript
+equals: {
+  firstName: 'Grace'
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  equals: {
+    firstName: 'Grace'
+  }
+};
+
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
+```
+
 ### > exists
 
 The `exists` filter matches documents containing non-null fields.
@@ -48,12 +92,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > ids
@@ -97,17 +143,67 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
+```
+
+### > in
+
+This filter allows testing a string field against multiple possibilities.
+
+Given the following documents:
+
+```javascript
+{
+  firstName: 'Grace',
+  lastName: 'Hopper'
+},
+{
+  firstName: 'Ada',
+  lastName: 'Lovelace'
+},
+{
+  firstName: 'Marie',
+  lastName: 'Curie'
+}
+```
+
+The following filter validates the first two documents:
+
+```javascript
+in: {
+  firstName: ['Grace', 'Ada']
+}
+```
+
+With the [JavaScript SDK](/sdk-documentation/#subscribe):
+
+```javascript
+var filter = {
+  in: {
+    firstName: ['Grace', 'Ada']
+  }
+};
+
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > missing
 
-A filter matching documents with missing field.
+A filter matching documents with a missing field.
 
 Given the following documents:
 
@@ -146,12 +242,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > range
@@ -217,12 +315,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > regexp
@@ -289,109 +389,23 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
-### > term
+### Filter operands
 
-The `term` filter matches documents or messages attributes using string equality.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-}
-```
-
-The following filter validates the first document:
-
-```javascript
-term: {
-  firstName: 'Grace'
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: 'Grace'
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### > terms
-
-This filter allows testing a string field against multiple possibilities.
-
-Given the following documents:
-
-```javascript
-{
-  firstName: 'Grace',
-  lastName: 'Hopper'
-},
-{
-  firstName: 'Ada',
-  lastName: 'Lovelace'
-},
-{
-  firstName: 'Marie',
-  lastName: 'Curie'
-}
-```
-
-The following filter validates the first two documents:
-
-```javascript
-terms: {
-  firstName: ['Grace', 'Ada']
-}
-```
-
-With the [JavaScript SDK](/sdk-documentation/#subscribe):
-
-```javascript
-var filter = {
-  term: {
-    firstName: ['Grace', 'Ada']
-  }
-};
-
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
-```
-
-### Filter controls
-
-Filter controls allow regrouping or inverting filters and/or geospatial filters.
+Filter operands allow combining multiple filters using boolean operands.
 
 ### > and
 
-The `and` filter allows filtering documents on two or more terms.
+The `and` filter takes an array of filter objects, combining them with AND operands.
 
 Given the following documents:
 
@@ -416,12 +430,12 @@ The following filter validates the first document:
 {
   and: [
     {
-      term: {
+      equals: {
         city: 'NYC'
       }
     },
     {
-      term: {
+      equals: {
         hobby: 'computer'
       }
     }
@@ -435,29 +449,40 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 var filter = {
     and: [
       {
-        term: {
+        equals: {
           city: 'NYC'
         }
       },
       {
-        term: {
+        equals: {
           hobby: 'computer'
         }
       }
     ]
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > bool
 
 A filter matching documents matching boolean combinations of other queries.
+
+This operand accepts the following attributes:
+
+* `must`: all listed conditions must be true
+* `must_not`: all listed conditions must be false
+* `should`: one of the listed condition must be true
+* `should_not`: one of the listed condition must be false
+
+Each one of these attributes are an array of filter objects.
 
 Given the following documents:
 
@@ -488,41 +513,43 @@ Given the following documents:
 The following filter validates the second document:
 
 ```javascript
-bool: {
-  must : [
-    {
-      terms : {
-        firstName : ['Grace', 'Ada']
-      }
-    },
-    {
-      range: {
-        age: {
-          gte: 36,
-          lt: 85
+{
+  bool: {
+    must : [
+      {
+        in : {
+          firstName : ['Grace', 'Ada']
+        }
+      },
+      {
+        range: {
+          age: {
+            gte: 36,
+            lt: 85
+          }
         }
       }
-    }
-  ],
-  'must_not' : [
-    {
-      term: {
-        city: 'NYC'
+    ],
+    'must_not' : [
+      {
+        equals: {
+          city: 'NYC'
+        }
       }
-    }
-  ],
-  should : [
-    {
-      term : {
-        hobby : 'computer'
+    ],
+    should : [
+      {
+        equals : {
+          hobby : 'computer'
+        }
+      },
+      {
+        exists : {
+          field : 'lastName'
+        }
       }
-    },
-    {
-      exists : {
-        field : 'lastName'
-      }
-    }
-  ]
+    ]
+  }
 }
 ```
 
@@ -533,7 +560,7 @@ var filter = {
     bool: {
       must : [
         {
-          terms : {
+          in : {
             firstName : ['Grace', 'Ada']
           }
         },
@@ -548,14 +575,14 @@ var filter = {
       ],
       'must_not' : [
         {
-          term: {
+          equals: {
             city: 'NYC'
           }
         }
       ],
       should : [
         {
-          term : {
+          equals : {
             hobby : 'computer'
           }
         },
@@ -568,12 +595,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > not
@@ -602,7 +631,7 @@ The following filter validates the first document:
 ```
 {
   not: {
-    term: {
+    equals: {
       city: 'London'
     }
   }
@@ -614,23 +643,25 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 ```javascript
 var filter = {
   not: {
-    term: {
+    equals: {
       city: 'London'
     }
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > or
 
-The `or` filter allows combining multiple filters with a OR boolean operator.
+The `or` filter takes an array containing filter objects, combining them using OR operands.
 
 Given the following documents:
 
@@ -659,16 +690,18 @@ The following filter validates the first two documents:
 
 ```javascript
 {
-  or: {
-    term: {
-      city: 'NYC'
+  or: [
+    {
+      equals: {
+        city: 'NYC'
+      }
+    },
+    {
+      equals: {
+        city: 'London'
+      }
     }
-  },
-  {
-    term: {
-      city: 'London'
-    }
-  }
+  ]
 }
 ```
 
@@ -676,36 +709,40 @@ With the [JavaScript SDK](/sdk-documentation/#subscribe):
 
 ```javascript
 var filter = {
-  or: {
-    term: {
-      city: 'NYC'
+  or: [
+      {
+      equals: {
+        city: 'NYC'
+      }
+    },
+    {
+      equals: {
+        city: 'London'
+      }
     }
-  },
-  {
-    term: {
-      city: 'London'
-    }
-  }
+  ]
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### Geospatial filters
 
-Geospatial filters allow you to find documents containing a geolocation field (i.e. a point).
+Geospatial filters allow you to find documents containing a geolocation field.
 
-There are some inherent objects and concepts which are good to understand before going further. Most of them are taken from the ElasticSearch DSL format, some have been simplified.
+There are some inherent objects and concepts that are good to understand before going further.
 
 #### Geospatial objects and concepts
 
   * Point
-  * Bounding Box aka BBox
+  * Bounding Box
   * Polygon
   * Distance
 
@@ -713,10 +750,14 @@ There are some inherent objects and concepts which are good to understand before
 
 A point is a single longitude-latitude coordinate pair.
 
-The following notations are valid:
+The following notations are accepted and valid:
 
 ```javascript
 { lat: -74.1, lon: 40.73 }
+```
+
+```javascript
+{ lat_lon: { lat: 40.73, lon: -74.1 } }
 ```
 
 ```javascript
@@ -731,6 +772,10 @@ When coordinates are in array format, the format is [lon, lat] to comply with <a
 { latLon: [ -74.1, 40.73 ] }
 ```
 
+```javascript
+{ lat_lon: [ -74.1, 40.73 ] }
+```
+
 <aside class="note">
 As a string, the coordinates format is "lat, lon"
 </aside>
@@ -739,20 +784,28 @@ As a string, the coordinates format is "lat, lon"
 { latLon: "40.73, -74.1" }
 ```
 
+```javascript
+{ lat_lon: "40.73, -74.1" }
+```
+
 Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
 ```javascript
 { latLon: "dr5r9ydj2" }
 ```
 
+```javascript
+{ lat_lon: "dr5r9ydj2" }
+```
+
 ##### Bounding Box
 
-A bounding box (also known as BBox) is a 2D box that can be defined using:
+A bounding box is a 2D box that can be defined using:
 
 1. 2 points coordinates tuples, defining the top left and bottom right corners of the box
-2. 4 values defining the 4 BBox sides. ```top``` and ```bottom``` are latitudes and ```left``` and ```right``` are longitudes
+2. 4 values defining the 4 box sides: ```top``` and ```bottom``` are latitudes, and ```left``` and ```right``` are longitudes
 
-All of these representations are defining the same BBox:
+All of these representations are defining the same bounding box:
 
 ```javascript
 {
@@ -770,6 +823,13 @@ All of these representations are defining the same BBox:
 }
 ```
 
+```javascript
+{
+  top_left: { lat: 40.73, lon: -74.1 },
+  bottom_right: { lat: 40.01, lon: -71.12 }
+}
+```
+
 <aside class="note">
 When cooddinates are in array format, the format is [lon, lat] to comply with <a href="http://geojson.org/">GeoJSON</a>
 </aside>
@@ -778,6 +838,13 @@ When cooddinates are in array format, the format is [lon, lat] to comply with <a
 {
   topLeft: [ -74.1, 40.73 ],
   bottomRight: [ -71.12, 40.01 ]
+}
+```
+
+```javascript
+{
+  top_left: [ -74.1, 40.73 ],
+  bottom_right: [ -71.12, 40.01 ]
 }
 ```
 
@@ -792,6 +859,13 @@ As a string, the coordinates format is "lat, lon"
 }
 ```
 
+```javascript
+{
+  top_left: "40.73, -74.1",
+  bottom_right: "40.01, -71.12"
+}
+```
+
 Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 
 ```javascript
@@ -801,12 +875,19 @@ Here is the [geoHash](https://en.wikipedia.org/wiki/Geohash) representation
 }
 ```
 
+```javascript
+{
+  top_left: "dr5r9ydj2",
+  bottom_right: "drj7teegp"
+}
+```
+
 ##### Polygon
 
 Unlike the GeoJSON representation, a polygon, here, must contain at least 3 [points](#point).  
 The last point do not have to be the same as the first one, but the points must be sorted in the right order. The polygon is automatically closed.
 
-For each polygon points, all the possible point notations are valid.
+For each polygon points, all the possible point notations are valid (see above).
 
 Example of a valid polygon representation:
 
@@ -824,6 +905,7 @@ Example of a valid polygon representation:
 ##### Distance
 
 By default, when it is not specified, the distance unit is expressed in meters.  
+Note that distance values are strings (including `from` and `to` attributes for `geoDistanceRange`)
 
 All formats supported by the [node-units](https://github.com/brettlangdon/node-units) library can be used:
 
@@ -905,12 +987,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > geoDistance
@@ -965,12 +1049,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 
@@ -1028,12 +1114,14 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```
 
 ### > geoPolygon
@@ -1096,10 +1184,12 @@ var filter = {
   }
 };
 
-var room =
-  kuzzle
-    .dataCollectionFactory('collection')
-    .subscribe(filter, function (error, result) {
-      // called each time a new notification on this filter is received
-    };
+kuzzle
+  .dataCollectionFactory('collection')
+  .subscribe(filter, function (error, notification) {
+      // called on notification
+   })
+  .onDone(function (error, kuzzleRoom) {
+     // subscription result
+  });
 ```

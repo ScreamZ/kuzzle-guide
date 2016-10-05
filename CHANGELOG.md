@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.0.0-RC7
+
+* https://github.com/kuzzleio/kuzzle-guide/releases/tag/1.0.0-RC7
+
 # 1.0.0-RC6
 
 * https://github.com/kuzzleio/kuzzle-guide/releases/tag/1.0.0-RC6

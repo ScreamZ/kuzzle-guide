@@ -340,7 +340,7 @@ For instance, to be notified about all contents posted to the collection "users"
   "collection": "users",
   "action": "on",
   "body": {
-    "term": {"hobby": "computer" }
+    "equals": {"hobby": "computer" }
   },
   "state": "all"
 }
@@ -371,7 +371,7 @@ Sample message:
   "controller": "subscribe",
   "action": "on",
   "filter": {
-    "term": {"hobby": "computer" }
+    "equals": {"hobby": "computer" }
   }
 }
 ```
@@ -445,4 +445,3 @@ The "_publish_" method can be triggered:
 \#4. The ```Notifier``` broadcasts the message to each related channel to the Websocket and MQ plugins.
 
 \#5. Finally, the plugins send the message to the clients who subscribed to it.
-

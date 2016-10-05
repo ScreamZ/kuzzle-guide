@@ -32,7 +32,6 @@ Additionally to plugins' custom configuration, there are a few reserved words us
 "main": "./lib/index.js",
 "pluginInfo": {
     "defaultConfig": {
-      "loadedBy": "all",
       "threads": 0,
       "privileged": false
     }

@@ -1,11 +1,8 @@
 # Changelog
 
-# Current
+# 1.0.0-RC7
 
-### Breaking changes
-
-* Rename a couple of DSL keywords to avoid confusion with Elasticsearch's DSL #44
-
+* https://github.com/kuzzleio/kuzzle-guide/releases/tag/1.0.0-RC5
 
 # 1.0.0-RC5
 

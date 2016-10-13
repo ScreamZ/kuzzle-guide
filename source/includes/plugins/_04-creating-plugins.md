@@ -1,5 +1,7 @@
 ## Creating plugins
 
+**Note :** You can use the ES2015 (es6) syntax while writing plugins.
+
 ### > Listener plugins
 
 `listener` plugins simply listen to events, and are supplied with these events data. These plugins cannot change the provided data, and Kuzzle does not wait for them to process the data either.
@@ -59,7 +61,9 @@ Plugin configuration example:
 
 ### > Pipe plugins
 
-`pipe` plugins, like `listener` plugins, are attached to Kuzzle events, and they are supplied with these events data.  
+`pipe` plugins, like `listener` plugins, are attached to Kuzzle events, and they are supplied with these events data.
+
+**However `pipe` plugins must expose a `pipes` (instead of a `hooks`) variable in the plugin context** listing in the same way the events and the names of plugin functions to execute.
 
 But unlike `listener` plugins, `pipe` plugins can modify the provided data, and Kuzzle wait for these plugin to process it. `pipe` plugins can even invalidate data, resulting to an error returned to the original client.
 
